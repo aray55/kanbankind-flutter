@@ -1,0 +1,34 @@
+class LocalKeys {
+  static const String appName = 'app_name';
+  static const String todo = 'todo';
+  static const String inProgress = 'in_progress';
+  static const String done = 'done';
+  static const String addTask = 'add_task';
+  static const String taskTitle = 'task_title';
+  static const String taskDescription = 'task_description';
+  static const String cancel = 'cancel';
+  static const String add = 'add';
+  static const String noTasks = 'no_tasks';
+  static const String taskStatus = 'task_status';
+  static const String noTaskAvailable = 'no_task_available';
+  static const String editTask = 'edit_task';
+  static const String newTask = 'new_task';
+  static const String pleaseEnterTitle = 'please_enter_title';
+  static const String pleaseEnterDescription = 'please_enter_description';
+  static const String priority = 'priority';
+  static const String dueDate = 'due_date';
+  static const String selectDueDate = 'select_due_date';
+  static const String high = 'high';
+  static const String medium = 'medium';
+  static const String low = 'low';
+  static const String clearDueDate = 'clear_due_date';
+  static const String update = 'update';
+  static const String create = 'create';
+  static const String delete = 'delete';
+  static const String deleteTask = 'delete_task';
+  static const String areYouSureDelete = 'are_you_sure_delete';
+  static const String language = 'language';
+  static const String refresh = 'refresh';
+  static const String changeLanguage = 'change_language';
+  static const String chooseLanguage = 'choose_language';
+}

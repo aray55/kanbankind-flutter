@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:kanbankit/core/localization/local_keys.dart';
 
 import '../enums/task_status.dart' show TaskStatus;
 
@@ -13,16 +15,18 @@ class HelperFunctionsUtils {
         return Colors.green;
     }
   }
+
   static String getStatusDisplayName(TaskStatus status) {
     switch (status) {
       case TaskStatus.todo:
-        return 'To Do';
+        return LocalKeys.todo.tr;
       case TaskStatus.inProgress:
-        return 'In Progress';
+        return LocalKeys.inProgress.tr;
       case TaskStatus.done:
-        return 'Done';
+        return LocalKeys.done.tr;
     }
   }
+
   static Color getDueDateColor(DateTime dueDate) {
     if (dueDate.isBefore(DateTime.now())) {
       return Colors.red;
@@ -32,5 +36,4 @@ class HelperFunctionsUtils {
       return Colors.green;
     }
   }
-
 }

@@ -10,6 +10,7 @@ enum TaskStatus {
   
   static TaskStatus fromString(String value) {
     return TaskStatus.values.firstWhere(
+      
       (status) => status.value == value,
       orElse: () => TaskStatus.todo,
     );
