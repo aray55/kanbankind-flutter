@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/core/localization/app_translations.dart';
 import 'views/board/board_page.dart';
 import 'bindings/board_binding.dart';
-import 'core/constants/app_constants.dart';
 
 class KanbanKitApp extends StatelessWidget {
   const KanbanKitApp({super.key});
@@ -10,7 +10,7 @@ class KanbanKitApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: AppConstants.appName,
+      title: 'app_name'.tr,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,
@@ -39,6 +39,9 @@ class KanbanKitApp extends StatelessWidget {
       home: const BoardPage(),
       initialBinding: BoardBinding(),
       debugShowCheckedModeBanner: false,
+      translations: AppTranslations(),
+      locale: Get.deviceLocale,
+      fallbackLocale: const Locale('en', 'US'),
     );
   }
 }
