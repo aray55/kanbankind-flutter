@@ -35,8 +35,20 @@ class DatabaseProvider {
         status TEXT NOT NULL,
         created_at INTEGER NOT NULL,
         due_date INTEGER,
-        priority INTEGER NOT NULL DEFAULT 2
+        priority INTEGER NOT NULL DEFAULT 2,
+        updated_at INTEGER
       )
+    ''');
+    await db.execute('''
+      CREATE TABLE ${AppConstants.checklistItemsTable} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    task_id INTEGER NOT NULL,        -- رابط بالمهمة
+    title TEXT NOT NULL,
+    is_done INTEGER NOT NULL DEFAULT 0, -- 0 = false, 1 = true
+    position INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE)
+
     ''');
   }
 

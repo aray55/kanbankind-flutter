@@ -41,14 +41,20 @@ class BoardController extends GetxController {
     }
   }
 
-  Future<void> addTask(Task task) async {
+  Future<Task> addTask(Task task) async {
     try {
-      await _taskRepository.createTask(task);
+      final taskId = await _taskRepository.createTask(task);
+      // Create a new task object with the returned ID
+      final createdTask = task.copyWith(id: taskId);
+      
       // Reload all tasks to ensure the UI is in sync
       await loadAllTasks();
       Get.snackbar('Success', 'Task added successfully');
+      
+      return createdTask;
     } catch (e) {
       Get.snackbar('Error', 'Failed to add task: $e');
+      rethrow;
     }
   }
 

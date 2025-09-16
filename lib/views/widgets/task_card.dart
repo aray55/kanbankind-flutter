@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/core/utils/helper_functions_utils.dart';
 import 'package:kanbankit/views/components/responsive_text.dart';
+import 'package:kanbankit/views/components/text_buttons/app_text_button.dart';
+import 'package:kanbankit/views/widgets/enhanced_task_editor.dart';
 import '../../models/task_model.dart';
 import '../../core/utils/date_utils.dart';
 import 'task_editor.dart';
@@ -199,7 +201,7 @@ class TaskCard extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => TaskEditor(task: task, onTaskSaved: onUpdated),
+      builder: (context) => EnhancedTaskEditor(task: task, onTaskSaved: onUpdated),
     );
   }
 
@@ -210,17 +212,16 @@ class TaskCard extends StatelessWidget {
         title: Text(LocalKeys.deleteTask.tr),
         content: Text('${LocalKeys.areYouSureDelete.tr} "${task.title}"?'),
         actions: [
-          TextButton(
+          AppTextButton(
+            label: LocalKeys.cancel.tr,
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(LocalKeys.cancel.tr),
           ),
-          TextButton(
+          AppTextButton(
+            label: LocalKeys.delete.tr,
             onPressed: () {
               Navigator.of(context).pop();
               onDeleted(task.id!);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(LocalKeys.delete.tr),
           ),
         ],
       ),

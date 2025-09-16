@@ -3,6 +3,7 @@ class AppConstants {
   static const String databaseName = 'kanban_kit.db';
   static const int databaseVersion = 1;
   static const String tasksTable = 'tasks';
+  static const String checklistItemsTable = 'checklist_items';
   
   // App constants
   static const String appName = 'KanbanKit';

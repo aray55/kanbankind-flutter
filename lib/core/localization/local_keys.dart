@@ -31,4 +31,32 @@ class LocalKeys {
   static const String refresh = 'refresh';
   static const String changeLanguage = 'change_language';
   static const String chooseLanguage = 'choose_language';
+  static const String selectLanguage = 'select_language';
+  static const String theme = 'theme';
+  static const String chooseTheme = 'choose_theme';
+  static const String lightTheme = 'light_theme';
+  static const String darkTheme = 'dark_theme';
+  static const String systemTheme = 'system_theme';
+  static const String alwaysUseLightTheme = 'always_use_light_theme';
+  static const String alwaysUseDarkTheme = 'always_use_dark_theme';
+  static const String followSystemTheme = 'follow_system_theme';
+  static const String switchTheme = 'switch_theme';
+  static const String chooseWhenThisTaskShouldBeCompleted = 'choose_when_this_task_should_be_completed';
+  static const String detailsTab = 'details_tab';
+  static const String checklistTab = 'checklist_tab';
+  static const String addChecklistItem = 'add_checklist_item';
+  static const String noChecklistItems = 'no_checklist_items';
+  static const String addItemsAboveToCreateChecklist = 'add_items_above_to_create_checklist';
+  static const String addingItem = 'adding_item';
+  static const String updating = 'updating';
+  static const String deleting = 'deleting';
+  static const String taskChecklist = 'task_checklist';
+static const String addChecklistItemsForNewTask = 'add_checklist_items_for_new_task';
+static const String addChecklistItemHint = 'add_checklist_item_hint';
+static const String itemsToAdd = 'items_to_add';
+static const String noChecklistItemsYet = 'no_checklist_items_yet';
+static const String addItemsAboveToBreakDownTask = 'add_items_above_to_break_down_task';
+static const String newItemsToAdd = 'new_items_to_add';
+static const String breakDownTaskIntoSmallerSteps = 'break_down_task_into_smaller_steps';
+
 }

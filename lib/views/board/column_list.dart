@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/views/widgets/enhanced_task_card.dart';
 import '../../controllers/board_controller.dart';
 import '../../core/localization/local_keys.dart' show LocalKeys;
 import '../../core/utils/helper_functions_utils.dart' show HelperFunctionsUtils;
@@ -122,7 +123,7 @@ class ColumnList extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8.0),
                                 child: SizedBox(
                                   width: 250,
-                                  child: TaskCard(
+                                  child: EnhancedTaskCard(
                                     task: tasks[index],
                                     onDeleted: onTaskDeleted,
                                     onUpdated: onTaskUpdated,
@@ -131,13 +132,13 @@ class ColumnList extends StatelessWidget {
                               ),
                               childWhenDragging: Opacity(
                                 opacity: 0.5,
-                                child: TaskCard(
+                                child: EnhancedTaskCard(
                                   task: tasks[index],
                                   onDeleted: onTaskDeleted,
                                   onUpdated: onTaskUpdated,
                                 ),
                               ),
-                              child: TaskCard(
+                              child: EnhancedTaskCard(
                                 task: tasks[index],
                                 onDeleted: onTaskDeleted,
                                 onUpdated: onTaskUpdated,

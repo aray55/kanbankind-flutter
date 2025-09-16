@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'app.dart';
+import 'package:kanbankit/app.dart';
+import 'core/services/service_initializer.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeServices();
   runApp(const KanbanKitApp());
 }

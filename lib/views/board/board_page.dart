@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/views/components/responsive_app_bar.dart';
 import 'package:kanbankit/views/widgets/language_switcher.dart';
+import 'package:kanbankit/views/components/theme_switcher.dart';
 import '../../controllers/board_controller.dart';
 import '../../core/localization/local_keys.dart' show LocalKeys;
+import '../../core/themes/app_colors.dart' show AppColors;
+import '../components/icon_buttons/app_icon_button.dart';
+import '../components/icon_buttons/icon_button_style.dart';
+import '../components/icon_buttons/icon_button_variant.dart';
+import '../widgets/enhanced_task_editor.dart' show EnhancedTaskEditor;
 import '../widgets/task_editor.dart';
 import '../components/responsive_board_layout.dart';
 
@@ -15,15 +21,20 @@ class BoardPage extends GetView<BoardController> {
     return Scaffold(
       appBar: ResponsiveAppBar(
         title: LocalKeys.appName.tr,
-        
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+
+        // backgroundColor:AppColors.surface,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.language),
+          AppIconButton(
+            style: AppIconButtonStyle.plain,
+            variant: AppIconButtonVariant.values[0],
+            child: const Icon(Icons.language),
             onPressed: () => _showLanguageSwitcher(context),
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
+          const ThemeSwitcher(isCompact: true),
+          AppIconButton(
+            style: AppIconButtonStyle.plain,
+            variant: AppIconButtonVariant.values[1],
+            child: const Icon(Icons.refresh),
             onPressed: () => controller.refreshTasks(),
           ),
         ],
@@ -32,7 +43,7 @@ class BoardPage extends GetView<BoardController> {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
-        
+
         return Listener(
           onPointerMove: controller.handlePointerMove,
           child: ResponsiveBoardLayout(
@@ -58,9 +69,8 @@ class BoardPage extends GetView<BoardController> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => TaskEditor(
-        onTaskSaved: (task) => controller.addTask(task),
-      ),
+      builder: (context) =>
+          EnhancedTaskEditor(onTaskSaved: (task) => controller.addTask(task)),
     );
   }
 

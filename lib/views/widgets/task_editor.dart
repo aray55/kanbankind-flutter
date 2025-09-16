@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/core/themes/theme_extensions.dart';
 import 'package:kanbankit/core/utils/helper_functions_utils.dart';
 import '../../core/localization/local_keys.dart' show LocalKeys;
+import '../../core/themes/app_colors.dart' show AppColors;
 import '../../models/task_model.dart';
 import '../../core/enums/task_status.dart';
 
@@ -192,8 +194,8 @@ class _TaskEditorState extends State<TaskEditor> {
                                   : LocalKeys.selectDueDate.tr,
                               style: TextStyle(
                                 color: _selectedDueDate != null
-                                    ? Colors.black
-                                    : Colors.grey[600],
+                                    ? AppColors.secondary
+                                    : AppColors.primary,
                               ),
                             ),
                           ),
@@ -271,6 +273,7 @@ class _TaskEditorState extends State<TaskEditor> {
         createdAt: widget.task?.createdAt ?? DateTime.now(),
         dueDate: _selectedDueDate,
         priority: _selectedPriority,
+        updatedAt: DateTime.now(),
       );
 
       widget.onTaskSaved(task);

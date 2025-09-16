@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/core/themes/app_typography.dart';
 
 import '../../core/localization/local_keys.dart' show LocalKeys;
 
@@ -34,7 +35,7 @@ class ResponsiveText extends StatelessWidget {
 
         // Determine text content based on available space
         String displayText = text;
-        TextStyle finalStyle = style ?? Theme.of(context).textTheme.bodyMedium!;
+        TextStyle finalStyle = style ?? AppTypography().body;
 
         // Screen size breakpoints
         final isSmallScreen = screenWidth < 600;
