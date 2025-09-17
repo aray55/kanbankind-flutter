@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 import 'button_size.dart';
 import 'button_variant.dart';
 import 'button_style.dart';
@@ -42,27 +43,27 @@ class AppTextButton extends StatelessWidget {
     final ButtonPalette p = paletteFor(variant);
 
     final ButtonStyle style = ButtonStyle(
-      padding: MaterialStateProperty.all(s.padding),
-      shape: MaterialStateProperty.all(
+      padding: WidgetStateProperty.all(s.padding),
+      shape: WidgetStateProperty.all(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius ?? s.radius),
         ),
       ),
-      foregroundColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.disabled)) return p.disabledFg;
+      foregroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) return p.disabledFg;
         return p.fg;
       }),
-      overlayColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.pressed)) {
-          return p.fg.withOpacity(0.15);
+      overlayColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.pressed)) {
+          return p.fg.withValues(alpha: 0.15);
         }
-        if (states.contains(MaterialState.hovered) ||
-            states.contains(MaterialState.focused)) {
-          return p.fg.withOpacity(0.10);
+        if (states.contains(WidgetState.hovered) ||
+            states.contains(WidgetState.focused)) {
+          return p.fg.withValues(alpha: 0.10);
         }
         return null;
       }),
-      minimumSize: MaterialStateProperty.all(Size(0, s.minHeight)),
+      minimumSize: WidgetStateProperty.all(Size(0, s.minHeight)),
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       alignment: Alignment.center,
     );
@@ -90,11 +91,11 @@ class AppTextButton extends StatelessWidget {
           ),
         if (label.isNotEmpty)
           Flexible(
-            child: Text(
+            child: AppText(
               uppercase ? label.toUpperCase() : label,
               maxLines: maxLines,
               overflow: TextOverflow.ellipsis,
-              style: textStyle(context, s, variant),
+              variant: AppTextVariant.button,
             ),
           ),
         if (trailingIcon != null)

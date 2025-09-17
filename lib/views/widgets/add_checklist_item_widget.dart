@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/core/localization/local_keys.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 import '../../controllers/checklist_controller.dart';
 import '../../core/themes/app_colors.dart';
 
@@ -29,7 +31,7 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
   bool _isExpanded = false;
   bool _isMultiline = false;
 
-  ChecklistController get _controller => 
+  ChecklistController get _controller =>
       widget.controller ?? Get.find<ChecklistController>();
 
   @override
@@ -37,13 +39,13 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
     super.initState();
     _textController = TextEditingController();
     _focusNode = FocusNode();
-    
+
     if (widget.autoFocus) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _focusNode.requestFocus();
       });
     }
-    
+
     _focusNode.addListener(_onFocusChange);
   }
 
@@ -59,7 +61,9 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
       setState(() {
         _isExpanded = true;
       });
-    } else if (!_focusNode.hasFocus && _textController.text.isEmpty && _isExpanded) {
+    } else if (!_focusNode.hasFocus &&
+        _textController.text.isEmpty &&
+        _isExpanded) {
       setState(() {
         _isExpanded = false;
       });
@@ -70,16 +74,13 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
     final title = _textController.text.trim();
     if (title.isEmpty) return;
 
-    await _controller.createChecklistItem(
-      taskId: widget.taskId,
-      title: title,
-    );
+    await _controller.createChecklistItem(taskId: widget.taskId, title: title);
 
     _textController.clear();
     if (widget.onItemAdded != null) {
       widget.onItemAdded!();
     }
-    
+
     // Keep focus for quick adding
     _focusNode.requestFocus();
   }
@@ -112,7 +113,7 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
       _isMultiline = false;
       _isExpanded = false;
     });
-    
+
     if (widget.onItemAdded != null) {
       widget.onItemAdded!();
     }
@@ -122,7 +123,7 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
     setState(() {
       _isMultiline = !_isMultiline;
     });
-    
+
     if (_isMultiline) {
       _focusNode.requestFocus();
     }
@@ -144,21 +145,25 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
       curve: Curves.easeInOut,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       decoration: BoxDecoration(
-        color: _isExpanded ? AppColors.surface : AppColors.surface.withOpacity(0.7),
+        color: _isExpanded
+            ? AppColors.surface
+            : AppColors.surface.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: _isExpanded 
-              ? AppColors.primary.withOpacity(0.3)
-              : AppColors.outline.withOpacity(0.2),
+          color: _isExpanded
+              ? AppColors.primary.withValues(alpha: 0.3)
+              : AppColors.outline.withValues(alpha: 0.2),
           width: _isExpanded ? 2 : 1,
         ),
-        boxShadow: _isExpanded ? [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ] : null,
+        boxShadow: _isExpanded
+            ? [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
       ),
       child: Column(
         children: [
@@ -173,9 +178,9 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
                   height: 24,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _isExpanded 
-                        ? AppColors.primary 
-                        : AppColors.outline.withOpacity(0.3),
+                    color: _isExpanded
+                        ? AppColors.primary
+                        : AppColors.outline.withValues(alpha: 0.3),
                   ),
                   child: Icon(
                     Icons.add,
@@ -183,9 +188,9 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
                     size: 16,
                   ),
                 ),
-                
+
                 const SizedBox(width: 12),
-                
+
                 // Text input
                 Expanded(
                   child: TextField(
@@ -198,48 +203,51 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
                       color: AppColors.onSurface,
                     ),
                     decoration: InputDecoration(
-                      hintText: _isMultiline 
-                          ? 'Add multiple items (one per line)...'
-                          : widget.hintText ?? 'Add checklist item...',
+                      hintText: _isMultiline
+                          ? LocalKeys.addMultipleItemsHint.tr
+                          : widget.hintText ??
+                                LocalKeys.addChecklistItemHint.tr,
                       hintStyle: TextStyle(
-                        color: AppColors.onSurface.withOpacity(0.5),
+                        color: AppColors.onSurface.withValues(alpha: 0.5),
                       ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.zero,
                     ),
-                    textInputAction: _isMultiline 
-                        ? TextInputAction.newline 
+                    textInputAction: _isMultiline
+                        ? TextInputAction.newline
                         : TextInputAction.done,
                     onSubmitted: _isMultiline ? null : (_) => _addItem(),
                   ),
                 ),
-                
+
                 // Action buttons (when expanded)
                 if (_isExpanded) ...[
                   const SizedBox(width: 8),
-                  
+
                   // Multiline toggle
                   IconButton(
                     onPressed: _toggleMultiline,
                     icon: Icon(
                       _isMultiline ? Icons.short_text : Icons.notes,
                       size: 18,
-                      color: _isMultiline 
-                          ? AppColors.primary 
-                          : AppColors.onSurface.withOpacity(0.6),
+                      color: _isMultiline
+                          ? AppColors.primary
+                          : AppColors.onSurface.withValues(alpha: 0.6),
                     ),
                     padding: const EdgeInsets.all(4),
                     constraints: const BoxConstraints(
                       minWidth: 32,
                       minHeight: 32,
                     ),
-                    tooltip: _isMultiline ? 'Single line' : 'Multiple lines',
+                    tooltip: _isMultiline
+                        ? LocalKeys.singleLine.tr
+                        : LocalKeys.multipleLines.tr,
                   ),
                 ],
               ],
             ),
           ),
-          
+
           // Action buttons (when expanded)
           if (_isExpanded)
             Container(
@@ -250,42 +258,48 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
                   // Cancel button
                   TextButton(
                     onPressed: _cancel,
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        color: AppColors.onSurface.withOpacity(0.6),
-                      ),
+                    child: AppText(
+                      LocalKeys.cancel.tr,
+                      variant: AppTextVariant.button,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
-                  
+
                   const SizedBox(width: 8),
-                  
+
                   // Add button
-                  Obx(() => ElevatedButton(
-                    onPressed: _controller.isCreating 
-                        ? null 
-                        : (_isMultiline ? _addMultipleItems : _addItem),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                  Obx(
+                    () => ElevatedButton(
+                      onPressed: _controller.isCreating
+                          ? null
+                          : (_isMultiline ? _addMultipleItems : _addItem),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                       ),
-                    ),
-                    child: _controller.isCreating
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                AppColors.white,
+                      child: _controller.isCreating
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.white,
+                                ),
                               ),
+                            )
+                          : AppText(
+                              _isMultiline
+                                  ? LocalKeys.addItems.tr
+                                  : LocalKeys.addItem.tr,
                             ),
-                          )
-                        : Text(_isMultiline ? 'Add Items' : 'Add Item'),
-                  )),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -308,16 +322,16 @@ class QuickAddChecklistItemButton extends StatelessWidget {
 
   void _showAddDialog(BuildContext context) {
     final textController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add Checklist Item'),
+        title: AppText(LocalKeys.addItem.tr),
         content: TextField(
           controller: textController,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Enter item title...',
+          decoration: InputDecoration(
+            hintText: LocalKeys.addItem.tr,
             border: OutlineInputBorder(),
           ),
           onSubmitted: (value) {
@@ -329,7 +343,7 @@ class QuickAddChecklistItemButton extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: AppText(LocalKeys.cancel.tr),
           ),
           ElevatedButton(
             onPressed: () {
@@ -338,7 +352,7 @@ class QuickAddChecklistItemButton extends StatelessWidget {
                 Navigator.of(context).pop(title);
               }
             },
-            child: const Text('Add'),
+            child: AppText(LocalKeys.add.tr),
           ),
         ],
       ),
@@ -356,8 +370,10 @@ class QuickAddChecklistItemButton extends StatelessWidget {
     return FloatingActionButton(
       onPressed: () => _showAddDialog(context),
       backgroundColor: AppColors.primary,
-      child: const Icon(
-        Icons.add,
+      child: AppText(
+        LocalKeys.addItem.tr,
+        variant: AppTextVariant.button,
+        fontWeight: FontWeight.w500,
         color: AppColors.white,
       ),
     );

@@ -41,22 +41,55 @@ class LocalKeys {
   static const String alwaysUseDarkTheme = 'always_use_dark_theme';
   static const String followSystemTheme = 'follow_system_theme';
   static const String switchTheme = 'switch_theme';
-  static const String chooseWhenThisTaskShouldBeCompleted = 'choose_when_this_task_should_be_completed';
+  static const String chooseWhenThisTaskShouldBeCompleted =
+      'choose_when_this_task_should_be_completed';
   static const String detailsTab = 'details_tab';
   static const String checklistTab = 'checklist_tab';
   static const String addChecklistItem = 'add_checklist_item';
   static const String noChecklistItems = 'no_checklist_items';
-  static const String addItemsAboveToCreateChecklist = 'add_items_above_to_create_checklist';
+  static const String addItemsAboveToCreateChecklist =
+      'add_items_above_to_create_checklist';
   static const String addingItem = 'adding_item';
   static const String updating = 'updating';
   static const String deleting = 'deleting';
   static const String taskChecklist = 'task_checklist';
-static const String addChecklistItemsForNewTask = 'add_checklist_items_for_new_task';
-static const String addChecklistItemHint = 'add_checklist_item_hint';
-static const String itemsToAdd = 'items_to_add';
-static const String noChecklistItemsYet = 'no_checklist_items_yet';
-static const String addItemsAboveToBreakDownTask = 'add_items_above_to_break_down_task';
-static const String newItemsToAdd = 'new_items_to_add';
-static const String breakDownTaskIntoSmallerSteps = 'break_down_task_into_smaller_steps';
-
+  static const String addChecklistItemsForNewTask =
+      'add_checklist_items_for_new_task';
+  static const String addChecklistItemHint = 'add_checklist_item_hint';
+  static const String itemsToAdd = 'items_to_add';
+  static const String noChecklistItemsYet = 'no_checklist_items_yet';
+  static const String addItemsAboveToBreakDownTask =
+      'add_items_above_to_break_down_task';
+  static const String newItemsToAdd = 'new_items_to_add';
+  static const String breakDownTaskIntoSmallerSteps =
+      'break_down_task_into_smaller_steps';
+  static const String viewAll = 'view_all';
+  static const String items = 'items';
+  static const String checklist = 'checklist';
+  static const String created = 'created';
+  static const String of = 'of';
+  static const String completed = 'completed';
+  static const String allItemsCompleted = 'all_items_completed';
+  static const String clear = 'clear';
+  static const String clearCompletedItems = 'clear_completed_items';
+  static const String areYouSure = 'are_you_sure';
+  static const String markAllItems = 'mark_all_items';
+  static const String uncompleteAllItems = 'uncomplete_all_items';
+  static const String completeAllItems = 'complete_all_items';
+  static const String searchChecklistItems = 'search_checklist_items';
+static const String editItem = 'edit_item';
+static const String deleteItem = 'delete_item';
+static const String saveChanges = 'save_changes';
+static const String discardChanges = 'discard_changes';
+static const String itemTitleEmpty = 'item_title_empty';
+static const String tapToEdit = 'tap_to_edit';
+static const String longPressToEdit = 'long_press_to_edit';
+static const String markAsComplete = 'mark_as_complete';
+static const String markAsIncomplete = 'mark_as_incomplete';
+  static const String addItem = 'add_item';
+  static const String addMultipleItems = 'add_multiple_items';
+  static const String addItems = 'add_items';
+  static const String singleLine = 'single_line';
+  static const String multipleLines = 'multiple_lines';
+  static const String addMultipleItemsHint = 'add_multiple_items_hint';
 }

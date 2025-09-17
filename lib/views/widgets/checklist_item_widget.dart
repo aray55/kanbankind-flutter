@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/core/localization/local_keys.dart';
+import 'package:kanbankit/views/components/icon_buttons/app_icon_button.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 import '../../models/checklist_item_model.dart';
 import '../../core/themes/app_colors.dart';
 import '../../controllers/checklist_controller.dart';
+import '../components/icon_buttons/icon_button_style.dart';
 
 class ChecklistItemWidget extends StatefulWidget {
   final ChecklistItem item;
@@ -31,8 +36,12 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
-  
+  late Animation<Color?> _colorAnimation;
+
   bool _isEditing = false;
+  bool _isHovered = false;
+  bool _hasError = false;
+  String? _errorMessage;
   late TextEditingController _textController;
   late FocusNode _focusNode;
 
@@ -40,29 +49,33 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.95,
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 1.0, end: 0.7).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+    _colorAnimation = ColorTween(
+      begin: AppColors.surface,
+      end: AppColors.primary.withValues(alpha: 0.1),
     ).animate(CurvedAnimation(
-      parent: _animationController,
+      parent: _animationController, 
       curve: Curves.easeInOut,
     ));
-    
-    _fadeAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.6,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    
+
     _textController = TextEditingController(text: widget.item.title);
     _focusNode = FocusNode();
-    
+
+    // Add listeners for better UX
+    _focusNode.addListener(_onFocusChanged);
+    _textController.addListener(_onTextChanged);
+
     if (widget.item.isDone) {
       _animationController.forward();
     }
@@ -71,9 +84,27 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
   @override
   void dispose() {
     _animationController.dispose();
+    _focusNode.removeListener(_onFocusChanged);
+    _textController.removeListener(_onTextChanged);
     _textController.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+  
+  void _onFocusChanged() {
+    if (!_focusNode.hasFocus && _isEditing) {
+      _saveEdit();
+    }
+  }
+  
+  void _onTextChanged() {
+    // Clear error when user starts typing
+    if (_hasError && _textController.text.trim().isNotEmpty) {
+      setState(() {
+        _hasError = false;
+        _errorMessage = null;
+      });
+    }
   }
 
   @override
@@ -86,13 +117,16 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
         _animationController.reverse();
       }
     }
-    
+
     if (oldWidget.item.title != widget.item.title) {
       _textController.text = widget.item.title;
     }
   }
 
   void _toggleCompletion() {
+    // Provide immediate visual feedback
+    HapticFeedback.selectionClick();
+    
     if (widget.onToggle != null) {
       widget.onToggle!();
     } else {
@@ -103,11 +137,16 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
 
   void _startEditing() {
     if (!widget.isEditable) return;
-    
+
     setState(() {
       _isEditing = true;
+      _hasError = false;
+      _errorMessage = null;
     });
-    
+
+    // Provide haptic feedback
+    HapticFeedback.lightImpact();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
       _textController.selection = TextSelection(
@@ -119,34 +158,113 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
 
   void _saveEdit() {
     final newTitle = _textController.text.trim();
+    
+    // Validate input
     if (newTitle.isEmpty) {
-      _textController.text = widget.item.title;
-      _cancelEdit();
+      setState(() {
+        _hasError = true;
+        _errorMessage = LocalKeys.itemTitleEmpty.tr;
+      });
+      
+      // Shake animation for error feedback
+      _animationController.forward().then((_) {
+        _animationController.reverse();
+      });
+      
+      HapticFeedback.mediumImpact();
       return;
     }
-    
+
+    // Only save if content actually changed
     if (newTitle != widget.item.title) {
-      final controller = Get.find<ChecklistController>();
-      controller.updateItemTitle(widget.item.id!, newTitle);
+      try {
+        final controller = Get.find<ChecklistController>();
+        controller.updateItemTitle(widget.item.id!, newTitle);
+        
+        // Success feedback
+        HapticFeedback.selectionClick();
+        
+        // Show success snackbar briefly
+        Get.showSnackbar(
+          GetSnackBar(
+            message: LocalKeys.saveChanges.tr,
+            duration: const Duration(seconds: 1),
+            backgroundColor: AppColors.primary,
+            snackPosition: SnackPosition.BOTTOM,
+            margin: const EdgeInsets.all(8),
+            borderRadius: 8,
+          ),
+        );
+      } catch (e) {
+        // Handle save error
+        setState(() {
+          _hasError = true;
+          _errorMessage = 'Error saving changes';
+        });
+        return;
+      }
     }
-    
+
     _cancelEdit();
   }
 
   void _cancelEdit() {
     setState(() {
       _isEditing = false;
+      _hasError = false;
+      _errorMessage = null;
     });
     _textController.text = widget.item.title;
   }
 
   void _deleteItem() {
-    if (widget.onDelete != null) {
-      widget.onDelete!();
-    } else {
-      final controller = Get.find<ChecklistController>();
-      controller.deleteItem(widget.item.id!);
-    }
+    // Show confirmation dialog for better UX
+    Get.dialog(
+      AlertDialog(
+        title: AppText(
+          LocalKeys.deleteItem.tr,
+          variant: AppTextVariant.h2,
+        ),
+        content: AppText(
+          '${LocalKeys.areYouSureDelete.tr} "${widget.item.title}"?',
+          variant: AppTextVariant.body,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: AppText(
+              LocalKeys.cancel.tr,
+              variant: AppTextVariant.button,
+              color: AppColors.onSurface.withValues(alpha: 0.7),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              
+              // Perform delete with haptic feedback
+              HapticFeedback.mediumImpact();
+              
+              if (widget.onDelete != null) {
+                widget.onDelete!();
+              } else {
+                final controller = Get.find<ChecklistController>();
+                controller.deleteItem(widget.item.id!);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.white,
+            ),
+            child: AppText(
+              LocalKeys.delete.tr,
+              variant: AppTextVariant.button,
+              color: AppColors.white,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -159,169 +277,94 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
           child: Opacity(
             opacity: _fadeAnimation.value,
             child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
               decoration: BoxDecoration(
-                color: widget.item.isDone 
-                    ? AppColors.surface.withValues(alpha: 0.5)
-                    : AppColors.onSurface.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
+                gradient: widget.item.isDone
+                    ? LinearGradient(
+                        colors: [
+                          AppColors.primary.withValues(alpha: 0.1),
+                          AppColors.surface.withValues(alpha: 0.8),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : LinearGradient(
+                        colors: [
+                          AppColors.surface,
+                          AppColors.surface.withValues(alpha: 0.9),
+                        ],
+                      ),
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: widget.item.isDone 
-                      ? AppColors.primary.withValues(alpha: 0.3)
-                      : AppColors.outline.withValues(alpha: 0.2),
-                  width: 1,
+                  color: _hasError
+                      ? AppColors.error
+                      : widget.item.isDone
+                          ? AppColors.primary.withValues(alpha: 0.4)
+                          : AppColors.outline.withValues(alpha: 0.3),
+                  width: _hasError ? 2 : 1,
                 ),
                 boxShadow: [
-                  if (!widget.item.isDone)
+                  if (!widget.item.isDone && !_hasError)
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                      spreadRadius: 0,
+                    ),
+                  if (_isHovered)
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
                 ],
               ),
               child: Material(
                 color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: _isEditing ? null : _toggleCompletion,
-                  onLongPress: widget.isEditable && !_isEditing ? _startEditing : null,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        // Checkbox
-                        GestureDetector(
-                          onTap: _toggleCompletion,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: widget.item.isDone 
-                                  ? AppColors.primary 
-                                  : Colors.transparent,
-                              border: Border.all(
-                                color: widget.item.isDone 
-                                    ? AppColors.primary 
-                                    : AppColors.outline,
-                                width: 2,
+                child: MouseRegion(
+                  onEnter: (_) => setState(() => _isHovered = true),
+                  onExit: (_) => setState(() => _isHovered = false),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: _isEditing ? null : _toggleCompletion,
+                    onLongPress: widget.isEditable && !_isEditing
+                        ? _startEditing
+                        : null,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              // Enhanced Checkbox with animation
+                              _buildAnimatedCheckbox(),
+                              
+                              const SizedBox(width: 16),
+                              
+                              // Title with enhanced styling
+                              Expanded(
+                                child: _buildTitleWidget(),
                               ),
-                            ),
-                            child: widget.item.isDone
-                                ? const Icon(
-                                    Icons.check,
-                                    color: AppColors.white,
-                                    size: 16,
-                                  )
-                                : null,
+                              
+                              // Action buttons with better spacing
+                              if (widget.showActions && !_isEditing) ...[
+                                const SizedBox(width: 8),
+                                _buildActionButtons(),
+                              ],
+                              
+                              // Edit mode buttons
+                              if (_isEditing) ...[
+                                const SizedBox(width: 8),
+                                _buildEditModeButtons(),
+                              ],
+                            ],
                           ),
-                        ),
-                        
-                        const SizedBox(width: 12),
-                        
-                        // Title
-                        Expanded(
-                          child: _isEditing
-                              ? TextField(
-                                  controller: _textController,
-                                  focusNode: _focusNode,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: AppColors.onSurface,
-                                    decoration: widget.item.isDone 
-                                        ? TextDecoration.lineThrough 
-                                        : null,
-                                  ),
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.zero,
-                                  ),
-                                  onSubmitted: (_) => _saveEdit(),
-                                  onEditingComplete: _saveEdit,
-                                )
-                              : Text(
-                                  widget.item.title,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: widget.item.isDone 
-                                        ? AppColors.onSurface.withOpacity(0.6)
-                                        : AppColors.onSurface,
-                                    decoration: widget.item.isDone 
-                                        ? TextDecoration.lineThrough 
-                                        : null,
-                                  ),
-                                ),
-                        ),
-                        
-                        // Actions
-                        if (widget.showActions && !_isEditing) ...[
-                          const SizedBox(width: 8),
                           
-                          // Edit button
-                          if (widget.isEditable)
-                            IconButton(
-                              onPressed: _startEditing,
-                              icon: Icon(
-                                Icons.edit_outlined,
-                                size: 18,
-                                color: AppColors.onSurface.withOpacity(0.6),
-                              ),
-                              padding: const EdgeInsets.all(4),
-                              constraints: const BoxConstraints(
-                                minWidth: 32,
-                                minHeight: 32,
-                              ),
-                            ),
-                          
-                          // Delete button
-                          IconButton(
-                            onPressed: _deleteItem,
-                            icon: Icon(
-                              Icons.delete_outline,
-                              size: 18,
-                              color: AppColors.error.withOpacity(0.7),
-                            ),
-                            padding: const EdgeInsets.all(4),
-                            constraints: const BoxConstraints(
-                              minWidth: 32,
-                              minHeight: 32,
-                            ),
-                          ),
+                          // Error message with slide animation
+                          if (_hasError && _errorMessage != null)
+                            _buildErrorMessage(),
                         ],
-                        
-                        // Save/Cancel buttons when editing
-                        if (_isEditing) ...[
-                          const SizedBox(width: 8),
-                          IconButton(
-                            onPressed: _saveEdit,
-                            icon: const Icon(
-                              Icons.check,
-                              size: 18,
-                              color: AppColors.primary,
-                            ),
-                            padding: const EdgeInsets.all(4),
-                            constraints: const BoxConstraints(
-                              minWidth: 32,
-                              minHeight: 32,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: _cancelEdit,
-                            icon: Icon(
-                              Icons.close,
-                              size: 18,
-                              color: AppColors.error.withOpacity(0.7),
-                            ),
-                            padding: const EdgeInsets.all(4),
-                            constraints: const BoxConstraints(
-                              minWidth: 32,
-                              minHeight: 32,
-                            ),
-                          ),
-                        ],
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -330,6 +373,233 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
           ),
         );
       },
+    );
+  }
+  
+  // Helper method to build animated checkbox
+  Widget _buildAnimatedCheckbox() {
+    return GestureDetector(
+      onTap: _toggleCompletion,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: 26,
+        height: 26,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: widget.item.isDone
+              ? AppColors.primary
+              : Colors.transparent,
+          border: Border.all(
+            color: widget.item.isDone
+                ? AppColors.primary
+                : AppColors.outline,
+            width: 2.5,
+          ),
+          boxShadow: [
+            if (widget.item.isDone)
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.3),
+                blurRadius: 8,
+                spreadRadius: 1,
+              ),
+          ],
+        ),
+        child: widget.item.isDone
+            ? const Icon(
+                Icons.check,
+                color: AppColors.white,
+                size: 18,
+              )
+            : null,
+      ),
+    );
+  }
+  
+  // Helper method to build title widget
+  Widget _buildTitleWidget() {
+    if (_isEditing) {
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: _hasError 
+                ? AppColors.error 
+                : AppColors.outline.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: TextField(
+          controller: _textController,
+          focusNode: _focusNode,
+          style: TextStyle(
+            fontSize: 16,
+            color: AppColors.onSurface,
+            fontWeight: FontWeight.w500,
+          ),
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
+            hintText: LocalKeys.editItem.tr,
+            hintStyle: TextStyle(
+              color: AppColors.onSurface.withValues(alpha: 0.5),
+            ),
+          ),
+          onSubmitted: (_) => _saveEdit(),
+          onEditingComplete: _saveEdit,
+        ),
+      );
+    }
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppText(
+          widget.item.title,
+          variant: AppTextVariant.body,
+          fontWeight: widget.item.isDone ? FontWeight.w400 : FontWeight.w500,
+          color: widget.item.isDone
+              ? AppColors.onSurface.withValues(alpha: 0.6)
+              : AppColors.onSurface,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (!_isEditing && widget.isEditable)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: AppText(
+              LocalKeys.longPressToEdit.tr,
+              variant: AppTextVariant.small,
+              color: AppColors.onSurface.withValues(alpha: 0.4),
+            ),
+          ),
+      ],
+    );
+  }
+  
+  // Helper method to build action buttons
+  Widget _buildActionButtons() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Edit button
+        if (widget.isEditable)
+          Tooltip(
+            message: LocalKeys.editItem.tr,
+            child: AppIconButton(
+              style: AppIconButtonStyle.plain,
+              onPressed: _startEditing,
+              child: Icon(
+                Icons.edit_outlined,
+                size: 20,
+                color: AppColors.primary.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+        
+        const SizedBox(width: 4),
+        
+        // Delete button
+        Tooltip(
+          message: LocalKeys.deleteItem.tr,
+          child: AppIconButton(
+            style: AppIconButtonStyle.plain,
+            onPressed: _deleteItem,
+            child: Icon(
+              Icons.delete_outline,
+              size: 20,
+              color: AppColors.error.withValues(alpha: 0.8),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  
+  // Helper method to build edit mode buttons
+  Widget _buildEditModeButtons() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Save button
+        Tooltip(
+          message: LocalKeys.saveChanges.tr,
+          child: AppIconButton(
+            style: AppIconButtonStyle.plain,
+            onPressed: _saveEdit,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Icon(
+                Icons.check,
+                size: 18,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+        ),
+        
+        const SizedBox(width: 4),
+        
+        // Cancel button
+        Tooltip(
+          message: LocalKeys.discardChanges.tr,
+          child: AppIconButton(
+            style: AppIconButtonStyle.plain,
+            onPressed: _cancelEdit,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: AppColors.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(
+                Icons.close,
+                size: 18,
+                color: AppColors.error.withValues(alpha: 0.8),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  
+  // Helper method to build error message
+  Widget _buildErrorMessage() {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.error.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: AppColors.error.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 16,
+            color: AppColors.error,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: AppText(
+              _errorMessage!,
+              variant: AppTextVariant.small,
+              color: AppColors.error,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

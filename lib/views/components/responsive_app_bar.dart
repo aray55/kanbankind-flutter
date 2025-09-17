@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kanbankit/core/themes/app_typography.dart';
-import 'package:kanbankit/views/components/responsive_text.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 
 import '../../core/themes/app_theme.dart';
 
@@ -30,10 +30,9 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (screenWidth < 600) {
           return AppBar(
             leading: leading,
-            title: ResponsiveText(
+            title: AppText(
               title,
-              style: AppTypography().h1,
-            
+              variant: AppTextVariant.h1,
             ),
             actions: actions,
             elevation: elevation ?? 0,
@@ -46,9 +45,9 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
         else {
           return AppBar(
             leading: leading,
-            title: ResponsiveText(
+            title: AppText(
               title,
-              style: AppTypography().h1,
+              variant: AppTextVariant.h1,
             ),
             actions: actions,
             elevation: elevation ?? 0,

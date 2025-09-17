@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
+import 'package:kanbankit/core/themes/app_colors.dart';
 import 'package:kanbankit/core/utils/helper_functions_utils.dart';
-import 'package:kanbankit/views/components/responsive_text.dart';
+import 'package:kanbankit/views/components/text_buttons/app_text_button.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 import '../../models/task_model.dart';
 import '../../core/utils/date_utils.dart';
 import 'enhanced_task_editor.dart';
@@ -37,13 +39,10 @@ class EnhancedTaskCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: ResponsiveText(
+                    child: AppText(
                       task.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
                       maxLines: 2,
+                      variant: AppTextVariant.h2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -52,6 +51,7 @@ class EnhancedTaskCard extends StatelessWidget {
                     children: [
                       _buildPriorityIndicator(),
                       PopupMenuButton<String>(
+                     
                         onSelected: (value) {
                           if (value == 'delete') {
                             _showDeleteConfirmation(context);
@@ -63,12 +63,13 @@ class EnhancedTaskCard extends StatelessWidget {
                         },
                         itemBuilder: (context) => [
                           PopupMenuItem(
+                            
                             value: 'edit',
                             child: Row(
                               children: [
                                 const Icon(Icons.edit, size: 16),
                                 const SizedBox(width: 8),
-                                Text(LocalKeys.editTask.tr),
+                                AppText(LocalKeys.editTask.tr),
                               ],
                             ),
                           ),
@@ -78,7 +79,7 @@ class EnhancedTaskCard extends StatelessWidget {
                               children: [
                                 const Icon(Icons.checklist, size: 16),
                                 const SizedBox(width: 8),
-                                Text('Checklist'),
+                                AppText(LocalKeys.checklist.tr),
                               ],
                             ),
                           ),
@@ -86,12 +87,9 @@ class EnhancedTaskCard extends StatelessWidget {
                             value: 'delete',
                             child: Row(
                               children: [
-                                const Icon(Icons.delete, size: 16, color: Colors.red),
+                                const Icon(Icons.delete, size: 16),
                                 const SizedBox(width: 8),
-                                Text(
-                                  LocalKeys.delete.tr,
-                                  style: const TextStyle(color: Colors.red),
-                                ),
+                                AppText(LocalKeys.delete.tr),
                               ],
                             ),
                           ),
@@ -104,14 +102,14 @@ class EnhancedTaskCard extends StatelessWidget {
               ),
               if (task.description.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                ResponsiveText(
+                AppText(
                   task.description,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   maxLines: 3,
+                  variant: AppTextVariant.body,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
-              
+
               // Checklist indicator (only show if task has an ID)
               if (task.id != null) ...[
                 const SizedBox(height: 8),
@@ -121,16 +119,13 @@ class EnhancedTaskCard extends StatelessWidget {
                   onTap: () => _showTaskEditor(context, initialTab: 1),
                 ),
               ],
-              
+
               const SizedBox(height: 8),
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final createdDateWidget = ResponsiveText(
-                    'Created: ${AppDateUtils.formatDate(task.createdAt)}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
+                  final createdDateWidget = AppText(
+                    '${LocalKeys.created.tr}: ${AppDateUtils.formatDate(task.createdAt)}',
+                    variant: AppTextVariant.body,
                   );
 
                   final dueDateWidget = task.dueDate != null
@@ -140,16 +135,15 @@ class EnhancedTaskCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: HelperFunctionsUtils.getDueDateColor(task.dueDate!),
+                            color: HelperFunctionsUtils.getDueDateColor(
+                              task.dueDate!,
+                            ),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: ResponsiveText(
-                            'Due: ${AppDateUtils.formatDate(task.dueDate!)}',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          child: AppText(
+                            '${LocalKeys.dueDate.tr}: ${AppDateUtils.formatDate(task.dueDate!)}',
+                            variant: AppTextVariant.body,
+                            fontWeight: FontWeight.bold,
                           ),
                         )
                       : null;
@@ -223,10 +217,8 @@ class EnhancedTaskCard extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => EnhancedTaskEditor(
-        task: task, 
-        onTaskSaved: onUpdated,
-      ),
+      builder: (context) =>
+          EnhancedTaskEditor(task: task, onTaskSaved: onUpdated),
     );
   }
 
@@ -234,20 +226,19 @@ class EnhancedTaskCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(LocalKeys.deleteTask.tr),
-        content: Text('${LocalKeys.areYouSureDelete.tr} "${task.title}"?'),
+        title: AppText(LocalKeys.deleteTask.tr),
+        content: AppText('${LocalKeys.areYouSureDelete.tr} "${task.title}"?'),
         actions: [
-          TextButton(
+          AppTextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(LocalKeys.cancel.tr),
+            label: LocalKeys.cancel.tr,
           ),
-          TextButton(
+          AppTextButton(
             onPressed: () {
               Navigator.of(context).pop();
               onDeleted(task.id!);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(LocalKeys.delete.tr),
+            label: LocalKeys.delete.tr,
           ),
         ],
       ),

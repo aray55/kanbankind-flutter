@@ -7,25 +7,35 @@ enum ThemeMode { light, dark, system }
 
 class ThemeController extends GetxController {
   late UserPrefService _userPrefService;
-  
+
   // Observable theme mode
   final Rx<ThemeMode> _themeMode = ThemeMode.system.obs;
   ThemeMode get themeMode => _themeMode.value;
-  
-  // Observable for current theme data
-  final Rx<ThemeData> _currentTheme = AppTheme.lightTheme.obs;
-  ThemeData get currentTheme => _currentTheme.value;
-  
+
   // Observable for current theme brightness
   final Rx<Brightness> _currentBrightness = Brightness.light.obs;
   Brightness get currentBrightness => _currentBrightness.value;
+
+  // Flag to track if controller is ready to update themes
+  bool _isInitialized = false;
 
   @override
   void onInit() {
     super.onInit();
     _userPrefService = Get.find<UserPrefService>();
     _loadSavedTheme();
-    _updateTheme();
+    _isInitialized = true;
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    // Update theme once the widget tree is ready
+    if (Get.context != null) {
+      _updateTheme();
+      // Notify GetBuilder to rebuild UI
+      update();
+    }
   }
 
   // Load saved theme from storage
@@ -48,34 +58,44 @@ class ThemeController extends GetxController {
   }
 
   // Update theme based on current theme mode
-  void _updateTheme() {
+  void _updateTheme([BuildContext? context]) {
+    // Don't update theme if controller is not initialized or no context available
+    if (!_isInitialized) return;
+
+    final buildContext = context ?? Get.context;
+    if (buildContext == null) return;
+
     switch (_themeMode.value) {
       case ThemeMode.light:
-        _currentTheme.value = AppTheme.lightTheme;
         _currentBrightness.value = Brightness.light;
         break;
       case ThemeMode.dark:
-        _currentTheme.value = AppTheme.darkTheme;
         _currentBrightness.value = Brightness.dark;
         break;
       case ThemeMode.system:
-        final systemBrightness = Get.context?.mediaQuery.platformBrightness ?? Brightness.light;
-        if (systemBrightness == Brightness.dark) {
-          _currentTheme.value = AppTheme.darkTheme;
-          _currentBrightness.value = Brightness.dark;
-        } else {
-          _currentTheme.value = AppTheme.lightTheme;
-          _currentBrightness.value = Brightness.light;
-        }
+        final systemBrightness = buildContext.mounted
+            ? MediaQuery.of(buildContext).platformBrightness
+            : Brightness.light;
+        _currentBrightness.value = systemBrightness;
         break;
     }
   }
 
+  // Get current theme data based on brightness
+  ThemeData getCurrentTheme(BuildContext context) {
+    return _currentBrightness.value == Brightness.dark
+        ? AppTheme.darkTheme(context)
+        : AppTheme.lightTheme(context);
+  }
+
   // Change theme mode
-  Future<void> changeThemeMode(ThemeMode newThemeMode) async {
+  Future<void> changeThemeMode(
+    ThemeMode newThemeMode, [
+    BuildContext? context,
+  ]) async {
     _themeMode.value = newThemeMode;
-    _updateTheme();
-    
+    _updateTheme(context);
+
     // Save to storage
     String themeModeString;
     switch (newThemeMode) {
@@ -89,26 +109,36 @@ class ThemeController extends GetxController {
         themeModeString = 'system';
         break;
     }
-    
+
     await _userPrefService.saveThemeMode(themeModeString);
-    
-    // Update GetX theme
-    Get.changeTheme(_currentTheme.value);
+
+    // Update GetX theme if context is available
+    final buildContext = context ?? Get.context;
+    if (buildContext != null) {
+      final newTheme = getCurrentTheme(buildContext);
+      Get.changeTheme(newTheme);
+    }
+
+    // Notify GetBuilder to rebuild UI
+    update();
   }
 
   // Toggle between light and dark theme
-  Future<void> toggleTheme() async {
+  Future<void> toggleTheme([BuildContext? context]) async {
     if (_themeMode.value == ThemeMode.light) {
-      await changeThemeMode(ThemeMode.dark);
+      await changeThemeMode(ThemeMode.dark, context);
     } else if (_themeMode.value == ThemeMode.dark) {
-      await changeThemeMode(ThemeMode.light);
+      await changeThemeMode(ThemeMode.light, context);
     } else {
       // If system mode, toggle to opposite of current system theme
-      final systemBrightness = Get.context?.mediaQuery.platformBrightness ?? Brightness.light;
-      if (systemBrightness == Brightness.dark) {
-        await changeThemeMode(ThemeMode.light);
-      } else {
-        await changeThemeMode(ThemeMode.dark);
+      final buildContext = context ?? Get.context;
+      if (buildContext != null) {
+        final systemBrightness = MediaQuery.of(buildContext).platformBrightness;
+        if (systemBrightness == Brightness.dark) {
+          await changeThemeMode(ThemeMode.light, context);
+        } else {
+          await changeThemeMode(ThemeMode.dark, context);
+        }
       }
     }
   }
@@ -141,10 +171,15 @@ class ThemeController extends GetxController {
   }
 
   // Listen to system theme changes when in system mode
-  void handleSystemThemeChange() {
+  void handleSystemThemeChange([BuildContext? context]) {
     if (_themeMode.value == ThemeMode.system) {
-      _updateTheme();
-      Get.changeTheme(_currentTheme.value);
+      _updateTheme(context);
+      final buildContext = context ?? Get.context;
+      if (buildContext != null) {
+        Get.changeTheme(getCurrentTheme(buildContext));
+      }
+      // Notify GetBuilder to rebuild UI
+      update();
     }
   }
 }

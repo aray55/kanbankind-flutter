@@ -13,7 +13,7 @@ class KanbanKitApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     // Get saved locale if any
+    // Get saved locale if any
     final userPrefService = Get.find<UserPrefService>();
     String? savedLocale = userPrefService.getSavedLocale();
     Locale? initialLocale;
@@ -25,8 +25,8 @@ class KanbanKitApp extends StatelessWidget {
       builder: (themeController) {
         return GetMaterialApp(
           title: LocalKeys.appName.tr,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
+          theme: AppTheme.lightTheme(context),
+          darkTheme: AppTheme.darkTheme(context),
           themeMode: _getFlutterThemeMode(themeController.themeMode),
           home: const BoardPage(),
           initialBinding: BoardBinding(),

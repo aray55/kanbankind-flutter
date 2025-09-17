@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:kanbankit/controllers/datetime_picker_controller.dart';
 import 'package:kanbankit/core/themes/app_colors.dart';
 import 'package:kanbankit/core/themes/app_typography.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 
 class DateTimePicker extends StatelessWidget {
   final String? label;
@@ -110,18 +111,17 @@ class DateTimePicker extends StatelessWidget {
                       const SizedBox(width: 12),
                     ],
                     Expanded(
-                      child: Text(
+                      child: AppText(
                         controller.getDisplayText(placeholder: placeholder),
-                        style: Get.theme.textTheme.bodyMedium?.copyWith(
-                          color: controller.selectedDateTime != null
-                              ? (enabled
-                                    ? Get.theme.colorScheme.onSurface
+                        variant: AppTextVariant.body,
+                        color: controller.selectedDateTime != null
+                            ? (enabled
+                                  ? Get.theme.colorScheme.onSurface
                                     : Get.theme.colorScheme.onSurface
                                           .withValues(alpha: 0.5))
                               : Get.theme.colorScheme.onSurface.withValues(
                                   alpha: 0.6,
                                 ),
-                        ),
                       ),
                     ),
                     if (controller.selectedDateTime != null && enabled) ...[
@@ -161,24 +161,19 @@ class DateTimePicker extends StatelessWidget {
             if (controller.hasError) {
               return Padding(
                 padding: const EdgeInsets.only(top: 4),
-                child: Text(
+                child: AppText(
                   controller.errorMessage,
-                  style: Get.theme.textTheme.bodySmall?.copyWith(
-                    color: Get.theme.colorScheme.error,
-                  ),
+                  variant: AppTextVariant.body,
+                  color: Get.theme.colorScheme.error,
                 ),
               );
             }
             if (helperText != null) {
               return Padding(
                 padding: const EdgeInsets.only(top: 4),
-                child: Text(
+                child: AppText(
                   helperText!,
-                  style: AppTypography().body.copyWith(
-                    color: Get.theme.colorScheme.onSurface.withValues(
-                      alpha: 0.6,
-                    ),
-                  ),
+                  variant: AppTextVariant.body,
                 ),
               );
             }

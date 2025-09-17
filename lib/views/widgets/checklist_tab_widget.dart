@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 import '../../controllers/task_editor_controller.dart';
 import '../../controllers/checklist_controller.dart';
 import '../../core/localization/local_keys.dart';
-import '../../core/themes/app_typography.dart' show AppTypography;
 import '../../core/themes/app_colors.dart';
-import 'checklist_item_widget.dart';
 import 'checklist_widget.dart';
 
 class ChecklistTab extends StatelessWidget {
@@ -48,20 +47,17 @@ class ChecklistTab extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Task Checklist',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
-                        ),
+                      AppText(
+                        LocalKeys.taskChecklist.tr,
+                        variant: AppTextVariant.h2,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
                       ),
-                      Text(
-                        'Add checklist items for this new task',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.primary.withValues(alpha: 0.7),
-                        ),
+                      AppText(
+                        LocalKeys.addChecklistItemsForNewTask.tr,
+                        variant: AppTextVariant.body,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary.withValues(alpha: 0.7),
                       ),
                     ],
                   ),
@@ -88,7 +84,7 @@ class ChecklistTab extends StatelessWidget {
                   TextField(
                     controller: controller.checklistItemController,
                     decoration: InputDecoration(
-                      hintText: 'Add checklist item...',
+                      hintText: LocalKeys.addChecklistItemHint.tr,
                       border: InputBorder.none,
                       prefixIcon: Icon(Icons.add, color: AppColors.primary),
                       suffixIcon: IconButton(
@@ -113,13 +109,10 @@ class ChecklistTab extends StatelessWidget {
                   ),
                   if (controller.tempChecklistItems.isNotEmpty) ...[
                     const Divider(),
-                    Text(
+                    AppText(
                       '${LocalKeys.itemsToAdd.tr} (${controller.tempChecklistItems.length}):',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.onSurface.withValues(alpha: 0.7),
-                      ),
+                      variant: AppTextVariant.body,
+                      fontWeight: FontWeight.w500,
                     ),
                   ],
                 ],
@@ -140,23 +133,19 @@ class ChecklistTab extends StatelessWidget {
                       Icon(
                         Icons.checklist_outlined,
                         size: 48,
-                        color: AppColors.onSurface.withOpacity(0.3),
+                        color: AppColors.onSurface.withValues(alpha: 0.3),
                       ),
                       const SizedBox(height: 16),
-                      Text(
+                      AppText(
                         LocalKeys.noChecklistItems.tr,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors.onSurface.withOpacity(0.6),
-                        ),
+                        variant: AppTextVariant.body,
+                        fontWeight: FontWeight.w500,
                       ),
                       const SizedBox(height: 8),
-                      Text(
+                      AppText(
                         LocalKeys.addItemsAboveToCreateChecklist,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.onSurface.withOpacity(0.4),
-                        ),
+                        variant: AppTextVariant.body,
+                        fontWeight: FontWeight.w500,
                       ),
                     ],
                   ),
@@ -174,7 +163,7 @@ class ChecklistTab extends StatelessWidget {
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: AppColors.outline.withOpacity(0.2),
+                        color: AppColors.outline.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -197,7 +186,7 @@ class ChecklistTab extends StatelessWidget {
                           icon: Icon(
                             Icons.close,
                             size: 16,
-                            color: AppColors.error.withOpacity(0.7),
+                            color: AppColors.error.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -253,20 +242,15 @@ class ChecklistTab extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            AppText(
                               LocalKeys.taskChecklist.tr,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary,
-                              ),
+                              variant: AppTextVariant.h2,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
                             ),
-                            Text(
+                            AppText(
                               LocalKeys.breakDownTaskIntoSmallerSteps.tr,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.primary.withOpacity(0.7),
-                              ),
+                              variant: AppTextVariant.body,
                             ),
                           ],
                         ),
@@ -298,13 +282,11 @@ class ChecklistTab extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      Text(
+                      AppText(
                         '${LocalKeys.newItemsToAdd.tr} (${tempItems.length}):',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.onSurface.withValues(alpha: 0.7),
-                        ),
+                        variant: AppTextVariant.body,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.onSurface.withValues(alpha: 0.7),
                       ),
                       const SizedBox(height: 8),
                       ...tempItems.asMap().entries.map((entry) {
@@ -314,10 +296,10 @@ class ChecklistTab extends StatelessWidget {
                           margin: const EdgeInsets.only(bottom: 8),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: AppColors.primary.withOpacity(0.3),
+                              color: AppColors.primary.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Row(
@@ -329,13 +311,11 @@ class ChecklistTab extends StatelessWidget {
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: Text(
+                                child: AppText(
                                   item,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  variant: AppTextVariant.body,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.primary,
                                 ),
                               ),
                               IconButton(
@@ -344,7 +324,7 @@ class ChecklistTab extends StatelessWidget {
                                 icon: Icon(
                                   Icons.close,
                                   size: 16,
-                                  color: AppColors.error.withOpacity(0.7),
+                                  color: AppColors.error.withValues(alpha: 0.7),
                                 ),
                               ),
                             ],

@@ -22,25 +22,28 @@ class ThemeSwitcher extends StatelessWidget {
     return GetBuilder<ThemeController>(
       builder: (controller) {
         if (isCompact) {
-          return _buildCompactSwitcher(controller);
+          return _buildCompactSwitcher(controller, context);
         }
-        return _buildFullSwitcher(controller);
+        return _buildFullSwitcher(controller, context);
       },
     );
   }
 
-  Widget _buildCompactSwitcher(ThemeController controller) {
+  Widget _buildCompactSwitcher(
+    ThemeController controller,
+    BuildContext context,
+  ) {
     return AppIconButton(
       style: AppIconButtonStyle.plain,
       variant: AppIconButtonVariant.values.first,
-      onPressed: () => controller.toggleTheme(),
+      onPressed: () => controller.toggleTheme(context),
       child: Obx(
         () => Icon(controller.isDarkMode ? Icons.light_mode : Icons.dark_mode),
       ),
     );
   }
 
-  Widget _buildFullSwitcher(ThemeController controller) {
+  Widget _buildFullSwitcher(ThemeController controller, BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -66,14 +69,14 @@ class ThemeSwitcher extends StatelessWidget {
               ),
               const SizedBox(height: 16),
             ],
-            _buildThemeOptions(controller),
+            _buildThemeOptions(controller, context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildThemeOptions(ThemeController controller) {
+  Widget _buildThemeOptions(ThemeController controller, BuildContext context) {
     return Obx(
       () => Column(
         children: [
@@ -83,6 +86,7 @@ class ThemeSwitcher extends StatelessWidget {
             Icons.light_mode,
             LocalKeys.lightTheme.tr,
             LocalKeys.alwaysUseLightTheme.tr,
+            context,
           ),
           const SizedBox(height: 8),
           _buildThemeOption(
@@ -91,6 +95,7 @@ class ThemeSwitcher extends StatelessWidget {
             Icons.dark_mode,
             LocalKeys.darkTheme.tr,
             LocalKeys.alwaysUseDarkTheme.tr,
+            context,
           ),
           const SizedBox(height: 8),
           _buildThemeOption(
@@ -99,6 +104,7 @@ class ThemeSwitcher extends StatelessWidget {
             Icons.settings_brightness,
             LocalKeys.systemTheme.tr,
             LocalKeys.followSystemTheme.tr,
+            context,
           ),
         ],
       ),
@@ -111,18 +117,19 @@ class ThemeSwitcher extends StatelessWidget {
     IconData icon,
     String title,
     String subtitle,
+    BuildContext context,
   ) {
     final isSelected = controller.themeMode == mode;
 
     return InkWell(
-      onTap: () => controller.changeThemeMode(mode),
+      onTap: () => controller.changeThemeMode(mode, context),
       borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           color: isSelected
-              ? Get.theme.colorScheme.primary.withOpacity(0.1)
+              ? Get.theme.colorScheme.primary.withValues(alpha: 0.1)
               : Colors.transparent,
           border: isSelected
               ? Border.all(color: Get.theme.colorScheme.primary)
@@ -245,7 +252,9 @@ class ThemeSwitcherBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Get.theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+              color: Get.theme.colorScheme.onSurfaceVariant.withValues(
+                alpha: 0.4,
+              ),
               borderRadius: BorderRadius.circular(2),
             ),
           ),

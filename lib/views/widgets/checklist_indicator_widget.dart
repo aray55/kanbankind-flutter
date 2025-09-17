@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 import '../../controllers/checklist_controller.dart';
+import '../../core/localization/local_keys.dart';
 import '../../core/themes/app_colors.dart';
 import 'checklist_progress_widget.dart';
 
@@ -21,7 +23,7 @@ class ChecklistIndicatorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     // Create a unique tag for each task to avoid sharing controller instances
     final controllerTag = 'checklist_indicator_$taskId';
-    
+
     return GetBuilder<ChecklistController>(
       tag: controllerTag,
       init: ChecklistController(),
@@ -52,18 +54,18 @@ class ChecklistIndicatorWidget extends StatelessWidget {
   Widget _buildCompactIndicator(ChecklistController controller) {
     final isCompleted = controller.isAllCompleted;
     final progressPercentage = controller.progressPercentage;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isCompleted 
+          color: isCompleted
               ? AppColors.primary.withValues(alpha: 0.1)
               : AppColors.outline.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isCompleted 
+            color: isCompleted
                 ? AppColors.primary.withValues(alpha: 0.3)
                 : AppColors.outline.withValues(alpha: 0.3),
             width: 1,
@@ -77,29 +79,18 @@ class ChecklistIndicatorWidget extends StatelessWidget {
               children: [
                 Icon(
                   isCompleted ? Icons.check_circle : Icons.checklist,
+
                   size: 14,
-                  color: isCompleted 
-                      ? AppColors.primary 
-                      : AppColors.onSurface.withValues(alpha: 0.6),
                 ),
                 const SizedBox(width: 6),
-                Text(
+                AppText(
                   '${controller.completedItems}/${controller.totalItems}',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: isCompleted 
-                        ? AppColors.primary 
-                        : AppColors.onSurface.withValues(alpha: 0.7),
-                  ),
+                  variant: AppTextVariant.small,
                 ),
                 const SizedBox(width: 4),
-                Text(
+                AppText(
                   '(${(progressPercentage * 100).round()}%)',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: AppColors.onSurface.withValues(alpha: 0.5),
-                  ),
+                  variant: AppTextVariant.small,
                 ),
               ],
             ),
@@ -117,8 +108,8 @@ class ChecklistIndicatorWidget extends StatelessWidget {
                 widthFactor: progressPercentage,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isCompleted 
-                        ? AppColors.primary 
+                    color: isCompleted
+                        ? AppColors.primary
                         : AppColors.primary.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(2),
                   ),
@@ -137,38 +128,22 @@ class ChecklistIndicatorWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.surface.withOpacity(0.7),
+          color: AppColors.surface.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: AppColors.outline.withOpacity(0.2),
-          ),
+          border: Border.all(color: AppColors.outline.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.checklist,
-                  size: 16,
-                  color: AppColors.onSurface.withOpacity(0.6),
-                ),
+                Icon(Icons.checklist, size: 16),
                 const SizedBox(width: 6),
-                Text(
-                  'Checklist',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.onSurface.withOpacity(0.8),
-                  ),
-                ),
+                AppText(LocalKeys.checklist.tr, variant: AppTextVariant.body),
                 const Spacer(),
-                Text(
+                AppText(
                   '${controller.completedItems}/${controller.totalItems}',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: AppColors.onSurface.withOpacity(0.6),
-                  ),
+                  variant: AppTextVariant.small,
                 ),
               ],
             ),
@@ -191,11 +166,8 @@ class ChecklistBadgeWidget extends StatelessWidget {
   final int taskId;
   final VoidCallback? onTap;
 
-  const ChecklistBadgeWidget({
-    Key? key,
-    required this.taskId,
-    this.onTap,
-  }) : super(key: key);
+  const ChecklistBadgeWidget({Key? key, required this.taskId, this.onTap})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -218,13 +190,13 @@ class ChecklistBadgeWidget extends StatelessWidget {
             child: Stack(
               children: [
                 Icon(
-                  controller.isAllCompleted 
-                      ? Icons.check_circle 
+                  controller.isAllCompleted
+                      ? Icons.check_circle
                       : Icons.checklist,
                   size: 16,
-                  color: controller.isAllCompleted 
-                      ? AppColors.primary 
-                      : AppColors.onSurface.withOpacity(0.6),
+                  color: controller.isAllCompleted
+                      ? AppColors.primary
+                      : AppColors.info,
                 ),
                 if (controller.completedItems > 0)
                   Positioned(
@@ -240,13 +212,9 @@ class ChecklistBadgeWidget extends StatelessWidget {
                         minWidth: 12,
                         minHeight: 12,
                       ),
-                      child: Text(
+                      child: AppText(
                         '${controller.completedItems}',
-                        style: const TextStyle(
-                          color: AppColors.white,
-                          fontSize: 8,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        variant: AppTextVariant.small,
                         textAlign: TextAlign.center,
                       ),
                     ),

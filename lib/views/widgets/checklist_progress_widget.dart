@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:kanbankit/core/localization/local_keys.dart';
 import '../../models/check_list_progress_model.dart';
 import '../../core/themes/app_colors.dart';
+import 'responsive_text.dart';
 
 class ChecklistProgressWidget extends StatelessWidget {
   final ChecklistProgress progress;
@@ -28,7 +31,7 @@ class ChecklistProgressWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final percentage = totalItems > 0 ? (completedItems / totalItems) : 0.0;
     final isCompleted = totalItems > 0 && completedItems == totalItems;
-    
+
     return Container(
       margin: EdgeInsets.symmetric(
         vertical: compact ? 4 : 8,
@@ -36,12 +39,12 @@ class ChecklistProgressWidget extends StatelessWidget {
       ),
       padding: EdgeInsets.all(compact ? 12 : 16),
       decoration: BoxDecoration(
-        color: isCompleted 
+        color: isCompleted
             ? AppColors.primary.withOpacity(0.1)
             : AppColors.surface,
         borderRadius: BorderRadius.circular(compact ? 8 : 12),
         border: Border.all(
-          color: isCompleted 
+          color: isCompleted
               ? AppColors.primary.withOpacity(0.3)
               : AppColors.outline.withOpacity(0.2),
           width: 1,
@@ -61,24 +64,22 @@ class ChecklistProgressWidget extends StatelessWidget {
                       Icon(
                         isCompleted ? Icons.check_circle : Icons.checklist,
                         size: compact ? 16 : 20,
-                        color: isCompleted 
-                            ? AppColors.primary 
-                            : AppColors.onSurface.withOpacity(0.6),
+                        color: isCompleted
+                            ? AppColors.primary
+                            : AppColors.infoDark,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        '$completedItems of $totalItems completed',
-                        style: TextStyle(
-                          fontSize: compact ? 12 : 14,
-                          fontWeight: FontWeight.w500,
-                          color: isCompleted 
-                              ? AppColors.primary 
-                              : AppColors.onSurface.withOpacity(0.8),
+                      AppText(
+                        '$completedItems ${LocalKeys.of.tr} $totalItems ${LocalKeys.completed.tr}',
+                        fontWeight: FontWeight.w500,
+                        color: isCompleted
+                              ? AppColors.primary
+                              : AppColors.onSurface.withValues(alpha: 0.8),
                         ),
-                      ),
+                      
                     ],
                   ),
-                
+
                 if (showPercentage)
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -86,28 +87,26 @@ class ChecklistProgressWidget extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: isCompleted 
-                          ? AppColors.primary 
+                      color: isCompleted
+                          ? AppColors.primary
                           : AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
+                    child: AppText(
                       '${(percentage * 100).round()}%',
-                      style: TextStyle(
-                        fontSize: compact ? 10 : 12,
-                        fontWeight: FontWeight.bold,
-                        color: isCompleted 
-                            ? AppColors.white 
+                      fontWeight: FontWeight.bold,
+                      color: isCompleted
+                            ? AppColors.white
                             : AppColors.primary,
                       ),
                     ),
-                  ),
+                  
               ],
             ),
-          
+
           if (!compact || showCounts || showPercentage)
             SizedBox(height: compact ? 8 : 12),
-          
+
           // Progress bar
           Container(
             height: compact ? 6 : 8,
@@ -123,37 +122,35 @@ class ChecklistProgressWidget extends StatelessWidget {
                 width: MediaQuery.of(context).size.width * percentage,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: isCompleted 
-                        ? [AppColors.primary, AppColors.primary.withOpacity(0.8)]
+                    colors: isCompleted
+                        ? [
+                            AppColors.primary,
+                            AppColors.primary.withValues(alpha: 0.8),
+                          ]
                         : [
                             progressColor ?? AppColors.primary,
-                            (progressColor ?? AppColors.primary).withOpacity(0.7),
+                            (progressColor ?? AppColors.primary).withValues(
+                              alpha: 0.7,
+                            ),
                           ],
                   ),
                 ),
               ),
             ),
           ),
-          
+
           // Completion message
           if (isCompleted && !compact)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.celebration,
-                    size: 16,
-                    color: AppColors.primary,
-                  ),
+                  Icon(Icons.celebration, size: 16, color: AppColors.primary),
                   const SizedBox(width: 6),
-                  Text(
-                    'All items completed!',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primary,
-                    ),
+                  AppText(
+                    LocalKeys.allItemsCompleted.tr,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primary,
                   ),
                 ],
               ),
@@ -191,7 +188,7 @@ class CircularChecklistProgressWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final percentage = totalItems > 0 ? (completedItems / totalItems) : 0.0;
     final isCompleted = totalItems > 0 && completedItems == totalItems;
-    
+
     return SizedBox(
       width: size,
       height: size,
@@ -210,7 +207,7 @@ class CircularChecklistProgressWidget extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Progress circle
           SizedBox(
             width: size,
@@ -236,17 +233,13 @@ class CircularChecklistProgressWidget extends StatelessWidget {
               },
             ),
           ),
-          
+
           // Center content
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (isCompleted)
-                Icon(
-                  Icons.check,
-                  color: AppColors.primary,
-                  size: size * 0.3,
-                )
+                Icon(Icons.check, color: AppColors.primary, size: size * 0.3)
               else if (showPercentage)
                 Text(
                   '${(percentage * 100).round()}%',
@@ -256,7 +249,7 @@ class CircularChecklistProgressWidget extends StatelessWidget {
                     color: AppColors.onSurface,
                   ),
                 ),
-              
+
               if (!isCompleted)
                 Text(
                   '$completedItems/$totalItems',
@@ -292,7 +285,7 @@ class MiniChecklistProgressWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final percentage = totalItems > 0 ? (completedItems / totalItems) : 0.0;
     final isCompleted = totalItems > 0 && completedItems == totalItems;
-    
+
     return Container(
       width: width,
       height: height,
@@ -306,8 +299,8 @@ class MiniChecklistProgressWidget extends StatelessWidget {
           duration: const Duration(milliseconds: 300),
           width: width * percentage,
           decoration: BoxDecoration(
-            color: isCompleted 
-                ? AppColors.primary 
+            color: isCompleted
+                ? AppColors.primary
                 : AppColors.primary.withOpacity(0.7),
           ),
         ),

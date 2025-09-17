@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/core/themes/app_typography.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 import '../../controllers/checklist_controller.dart';
 import '../../core/localization/local_keys.dart';
 import '../../core/themes/app_colors.dart';
 import '../../models/checklist_item_model.dart';
+import '../components/text_buttons/app_text_button.dart';
+import '../components/text_buttons/button_variant.dart';
 import 'checklist_item_widget.dart';
 import 'add_checklist_item_widget.dart';
 import 'checklist_progress_widget.dart';
@@ -31,7 +34,7 @@ class ChecklistWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ChecklistController>();
-    
+
     // Load checklist items if not already loaded for this task
     if (controller.currentTaskId != taskId) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -43,182 +46,176 @@ class ChecklistWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header
-        if (header != null) ...[
-          header!,
-          const SizedBox(height: 16),
-        ],
+        if (header != null) ...[header!, const SizedBox(height: 16)],
 
         // Progress indicator
         if (showProgress)
-          Obx(() => controller.hasItems
-              ? ChecklistProgressWidget(
-                  progress: controller.progress,
-                  totalItems: controller.totalItems,
-                  completedItems: controller.completedItems,
-                )
-              : const SizedBox.shrink()),
+          Obx(
+            () => controller.hasItems
+                ? ChecklistProgressWidget(
+                    progress: controller.progress,
+                    totalItems: controller.totalItems,
+                    completedItems: controller.completedItems,
+                  )
+                : const SizedBox.shrink(),
+          ),
 
         // Actions bar
         if (showActions)
-          Obx(() => controller.hasItems
-              ? ChecklistActionsWidget(
-                  controller: controller,
-                  isEditable: isEditable,
-                )
-              : const SizedBox.shrink()),
+          Obx(
+            () => controller.hasItems
+                ? ChecklistActionsWidget(
+                    controller: controller,
+                    isEditable: isEditable,
+                  )
+                : const SizedBox.shrink(),
+          ),
 
         // Add new item widget
         if (isEditable)
-          AddChecklistItemWidget(
-            taskId: taskId,
-            controller: controller,
-          ),
+          AddChecklistItemWidget(taskId: taskId, controller: controller),
 
         const SizedBox(height: 8),
 
         // Checklist items
         Obx(() {
-              if (controller.isLoading) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: CircularProgressIndicator(),
+          if (controller.isLoading) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          final items = controller.filteredItems;
+
+          if (items.isEmpty) {
+            return Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: AppColors.surface.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.outline.withValues(alpha: 0.2),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.checklist_outlined,
+                    size: 48,
                   ),
-                );
-              }
-
-              final items = controller.filteredItems;
-
-              if (items.isEmpty) {
-                return Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(32),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.outline.withValues(alpha: 0.2),
+                  const SizedBox(height: 16),
+                  AppText(
+                    emptyMessage ?? LocalKeys.noChecklistItems.tr,
+                    variant: AppTextVariant.body,
+                    textAlign: TextAlign.center,
+                  ),
+                  if (isEditable) ...[
+                    const SizedBox(height: 8),
+                    AppText(
+                      LocalKeys.addItemsAboveToCreateChecklist.tr,
+                      variant: AppTextVariant.body,
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.checklist_outlined,
-                        size: 48,
-                        color: AppColors.onSurface.withValues(alpha: 0.3),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        emptyMessage ?? LocalKeys.noChecklistItems.tr,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors.onSurface.withValues(alpha: 0.6),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      if (isEditable) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          LocalKeys.addItemsAboveToCreateChecklist.tr,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.onSurface.withValues(alpha: 0.4),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ],
-                  ),
-                );
-              }
+                  ],
+                ],
+              ),
+            );
+          }
 
-              return ReorderableListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: items.length,
-                onReorder: isEditable ? (int oldIndex, int newIndex) {
-                  if (newIndex > oldIndex) newIndex--;
-                  
-                  final reorderedItems = List<ChecklistItem>.from(items);
-                  final item = reorderedItems.removeAt(oldIndex);
-                  reorderedItems.insert(newIndex, item);
-                  
-                  // Update positions
-                  for (int i = 0; i < reorderedItems.length; i++) {
-                    reorderedItems[i] = reorderedItems[i].copyWith(position: i);
+          return ReorderableListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: items.length,
+            onReorder: isEditable
+                ? (int oldIndex, int newIndex) {
+                    if (newIndex > oldIndex) newIndex--;
+
+                    final reorderedItems = List<ChecklistItem>.from(items);
+                    final item = reorderedItems.removeAt(oldIndex);
+                    reorderedItems.insert(newIndex, item);
+
+                    // Update positions
+                    for (int i = 0; i < reorderedItems.length; i++) {
+                      reorderedItems[i] = reorderedItems[i].copyWith(
+                        position: i,
+                      );
+                    }
+
+                    controller.reorderItems(reorderedItems);
                   }
-                  
-                  controller.reorderItems(reorderedItems);
-                } : (int oldIndex, int newIndex) {},
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  
-                  return ChecklistItemWidget(
-                    key: ValueKey(item.id),
-                    item: item,
-                    isEditable: isEditable,
-                    showActions: true,
-                  );
-                },
+                : (int oldIndex, int newIndex) {},
+            itemBuilder: (context, index) {
+              final item = items[index];
+
+              return ChecklistItemWidget(
+                key: ValueKey(item.id),
+                item: item,
+                isEditable: isEditable,
+                showActions: true,
               );
-            }),
+            },
+          );
+        }),
 
-            // Loading indicator for operations
-            Obx(() {
-              if (controller.isCreating || controller.isUpdating) {
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        controller.isCreating 
-                            ? LocalKeys.addingItem.tr 
-                            : LocalKeys.updating.tr,
-                        style: 
-                        AppTypography().h2.copyWith(color: AppColors.onSurface.withValues(alpha: 0.6)),
-                      ),
-                    ],
+        // Loading indicator for operations
+        Obx(() {
+          if (controller.isCreating || controller.isUpdating) {
+            return Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   ),
-                );
-              }
-              return const SizedBox.shrink();
-            }),
+                  const SizedBox(width: 12),
+                  AppText(
+                    controller.isCreating
+                        ? LocalKeys.addingItem.tr
+                        : LocalKeys.updating.tr,
+                    variant: AppTextVariant.body,
+                  ),
+                ],
+              ),
+            );
+          }
+          return const SizedBox.shrink();
+        }),
 
-            // Loading indicator for operations
-            Obx(() {
-              if (controller.isCreating || controller.isUpdating) {
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        controller.isCreating ? 'Adding item...' : 'Updating...',
-                        style: TextStyle(
-                          color: AppColors.onSurface.withOpacity(0.7),
-                        ),
-                      ),
-                    ],
+        // Loading indicator for operations
+        Obx(() {
+          if (controller.isCreating || controller.isUpdating) {
+            return Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   ),
-                );
-              }
-              return const SizedBox.shrink();
-            }),
-          ],
-        );
+                  const SizedBox(width: 12),
+                  AppText(
+                    controller.isCreating
+                        ? LocalKeys.addingItem.tr
+                        : LocalKeys.updating.tr,
+                    variant: AppTextVariant.body,
+                  ),
+                ],
+              ),
+            );
+          }
+          return const SizedBox.shrink();
+        }),
+      ],
+    );
   }
 }
 
@@ -280,26 +277,23 @@ class CompactChecklistWidget extends StatelessWidget {
               const SizedBox(height: 8),
 
               // Items
-              ...displayItems.map((item) => ChecklistItemWidget(
-                key: ValueKey(item.id),
-                item: item,
-                isEditable: false,
-                showActions: false,
-              )),
+              ...displayItems.map(
+                (item) => ChecklistItemWidget(
+                  key: ValueKey(item.id),
+                  item: item,
+                  isEditable: false,
+                  showActions: false,
+                ),
+              ),
 
               // View all button
               if (maxItems != null && items.length > maxItems!)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: TextButton(
+                  child: AppTextButton(
                     onPressed: onViewAll,
-                    child: Text(
-                      'View all ${items.length} items',
-                      style: const TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 14,
-                      ),
-                    ),
+                    label: '${LocalKeys.viewAll.tr}${items.length} ${LocalKeys.items.tr}',
+                    variant: AppButtonVariant.primary,
                   ),
                 ),
             ],

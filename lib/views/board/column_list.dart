@@ -8,7 +8,7 @@ import '../../models/task_model.dart';
 import '../../core/enums/task_status.dart';
 import '../components/empty_state.dart' show EmptyState;
 import '../widgets/task_card.dart';
-import '../components/responsive_text.dart';
+import '../widgets/responsive_text.dart';
 
 class ColumnList extends StatelessWidget {
   final String title;

@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/core/utils/helper_functions_utils.dart';
-import 'package:kanbankit/views/components/responsive_text.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 import 'package:kanbankit/views/components/text_buttons/app_text_button.dart';
 import 'package:kanbankit/views/widgets/enhanced_task_editor.dart';
 import '../../models/task_model.dart';
 import '../../core/utils/date_utils.dart';
-import 'task_editor.dart';
 
 class TaskCard extends StatelessWidget {
   final Task task;
@@ -38,14 +37,11 @@ class TaskCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: ResponsiveText(
+                    child: AppText(
                       task.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
+                      variant: AppTextVariant.h2,
                     ),
                   ),
                   Row(
@@ -67,7 +63,7 @@ class TaskCard extends StatelessWidget {
                               children: [
                                 const Icon(Icons.edit, size: 16),
                                 const SizedBox(width: 8),
-                                Text(LocalKeys.editTask.tr),
+                                AppText(LocalKeys.editTask.tr),
                               ],
                             ),
                           ),
@@ -77,9 +73,10 @@ class TaskCard extends StatelessWidget {
                               children: [
                                 const Icon(Icons.delete, size: 16, color: Colors.red),
                                 const SizedBox(width: 8),
-                                Text(
+                                AppText(
                                   LocalKeys.delete.tr,
-                                  style: const TextStyle(color: Colors.red),
+                                  variant: AppTextVariant.body,
+                                  color: Colors.red,
                                 ),
                               ],
                             ),
@@ -93,9 +90,10 @@ class TaskCard extends StatelessWidget {
               ),
               if (task.description.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                ResponsiveText(
+                AppText(
                   task.description,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  variant: AppTextVariant.body,
+                  color: Colors.grey[600],
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -103,12 +101,10 @@ class TaskCard extends StatelessWidget {
               const SizedBox(height: 8),
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final createdDateWidget = ResponsiveText(
-                    'Created: ${AppDateUtils.formatDate(task.createdAt)}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
+                  final createdDateWidget = AppText(
+                    '${LocalKeys.created.tr}: ${AppDateUtils.formatDate(task.createdAt)}',
+                    variant: AppTextVariant.body,
+                    color: Colors.grey[500],
                   );
 
                   final dueDateWidget = task.dueDate != null
@@ -121,16 +117,13 @@ class TaskCard extends StatelessWidget {
                             color: HelperFunctionsUtils.getDueDateColor(task.dueDate!),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: ResponsiveText(
-                            'Due: ${AppDateUtils.formatDate(task.dueDate!)}',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                          child: AppText(
+                            '${LocalKeys.dueDate.tr}: ${AppDateUtils.formatDate(task.dueDate!)}',
+                            variant: AppTextVariant.body,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
                             ),
-                          ),
-                        )
-                      : null;
+                          ) : null;
 
                   if (constraints.maxWidth > 200) {
                     return Row(

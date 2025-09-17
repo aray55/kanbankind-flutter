@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/core/localization/local_keys.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 import '../../controllers/checklist_controller.dart';
 import '../../core/themes/app_colors.dart';
 
@@ -21,24 +23,22 @@ class ChecklistActionsWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Clear Completed Items'),
-        content: Text(
-          'Are you sure you want to delete all ${controller.completedItems} completed items? This action cannot be undone.',
+        title: AppText(LocalKeys.clearCompletedItems.tr),
+        content: AppText(
+          '${LocalKeys.areYouSure.tr} ${LocalKeys.clearCompletedItems.tr} ${controller.completedItems} ${LocalKeys.items.tr}?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: AppText(LocalKeys.cancel.tr),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
               controller.clearCompletedItems();
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('Clear'),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            child: AppText(LocalKeys.clear.tr),
           ),
         ],
       ),
@@ -50,21 +50,27 @@ class ChecklistActionsWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('${markAsDone ? 'Complete' : 'Uncomplete'} All Items'),
-        content: Text(
-          'Are you sure you want to $action all ${controller.totalItems} items?',
+        title: AppText(
+          '${markAsDone ? LocalKeys.completeAllItems.tr : LocalKeys.uncompleteAllItems.tr}',
+        ),
+        content: AppText(
+          '${LocalKeys.areYouSure.tr} ${LocalKeys.markAllItems.tr} ${controller.totalItems} ${LocalKeys.items.tr}?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: AppText(LocalKeys.cancel.tr),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
               controller.markAllItems(markAsDone);
             },
-            child: Text(markAsDone ? 'Complete All' : 'Uncomplete All'),
+            child: AppText(
+              markAsDone
+                  ? LocalKeys.completeAllItems.tr
+                  : LocalKeys.uncompleteAllItems.tr,
+            ),
           ),
         ],
       ),
@@ -101,14 +107,12 @@ class ChecklistActionsWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.background,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: AppColors.outline.withOpacity(0.3),
-                  ),
+                  border: Border.all(color: AppColors.outline.withOpacity(0.3)),
                 ),
                 child: TextField(
                   onChanged: controller.updateSearchQuery,
                   decoration: InputDecoration(
-                    hintText: 'Search checklist items...',
+                    hintText: LocalKeys.searchChecklistItems.tr,
                     hintStyle: TextStyle(
                       color: AppColors.onSurface.withOpacity(0.5),
                     ),
@@ -168,7 +172,7 @@ class ChecklistActionsWidget extends StatelessWidget {
                         if (!compact) ...[
                           const SizedBox(width: 4),
                           Text(
-                            'completed',
+                            LocalKeys.completed.tr,
                             style: TextStyle(
                               fontSize: 12,
                               color: AppColors.primary.withOpacity(0.7),
@@ -219,11 +223,13 @@ class ChecklistActionsWidget extends StatelessWidget {
                             children: [
                               const Icon(Icons.check_circle_outline),
                               const SizedBox(width: 12),
-                              Text('Complete All (${controller.remainingItems})'),
+                              Text(
+                                '${LocalKeys.completeAllItems.tr} (${controller.remainingItems})',
+                              ),
                             ],
                           ),
                         ),
-                      
+
                       if (controller.completedItems > 0)
                         PopupMenuItem(
                           value: 'mark_all_incomplete',
@@ -231,36 +237,40 @@ class ChecklistActionsWidget extends StatelessWidget {
                             children: [
                               const Icon(Icons.radio_button_unchecked),
                               const SizedBox(width: 12),
-                              Text('Uncomplete All (${controller.completedItems})'),
+                              Text(
+                                '${LocalKeys.uncompleteAllItems.tr} (${controller.completedItems})',
+                              ),
                             ],
                           ),
                         ),
-                      
+
                       if (controller.completedItems > 0) ...[
                         const PopupMenuDivider(),
                         PopupMenuItem(
                           value: 'clear_completed',
                           child: Row(
                             children: [
-                              Icon(Icons.delete_outline, color: AppColors.error),
+                              Icon(
+                                Icons.delete_outline,
+                                color: AppColors.error,
+                              ),
                               const SizedBox(width: 12),
-                              Text(
-                                'Clear Completed (${controller.completedItems})',
-                                style: TextStyle(color: AppColors.error),
+                              AppText(
+                                '${LocalKeys.clearCompletedItems.tr} (${controller.completedItems})',
                               ),
                             ],
                           ),
                         ),
                       ],
-                      
+
                       const PopupMenuDivider(),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'refresh',
                         child: Row(
                           children: [
                             Icon(Icons.refresh),
                             SizedBox(width: 12),
-                            Text('Refresh'),
+                            AppText(LocalKeys.refresh.tr),
                           ],
                         ),
                       ),
@@ -271,7 +281,10 @@ class ChecklistActionsWidget extends StatelessWidget {
             ),
 
             // Quick action chips (compact mode)
-            if (compact && isEditable && (controller.completedItems > 0 || controller.remainingItems > 0))
+            if (compact &&
+                isEditable &&
+                (controller.completedItems > 0 ||
+                    controller.remainingItems > 0))
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Wrap(
@@ -279,24 +292,22 @@ class ChecklistActionsWidget extends StatelessWidget {
                   children: [
                     if (controller.remainingItems > 0)
                       ActionChip(
-                        label: Text(
-                          'Complete All',
-                          style: TextStyle(fontSize: 11),
-                        ),
+                        label: AppText(LocalKeys.completeAllItems.tr),
                         onPressed: () => _showMarkAllDialog(context, true),
                         backgroundColor: AppColors.primary.withOpacity(0.1),
-                        side: BorderSide(color: AppColors.primary.withOpacity(0.3)),
+                        side: BorderSide(
+                          color: AppColors.primary.withOpacity(0.3),
+                        ),
                       ),
-                    
+
                     if (controller.completedItems > 0)
                       ActionChip(
-                        label: Text(
-                          'Clear Done',
-                          style: TextStyle(fontSize: 11),
-                        ),
+                        label: AppText(LocalKeys.clearCompletedItems.tr),
                         onPressed: () => _showClearCompletedDialog(context),
                         backgroundColor: AppColors.error.withOpacity(0.1),
-                        side: BorderSide(color: AppColors.error.withOpacity(0.3)),
+                        side: BorderSide(
+                          color: AppColors.error.withOpacity(0.3),
+                        ),
                       ),
                   ],
                 ),
@@ -339,8 +350,7 @@ class ChecklistFloatingActions extends StatelessWidget {
               child: const Icon(Icons.clear_all, color: AppColors.white),
             ),
 
-          if (controller.completedItems > 0)
-            const SizedBox(height: 8),
+          if (controller.completedItems > 0) const SizedBox(height: 8),
 
           // Mark all complete
           if (controller.remainingItems > 0)
@@ -352,8 +362,7 @@ class ChecklistFloatingActions extends StatelessWidget {
               child: const Icon(Icons.done_all, color: AppColors.white),
             ),
 
-          if (controller.remainingItems > 0)
-            const SizedBox(height: 8),
+          if (controller.remainingItems > 0) const SizedBox(height: 8),
 
           // Add new item
           FloatingActionButton(
@@ -372,10 +381,7 @@ class ChecklistFloatingActions extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          'Add Checklist Item',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
+                        AppText(LocalKeys.addChecklistItem.tr),
                         const SizedBox(height: 16),
                         // Add your AddChecklistItemWidget here
                         // AddChecklistItemWidget(taskId: taskId, autoFocus: true),
