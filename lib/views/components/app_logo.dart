@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:kanbankit/core/localization/local_keys.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 
 class AppLogo extends StatelessWidget {
   final double size;
@@ -49,19 +52,16 @@ class AppLogo extends StatelessWidget {
       children: [
         logoWidget,
         const SizedBox(height: 12),
-        Text(
+        AppText(
           customText ?? 'KanbanKit',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+          variant: AppTextVariant.small,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
         const SizedBox(height: 4),
-        Text(
-          'Organize your tasks efficiently',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-          ),
+        AppText(
+          LocalKeys.organizeYourTasksEfficiently.tr,
+          variant: AppTextVariant.body,
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
         ),
       ],
     );

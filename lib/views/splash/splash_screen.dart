@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/core/localization/local_keys.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 import '../components/app_logo.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -102,14 +104,10 @@ class _SplashScreenState extends State<SplashScreen>
                     
                     const SizedBox(height: 16),
                     
-                    Text(
-                      'Loading...',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.6),
-                      ),
+                    AppText(
+                      LocalKeys.loading.tr,
+                   variant: AppTextVariant.body,
+                   color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ],
                 ),

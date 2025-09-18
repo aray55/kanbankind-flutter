@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/core/services/dialog_service.dart';
 import '../core/themes/app_colors.dart' show AppColors;
 import '../models/checklist_item_model.dart';
 import '../models/check_list_progress_model.dart';
 import '../data/repository/checklist_item_repository.dart';
+import '../core/services/task_movement_service.dart';
+import '../data/repository/task_repository.dart';
 
 class ChecklistController extends GetxController {
   final ChecklistItemRepository _repository = ChecklistItemRepository();
+  final TaskMovementService _taskMovementService = TaskMovementService();
+  final TaskRepository _taskRepository = TaskRepository();
 
   final DialogService _dialogService = Get.find<DialogService>();
 
@@ -24,9 +29,6 @@ class ChecklistController extends GetxController {
     percentage: 0.0,
   ).obs;
 
-  
-
-
   // Getters
   List<ChecklistItem> get checklistItems => _checklistItems.toList();
   List<ChecklistItem> get filteredItems {
@@ -34,22 +36,27 @@ class ChecklistController extends GetxController {
       return _checklistItems.toList();
     }
     return _checklistItems
-        .where((item) => item.title.toLowerCase().contains(_searchQuery.value.toLowerCase()))
+        .where(
+          (item) => item.title.toLowerCase().contains(
+            _searchQuery.value.toLowerCase(),
+          ),
+        )
         .toList();
   }
-  
+
   bool get isLoading => _isLoading.value;
   bool get isCreating => _isCreating.value;
   bool get isUpdating => _isUpdating.value;
   String get searchQuery => _searchQuery.value;
   int get currentTaskId => _currentTaskId.value;
   ChecklistProgress get progress => _progress.value;
-  
+
   // Computed properties
   int get totalItems => _checklistItems.length;
   int get completedItems => _checklistItems.where((item) => item.isDone).length;
   int get remainingItems => totalItems - completedItems;
-  double get progressPercentage => totalItems > 0 ? completedItems / totalItems : 0.0;
+  double get progressPercentage =>
+      totalItems > 0 ? completedItems / totalItems : 0.0;
   bool get hasItems => _checklistItems.isNotEmpty;
   bool get isAllCompleted => totalItems > 0 && completedItems == totalItems;
 
@@ -65,15 +72,15 @@ class ChecklistController extends GetxController {
     try {
       _isLoading.value = true;
       _currentTaskId.value = taskId;
-      
+
       final items = await _repository.getChecklistItemsByTaskId(taskId);
       _checklistItems.assignAll(items);
-      
+
       await _updateProgress();
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Loading Checklist',
-        message: 'Failed to load checklist items: ${e.toString()}',
+        title: LocalKeys.errorLoadingChecklist.tr,
+        message: LocalKeys.errorLoadingChecklist.tr,
       );
     } finally {
       _isLoading.value = false;
@@ -88,34 +95,34 @@ class ChecklistController extends GetxController {
   }) async {
     if (title.trim().isEmpty) {
       _dialogService.showErrorSnackbar(
-        title: 'Invalid Input',
-        message: 'Checklist item title cannot be empty',
+        title: LocalKeys.invalidInput.tr,
+        message: LocalKeys.checklistItemTitleEmpty.tr,
       );
       return;
     }
 
     try {
       _isCreating.value = true;
-      
+
       final newItem = await _repository.createChecklistItem(
         taskId: taskId,
         title: title.trim(),
         position: position,
       );
-      
+
       _checklistItems.add(newItem);
       _sortItemsByPosition();
-      
+
       _dialogService.showSuccessSnackbar(
-        title: 'Success',
-        message: 'Checklist item created successfully',
+        title: LocalKeys.success.tr,
+        message: LocalKeys.checklistItemCreatedSuccessfully.tr,
         backgroundColor: AppColors.primary,
         icon: Icons.check_circle_outline,
       );
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Creating Item',
-        message: 'Failed to create checklist item: ${e.toString()}',
+        title: LocalKeys.errorCreatingItem.tr,
+        message: LocalKeys.errorCreatingItem.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -129,12 +136,14 @@ class ChecklistController extends GetxController {
     required int taskId,
     required List<String> titles,
   }) async {
-    final validTitles = titles.where((title) => title.trim().isNotEmpty).toList();
-    
+    final validTitles = titles
+        .where((title) => title.trim().isNotEmpty)
+        .toList();
+
     if (validTitles.isEmpty) {
       _dialogService.showErrorSnackbar(
-        title: 'Invalid Input',
-        message: 'No valid checklist items to create',
+        title: LocalKeys.invalidInput.tr,
+        message: LocalKeys.invalidInput.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -143,23 +152,23 @@ class ChecklistController extends GetxController {
 
     try {
       _isCreating.value = true;
-      
+
       final newItems = await _repository.createMultipleItems(
         taskId: taskId,
         titles: validTitles,
       );
-      
+
       _checklistItems.addAll(newItems);
       _sortItemsByPosition();
-      
+
       _dialogService.showSuccessSnackbar(
-        title: 'Success',
-        message: 'Created ${newItems.length} checklist items',
+        title: LocalKeys.success.tr,
+        message: LocalKeys.created.tr,
       );
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Creating Items',
-        message: 'Failed to create checklist items: ${e.toString()}',
+        title: LocalKeys.errorCreatingItems.tr,
+        message: LocalKeys.errorCreatingItems.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -172,8 +181,8 @@ class ChecklistController extends GetxController {
   Future<void> updateItemTitle(int itemId, String newTitle) async {
     if (newTitle.trim().isEmpty) {
       _dialogService.showErrorSnackbar(
-        title: 'Invalid Input',
-        message: 'Checklist item title cannot be empty',
+        title: LocalKeys.invalidInput.tr,
+        message: LocalKeys.invalidInput.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -182,24 +191,27 @@ class ChecklistController extends GetxController {
 
     try {
       _isUpdating.value = true;
-      
-      final updatedItem = await _repository.updateChecklistItemTitle(itemId, newTitle.trim());
-      
+
+      final updatedItem = await _repository.updateChecklistItemTitle(
+        itemId,
+        newTitle.trim(),
+      );
+
       if (updatedItem != null) {
         final index = _checklistItems.indexWhere((item) => item.id == itemId);
         if (index != -1) {
           _checklistItems[index] = updatedItem;
         }
-        
+
         _dialogService.showSuccessSnackbar(
-          title: 'Success',
-          message: 'Checklist item updated successfully',
+          title: LocalKeys.success.tr,
+          message: LocalKeys.checklistItemUpdatedSuccessfully.tr,
         );
       }
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Updating Item',
-        message: 'Failed to update checklist item: ${e.toString()}',
+        title: LocalKeys.errorUpdatingItem.tr,
+        message: LocalKeys.errorUpdatingItem.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -212,17 +224,20 @@ class ChecklistController extends GetxController {
   Future<void> toggleItemCompletion(int itemId) async {
     try {
       final updatedItem = await _repository.toggleChecklistItemDone(itemId);
-      
+
       if (updatedItem != null) {
         final index = _checklistItems.indexWhere((item) => item.id == itemId);
         if (index != -1) {
           _checklistItems[index] = updatedItem;
         }
+
+        // Trigger automatic task movement evaluation
+        await _evaluateTaskMovement(updatedItem.taskId);
       }
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Toggling Item',
-        message: 'Failed to toggle checklist item: ${e.toString()}',
+        title: LocalKeys.errorTogglingItem.tr,
+        message: LocalKeys.errorTogglingItem.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -232,18 +247,24 @@ class ChecklistController extends GetxController {
   // Mark item as done/undone
   Future<void> markItemDone(int itemId, bool isDone) async {
     try {
-      final updatedItem = await _repository.markChecklistItemDone(itemId, isDone);
-      
+      final updatedItem = await _repository.markChecklistItemDone(
+        itemId,
+        isDone,
+      );
+
       if (updatedItem != null) {
         final index = _checklistItems.indexWhere((item) => item.id == itemId);
         if (index != -1) {
           _checklistItems[index] = updatedItem;
         }
+
+        // Trigger automatic task movement evaluation
+        await _evaluateTaskMovement(updatedItem.taskId);
       }
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Updating Item',
-        message: 'Failed to update checklist item: ${e.toString()}',
+        title: LocalKeys.errorUpdatingItem.tr,
+        message: LocalKeys.errorUpdatingItem.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -254,19 +275,19 @@ class ChecklistController extends GetxController {
   Future<void> deleteItem(int itemId) async {
     try {
       final success = await _repository.deleteChecklistItem(itemId);
-      
+
       if (success) {
         _checklistItems.removeWhere((item) => item.id == itemId);
-        
+
         _dialogService.showSuccessSnackbar(
-          title: 'Success',
-          message: 'Checklist item deleted successfully',
+          title: LocalKeys.success.tr,
+          message: LocalKeys.checklistItemDeletedSuccessfully.tr,
         );
       }
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Deleting Item',
-        message: 'Failed to delete checklist item: ${e.toString()}',
+        title: LocalKeys.errorDeletingItem.tr,
+        message: LocalKeys.errorDeletingItem.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -279,19 +300,19 @@ class ChecklistController extends GetxController {
 
     try {
       final success = await _repository.deleteMultipleItems(itemIds);
-      
+
       if (success) {
         _checklistItems.removeWhere((item) => itemIds.contains(item.id));
-        
+
         _dialogService.showSuccessSnackbar(
-          title: 'Success',
-          message: 'Deleted ${itemIds.length} checklist items',
+          title: LocalKeys.success.tr,
+          message: LocalKeys.deleteItem.tr,
         );
       }
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Deleting Items',
-        message: 'Failed to delete checklist items: ${e.toString()}',
+        title: LocalKeys.errorDeletingItems.tr,
+        message: LocalKeys.errorDeletingItems.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -305,8 +326,8 @@ class ChecklistController extends GetxController {
       _checklistItems.assignAll(reorderedItems);
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Reordering Items',
-        message: 'Failed to reorder checklist items: ${e.toString()}',
+        title: LocalKeys.errorReorderingItems.tr,
+        message: LocalKeys.errorReorderingItems.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -320,12 +341,15 @@ class ChecklistController extends GetxController {
   // Move item to new position
   Future<void> moveItem(int itemId, int newPosition) async {
     try {
-      final reorderedItems = await _repository.moveChecklistItem(itemId, newPosition);
+      final reorderedItems = await _repository.moveChecklistItem(
+        itemId,
+        newPosition,
+      );
       _checklistItems.assignAll(reorderedItems);
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Moving Item',
-        message: 'Failed to move checklist item: ${e.toString()}',
+        title: LocalKeys.errorMovingItem.tr,
+        message: LocalKeys.errorMovingItem.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -341,20 +365,22 @@ class ChecklistController extends GetxController {
     if (_currentTaskId.value == 0) return;
 
     try {
-      final success = await _repository.clearCompletedItems(_currentTaskId.value);
-      
+      final success = await _repository.clearCompletedItems(
+        _currentTaskId.value,
+      );
+
       if (success) {
         _checklistItems.removeWhere((item) => item.isDone);
-        
+
         _dialogService.showSuccessSnackbar(
-          title: 'Success',
-          message: 'Cleared all completed items',
+          title: LocalKeys.success.tr,
+          message: LocalKeys.clearCompletedItems.tr,
         );
       }
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Clearing Items',
-        message: 'Failed to clear completed items: ${e.toString()}',
+        title: LocalKeys.errorClearingItems.tr,
+        message: LocalKeys.errorClearingItems.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -366,18 +392,21 @@ class ChecklistController extends GetxController {
     if (_currentTaskId.value == 0) return;
 
     try {
-      final updatedItems = await _repository.markAllItems(_currentTaskId.value, isDone);
+      final updatedItems = await _repository.markAllItems(
+        _currentTaskId.value,
+        isDone,
+      );
       _checklistItems.assignAll(updatedItems);
-      
+
       final action = isDone ? 'completed' : 'uncompleted';
       _dialogService.showSuccessSnackbar(
-        title: 'Success',
-        message: 'Marked all items as $action',
+        title: LocalKeys.success.tr,
+        message: LocalKeys.markedAllItems.tr,
       );
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Updating Items',
-        message: 'Failed to update all items: ${e.toString()}',
+        title: LocalKeys.errorUpdatingAllItems.tr,
+        message: LocalKeys.errorUpdatingAllItems.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -397,17 +426,17 @@ class ChecklistController extends GetxController {
   Future<void> searchItems(String query, {int? taskId}) async {
     try {
       _isLoading.value = true;
-      
+
       final items = await _repository.searchChecklistItems(
         query,
         taskId: taskId ?? _currentTaskId.value,
       );
-      
+
       _checklistItems.assignAll(items);
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Searching',
-        message: 'Failed to search checklist items: ${e.toString()}',
+        title: LocalKeys.errorSearchingItems.tr,
+        message: LocalKeys.errorSearchingItems.tr,
         backgroundColor: AppColors.error,
         icon: Icons.error_outline,
       );
@@ -424,25 +453,27 @@ class ChecklistController extends GetxController {
   }) async {
     try {
       _isLoading.value = true;
-      
+
       final duplicatedItems = await _repository.duplicateChecklistItems(
         fromTaskId: fromTaskId,
         toTaskId: toTaskId,
         copyCompletionStatus: copyCompletionStatus,
       );
-      
+
       if (toTaskId == _currentTaskId.value) {
         _checklistItems.assignAll(duplicatedItems);
       }
-      
+
       _dialogService.showSuccessSnackbar(
-        title: 'Success',
-        message: 'Duplicated ${duplicatedItems.length} checklist items',
+        title: LocalKeys.success.tr,
+        message: LocalKeys.duplicatedChecklistItems.tr,
       );
     } catch (e) {
       _dialogService.showErrorSnackbar(
-        title: 'Error Duplicating',
-        message: 'Failed to duplicate checklist items: ${e.toString()}',
+        title: LocalKeys.errorDuplicatingItems.tr,
+        message: LocalKeys.errorDuplicatingItems.tr,
+        backgroundColor: AppColors.error,
+        icon: Icons.error_outline,
       );
     } finally {
       _isLoading.value = false;
@@ -478,7 +509,9 @@ class ChecklistController extends GetxController {
     if (_currentTaskId.value == 0) return;
 
     try {
-      final progress = await _repository.getChecklistProgress(_currentTaskId.value);
+      final progress = await _repository.getChecklistProgress(
+        _currentTaskId.value,
+      );
       _progress.value = progress;
     } catch (e) {
       // Silent fail for progress updates
@@ -503,6 +536,24 @@ class ChecklistController extends GetxController {
         completed: 0,
         percentage: 0.0,
       );
+    }
+  }
+
+  /// Evaluates task for automatic movement after checklist changes
+  Future<void> _evaluateTaskMovement(int taskId) async {
+    try {
+      final task = await _taskRepository.getTaskById(taskId);
+      if (task != null) {
+        final movedTask = await _taskMovementService.evaluateAndMoveTask(task);
+        if (movedTask != null) {
+          _dialogService.showSuccessSnackbar(
+            title:" تم نقل المهمة تلقائيًا",
+            message: "تم نقل المهمة إلى ${movedTask.status.name}",
+          );
+        }
+      }
+    } catch (e) {
+      // Silent fail for automatic movement
     }
   }
 

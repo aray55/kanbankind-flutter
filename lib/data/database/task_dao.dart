@@ -1,3 +1,4 @@
+import 'package:sqflite/sqflite.dart';
 import '../../models/task_model.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/enums/task_status.dart';
@@ -31,7 +32,7 @@ class TaskDao {
   Future<List<Task>> getAllTasksWithChecklists() async {
     final tasks = await getAllTasks();
     final List<Task> tasksWithChecklists = [];
-    
+
     for (final task in tasks) {
       if (task.id != null) {
         final checklistItems = await _checklistItemDao.getByTaskId(task.id!);
@@ -40,7 +41,7 @@ class TaskDao {
         tasksWithChecklists.add(task);
       }
     }
-    
+
     return tasksWithChecklists;
   }
 
@@ -59,7 +60,7 @@ class TaskDao {
   Future<List<Task>> getTasksByStatusWithChecklists(TaskStatus status) async {
     final tasks = await getTasksByStatus(status);
     final List<Task> tasksWithChecklists = [];
-    
+
     for (final task in tasks) {
       if (task.id != null) {
         final checklistItems = await _checklistItemDao.getByTaskId(task.id!);
@@ -68,7 +69,7 @@ class TaskDao {
         tasksWithChecklists.add(task);
       }
     }
-    
+
     return tasksWithChecklists;
   }
 
@@ -80,7 +81,7 @@ class TaskDao {
       whereArgs: [id],
       limit: 1,
     );
-    
+
     if (maps.isNotEmpty) {
       return Task.fromMap(maps.first);
     }
@@ -91,7 +92,7 @@ class TaskDao {
   Future<Task?> getTaskByIdWithChecklist(int id) async {
     final task = await getTaskById(id);
     if (task == null) return null;
-    
+
     final checklistItems = await _checklistItemDao.getByTaskId(id);
     return task.copyWith(checklistItems: checklistItems);
   }
@@ -127,20 +128,23 @@ class TaskDao {
   }
 
   // Insert task with checklist items
-  Future<Task> insertTaskWithChecklist(Task task, List<ChecklistItem> checklistItems) async {
+  Future<Task> insertTaskWithChecklist(
+    Task task,
+    List<ChecklistItem> checklistItems,
+  ) async {
     final taskId = await insertTask(task);
     final createdTask = task.copyWith(id: taskId);
-    
+
     if (checklistItems.isNotEmpty) {
-      final itemsWithTaskId = checklistItems.map((item) => 
-        item.copyWith(taskId: taskId)
-      ).toList();
-      
+      final itemsWithTaskId = checklistItems
+          .map((item) => item.copyWith(taskId: taskId))
+          .toList();
+
       await _checklistItemDao.insertBatch(itemsWithTaskId);
       final savedItems = await _checklistItemDao.getByTaskId(taskId);
       return createdTask.copyWith(checklistItems: savedItems);
     }
-    
+
     return createdTask;
   }
 
@@ -156,12 +160,16 @@ class TaskDao {
   // Get tasks with checklist progress
   Future<List<Map<String, dynamic>>> getTasksWithProgress() async {
     final tasks = await getAllTasksWithChecklists();
-    return tasks.map((task) => {
-      'task': task,
-      'total_items': task.totalChecklistItems,
-      'completed_items': task.completedChecklistItems,
-      'progress': task.checklistProgress,
-      'is_completed': task.isChecklistCompleted,
-    }).toList();
+    return tasks
+        .map(
+          (task) => {
+            'task': task,
+            'total_items': task.totalChecklistItems,
+            'completed_items': task.completedChecklistItems,
+            'progress': task.checklistProgress,
+            'is_completed': task.isChecklistCompleted,
+          },
+        )
+        .toList();
   }
 }

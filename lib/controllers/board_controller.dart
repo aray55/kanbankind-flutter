@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../core/localization/local_keys.dart';
 import '../models/task_model.dart';
 import '../core/enums/task_status.dart';
 import '../data/repository/task_repository.dart';
+import '../core/services/task_movement_service.dart';
 
 class BoardController extends GetxController {
   final TaskRepository _taskRepository = TaskRepository();
+  final TaskMovementService _taskMovementService = TaskMovementService();
 
   final RxList<Task> todoTasks = <Task>[].obs;
   final RxList<Task> inProgressTasks = <Task>[].obs;
@@ -21,11 +24,15 @@ class BoardController extends GetxController {
   void onInit() {
     super.onInit();
     loadAllTasks();
+    
   }
 
   Future<void> loadAllTasks() async {
     try {
       isLoading.value = true;
+
+      // First, evaluate and move tasks automatically
+      await _evaluateAndMoveTasksAutomatically();
 
       final todoList = await _taskRepository.getTodoTasks();
       final inProgressList = await _taskRepository.getInProgressTasks();
@@ -35,7 +42,7 @@ class BoardController extends GetxController {
       inProgressTasks.assignAll(inProgressList);
       doneTasks.assignAll(doneList);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to load tasks: $e');
+      Get.snackbar(LocalKeys.error.tr, LocalKeys.failedToLoadTasks.tr);
     } finally {
       isLoading.value = false;
     }
@@ -46,14 +53,14 @@ class BoardController extends GetxController {
       final taskId = await _taskRepository.createTask(task);
       // Create a new task object with the returned ID
       final createdTask = task.copyWith(id: taskId);
-      
+
       // Reload all tasks to ensure the UI is in sync
       await loadAllTasks();
-      Get.snackbar('Success', 'Task added successfully');
-      
+      Get.snackbar(LocalKeys.success.tr, LocalKeys.taskAddedSuccessfully.tr);
+
       return createdTask;
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add task: $e');
+      Get.snackbar(LocalKeys.error.tr, LocalKeys.failedToAddTask.tr);
       rethrow;
     }
   }
@@ -62,11 +69,20 @@ class BoardController extends GetxController {
     try {
       final success = await _taskRepository.updateTask(task);
       if (success) {
+        // Check if the task needs automatic movement after update
+        final movedTask = await _taskMovementService.evaluateAndMoveTask(task);
+        if (movedTask != null) {
+          Get.snackbar(
+            LocalKeys.automaticMove.tr,
+            LocalKeys.taskMovedToStatus.tr,
+          );
+        }
+
         await loadAllTasks(); // Refresh all lists
-        Get.snackbar('Success', 'Task updated successfully');
+        Get.snackbar(LocalKeys.success.tr, LocalKeys.taskUpdatedSuccessfully.tr);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update task: $e');
+      Get.snackbar(LocalKeys.error.tr, LocalKeys.failedToUpdateTask.tr);
     }
   }
 
@@ -77,10 +93,10 @@ class BoardController extends GetxController {
         todoTasks.removeWhere((task) => task.id == taskId);
         inProgressTasks.removeWhere((task) => task.id == taskId);
         doneTasks.removeWhere((task) => task.id == taskId);
-        Get.snackbar('Success', 'Task deleted successfully');
+        Get.snackbar(LocalKeys.success.tr, LocalKeys.taskDeletedSuccessfully.tr);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete task: $e');
+      Get.snackbar(LocalKeys.error.tr, LocalKeys.failedToDeleteTask.tr);
     }
   }
 
@@ -93,15 +109,37 @@ class BoardController extends GetxController {
       if (success) {
         // Instead of manually manipulating the lists, just reload them from the source of truth.
         await loadAllTasks();
-        Get.snackbar('Success', 'Task moved to ${newStatus.displayName}');
+        Get.snackbar(LocalKeys.success.tr, LocalKeys.taskMovedToStatus.tr);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to move task: $e');
+      Get.snackbar(LocalKeys.error.tr, LocalKeys.failedToMoveTask.tr);
     }
   }
 
   void refreshTasks() {
     loadAllTasks();
+  }
+
+  /// Automatically evaluates and moves tasks based on due dates and checklist completion
+  Future<void> _evaluateAndMoveTasksAutomatically() async {
+    try {
+      final movedTasks = await _taskMovementService
+          .evaluateAndMoveTasksAutomatically();
+      if (movedTasks.isNotEmpty) {
+        Get.snackbar(
+          LocalKeys.automaticMove.tr,
+          LocalKeys.taskMovedToStatusAutomatically.tr,
+          duration: const Duration(seconds: 2),
+        );
+      }
+    } catch (e) {
+      // Silent fail for automatic movement
+    }
+  }
+
+  /// Evaluates a specific task for automatic movement
+  Future<Task?> evaluateTaskForMovement(Task task) async {
+    return await _taskMovementService.evaluateAndMoveTask(task);
   }
 
   // Auto-scroll logic based on pointer position

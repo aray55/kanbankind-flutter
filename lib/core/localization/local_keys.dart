@@ -103,4 +103,67 @@ class LocalKeys {
   static const String noDescription = 'no_description';
   static const String noDueDate = 'no_due_date';
 
+  // Onboarding keys
+  static const String previous = 'previous';
+  static const String next = 'next';
+  static const String skip = 'skip';
+  static const String getStarted = 'get_started';
+  static const String welcomeToKanbanKit = 'welcome_to_kanban_kit';
+  static const String organizeTasksEffectively = 'organize_tasks_effectively';
+  static const String kanbanKitHelpsYouManageTasks =
+      'kanban_kit_helps_you_manage_tasks';
+  static const String createAndManageTasks = 'create_and_manage_tasks';
+  static const String stayOrganized = 'stay_organized';
+  static const String createTasksWithDetails = 'create_tasks_with_details';
+  static const String trackProgress = 'track_progress';
+  static const String visualizeWorkflow = 'visualize_workflow';
+  static const String moveTasksBetweenColumns = 'move_tasks_between_columns';
+  static const String checklistFeature = 'checklist_feature';
+  static const String breakDownComplexTasks = 'break_down_complex_tasks';
+  static const String addChecklistItemsToTasks = 'add_checklist_items_to_tasks';
+  static const String readyToBeginJourney = 'ready_to_begin_journey';
+  static const String startUsingKanbanKitToday = 'start_using_kanban_kit_today';
+  static const String error = 'error';
+  static const String success = 'success';
+  static const String automaticMove = 'automatic_move';
+  static const String automaticUpdate = 'automatic_update';
+  static const String failedToLoadTasks = 'failed_to_load_tasks';
+  static const String failedToAddTask = 'failed_to_add_task';
+  static const String taskAddedSuccessfully = 'task_added_successfully';
+  static const String taskUpdatedSuccessfully = 'task_updated_successfully';
+  static const String failedToUpdateTask = 'failed_to_update_task';
+  static const String taskDeletedSuccessfully = 'task_deleted_successfully';
+  static const String failedToDeleteTask = 'failed_to_delete_task';
+  static const String taskMovedTo = 'task_moved_to';
+  static const String failedToMoveTask = 'failed_to_move_task';
+  static const String movedTasksAutomatically = 'moved_tasks_automatically';
+  static const String taskMovedToStatus = 'task_moved_to_status{status}';
+  static const String taskMovedToStatusAutomatically =
+      'task_moved_to_status_automatically';
+      static const String errorLoadingChecklist = 'error_loading_checklist';
+static const String invalidInput = 'invalid_input';
+static const String checklistItemTitleEmpty = 'checklist_item_title_empty';
+static const String checklistItemCreatedSuccessfully = 'checklist_item_created_successfully';
+static const String checklistItemsCreatedSuccessfully = 'checklist_items_created_successfully';
+static const String errorCreatingItem = 'error_creating_item';
+static const String errorCreatingItems = 'error_creating_items';
+static const String checklistItemUpdatedSuccessfully = 'checklist_item_updated_successfully';
+static const String errorUpdatingItem = 'error_updating_item';
+static const String errorTogglingItem = 'error_toggling_item';
+static const String errorDeletingItem = 'error_deleting_item';
+static const String checklistItemDeletedSuccessfully = 'checklist_item_deleted_successfully';
+static const String errorDeletingItems = 'error_deleting_items';
+static const String checklistItemsDeletedSuccessfully = 'checklist_items_deleted_successfully';
+static const String errorReorderingItems = 'error_reordering_items';
+static const String errorMovingItem = 'error_moving_item';
+static const String clearedCompletedItems = 'cleared_completed_items';
+static const String errorClearingItems = 'error_clearing_items';
+static const String markedAllItems = 'marked_all_items';
+static const String errorUpdatingAllItems = 'error_updating_all_items';
+static const String errorSearchingItems = 'error_searching_items';
+static const String duplicatedChecklistItems = 'duplicated_checklist_items';
+static const String errorDuplicatingItems = 'error_duplicating_items';
+static const String taskMovedAutomatically = 'task_moved_automatically';
+static const String loading = 'loading';
+static const String organizeYourTasksEfficiently = 'organize_your_tasks_efficiently';
 }

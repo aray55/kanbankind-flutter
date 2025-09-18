@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kanbankit/core/themes/theme_extensions.dart';
 import 'package:kanbankit/core/utils/helper_functions_utils.dart';
 import '../../core/localization/local_keys.dart' show LocalKeys;
 import '../../core/themes/app_colors.dart' show AppColors;

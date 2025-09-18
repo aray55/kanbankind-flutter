@@ -51,6 +51,7 @@ dependencies:
   # Animation
   confetti: ^0.7.0
   logger: ^2.6.1
+  liquid_swipe: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +63,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  
+  # Launcher icons generator
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -104,3 +108,22 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Launcher Icons Configuration
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/images/app_logo.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/images/app_logo.png"
+    background_color: "#2196F3"
+    theme_color: "#2196F3"
+  windows:
+    generate: true
+    image_path: "assets/images/app_logo.png"
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: "assets/images/app_logo.png"

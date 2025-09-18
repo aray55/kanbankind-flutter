@@ -6,6 +6,7 @@ import '../../controllers/task_editor_controller.dart';
 import '../../controllers/checklist_controller.dart';
 import '../../core/localization/local_keys.dart';
 import '../../core/themes/app_colors.dart';
+import '../components/icon_buttons/app_icon_button.dart';
 import 'checklist_widget.dart';
 
 class ChecklistTab extends StatefulWidget {
@@ -81,7 +82,7 @@ class _ChecklistTabState extends State<ChecklistTab> {
   }
 
   Widget _buildNewTaskChecklist(TaskEditorController controller) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +111,6 @@ class _ChecklistTabState extends State<ChecklistTab> {
                       AppText(
                         LocalKeys.addChecklistItemsForNewTask.tr,
                         variant: AppTextVariant.body,
-
                         fontWeight: FontWeight.w300,
                         color: AppColors.primary.withValues(alpha: 0.7),
                       ),
@@ -135,12 +135,12 @@ class _ChecklistTabState extends State<ChecklistTab> {
             ),
             child: Obx(
               () => Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: controller.checklistItemController,
                     decoration: InputDecoration(
                       hintText: LocalKeys.addChecklistItemHint.tr,
-
                       border: InputBorder.none,
                       prefixIcon: Icon(Icons.add, color: AppColors.primary),
                       suffixIcon: IconButton(
@@ -179,79 +179,77 @@ class _ChecklistTabState extends State<ChecklistTab> {
           const SizedBox(height: 16),
 
           // Temporary checklist items
-          Expanded(
-            child: Obx(() {
-              if (controller.tempChecklistItems.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          Obx(() {
+            if (controller.tempChecklistItems.isEmpty) {
+              return Container(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.checklist_outlined,
+                      size: 48,
+                      color: AppColors.onSurface.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(height: 16),
+                    AppText(
+                      LocalKeys.noChecklistItems.tr,
+                      variant: AppTextVariant.body,
+                      fontWeight: FontWeight.w500,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    AppText(
+                      LocalKeys.addItemsAboveToCreateChecklist.tr,
+                      variant: AppTextVariant.body,
+                      fontWeight: FontWeight.w500,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: controller.tempChecklistItems.asMap().entries.map((
+                entry,
+              ) {
+                final index = entry.key;
+                final item = entry.value;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color:
+                        AppColors.primaryGradient[Theme.of(
+                                  context,
+                                ).brightness ==
+                                Brightness.dark
+                            ? 1
+                            : 0],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(),
+                  ),
+                  child: Row(
                     children: [
-                      Icon(
-                        Icons.checklist_outlined,
-                        size: 48,
-                        color: AppColors.onSurface.withValues(alpha: 0.3),
-                      ),
-                      const SizedBox(height: 16),
-                      AppText(
-                        LocalKeys.noChecklistItems.tr,
-                        variant: AppTextVariant.body,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      const SizedBox(height: 8),
-                      AppText(
-                        LocalKeys.addItemsAboveToCreateChecklist,
-                        variant: AppTextVariant.body,
-                        fontWeight: FontWeight.w500,
+                      Icon(Icons.radio_button_unchecked, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(child: AppText(item)),
+                      AppIconButton(
+                        onPressed: () =>
+                            controller.removeTempChecklistItem(index),
+                        child: Icon(
+                          Icons.close,
+                          color: AppColors.error.withValues(alpha: 0.7),
+                        ),
                       ),
                     ],
                   ),
                 );
-              }
-
-              return ListView.builder(
-                itemCount: controller.tempChecklistItems.length,
-                itemBuilder: (context, index) {
-                  final item = controller.tempChecklistItems[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: AppColors.outline.withValues(alpha: 0.2),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.radio_button_unchecked,
-                          size: 20,
-                          color: AppColors.outline,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            item,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () =>
-                              controller.removeTempChecklistItem(index),
-                          icon: Icon(
-                            Icons.close,
-                            size: 16,
-                            color: AppColors.error.withValues(alpha: 0.7),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            }),
-          ),
+              }).toList(),
+            );
+          }),
         ],
       ),
     );

@@ -9,6 +9,7 @@ import 'core/routes/app_pages.dart';
 import 'core/routes/app_routes.dart';
 import 'views/board/board_page.dart';
 import 'views/splash/splash_screen.dart';
+import 'views/onboarding/onboarding_screen.dart';
 import 'bindings/board_binding.dart';
 
 class KanbanKitApp extends StatefulWidget {
@@ -25,6 +26,26 @@ class _KanbanKitAppState extends State<KanbanKitApp> {
     setState(() {
       _showSplash = false;
     });
+  }
+
+  Widget _getInitialScreen() {
+    final userPrefService = Get.find<UserPrefService>();
+    final isOnboardingCompleted = userPrefService.isOnboardingCompleted();
+
+    if (!isOnboardingCompleted) {
+      return const OnboardingScreen();
+    }
+    return const BoardPage();
+  }
+
+  String _getInitialRoute() {
+    final userPrefService = Get.find<UserPrefService>();
+    final isOnboardingCompleted = userPrefService.isOnboardingCompleted();
+
+    if (!isOnboardingCompleted) {
+      return AppRoutes.onboarding;
+    }
+    return AppRoutes.board;
   }
 
   @override
@@ -46,8 +67,8 @@ class _KanbanKitAppState extends State<KanbanKitApp> {
           themeMode: _getFlutterThemeMode(themeController.themeMode),
           home: _showSplash
               ? SplashScreen(onComplete: _hideSplash)
-              : const BoardPage(),
-          initialRoute: _showSplash ? '/' : AppRoutes.board,
+              : _getInitialScreen(),
+          initialRoute: _showSplash ? '/' : _getInitialRoute(),
           getPages: AppPages.pages,
           initialBinding: BoardBinding(),
           debugShowCheckedModeBanner: false,

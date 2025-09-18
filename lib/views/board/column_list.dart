@@ -112,7 +112,7 @@ class ColumnList extends StatelessWidget {
                           itemCount: tasks.length,
                           itemBuilder: (context, index) {
                             final boardController = Get.find<BoardController>();
-                            return Draggable<Task>(
+                            return LongPressDraggable<Task>(
                               data: tasks[index],
                               onDragStarted: boardController.handleDragStart,
                               onDragEnd: (details) =>

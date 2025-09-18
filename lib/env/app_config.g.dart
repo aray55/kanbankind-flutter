@@ -10,7 +10,7 @@ part of 'app_config.dart';
 // ignore_for_file: type=lint
 // generated_from: .env.dev
 final class _DevConfig {
-  static const bool debug = true;
+  static const bool debug = false;
 
   static const String appVersion = '1.0.0';
 

@@ -198,10 +198,7 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
                     focusNode: _focusNode,
                     maxLines: _isMultiline ? null : 1,
                     minLines: _isMultiline ? 3 : 1,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.onSurface,
-                    ),
+                    style: const TextStyle(fontSize: 16),
                     decoration: InputDecoration(
                       hintText: _isMultiline
                           ? LocalKeys.addMultipleItemsHint.tr

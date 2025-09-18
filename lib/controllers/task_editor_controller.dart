@@ -4,6 +4,7 @@ import '../../models/task_model.dart';
 import '../../core/enums/task_status.dart';
 import '../../controllers/checklist_controller.dart';
 import '../../controllers/board_controller.dart';
+import '../../data/repository/checklist_item_repository.dart';
 
 class TaskEditorController extends GetxController
     with GetTickerProviderStateMixin {
@@ -14,6 +15,8 @@ class TaskEditorController extends GetxController
   var tempChecklistItems = <String>[].obs;
   final checklistItemController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  final ChecklistItemRepository _checklistRepository =
+      ChecklistItemRepository();
 
   // Text controllers for form fields
   final titleController = TextEditingController();
@@ -78,19 +81,13 @@ class TaskEditorController extends GetxController
 
   Future<Task> saveTask() async {
     try {
-      print('DEBUG: Starting saveTask');
-      print('DEBUG: Title: "${titleController.text}"');
-      print('DEBUG: Description: "${descriptionController.text}"');
-      print('DEBUG: Form key exists: ${formKey.currentState != null}');
+
 
       // Validate form before saving
       if (formKey.currentState?.validate() != true) {
-        print('DEBUG: Form validation failed');
-        print('DEBUG: Title isEmpty: ${titleController.text.trim().isEmpty}');
         throw Exception('Please fill in all required fields');
       }
 
-      print('DEBUG: Form validation passed');
 
       final task = Task(
         id: editingTask?.id,
@@ -103,19 +100,14 @@ class TaskEditorController extends GetxController
         updatedAt: DateTime.now(),
       );
 
-      print('DEBUG: Task object created: ${task.title}');
 
       final boardController = Get.find<BoardController>();
       if (editingTask?.id == null) {
-        print('DEBUG: Creating new task');
         // Creating a new task
         final createdTask = await boardController.addTask(task);
-        print('DEBUG: Task created with ID: ${createdTask.id}');
 
         if (tempChecklistItems.isNotEmpty && createdTask.id != null) {
-          print('DEBUG: Adding checklist items');
-          final checklistController = Get.find<ChecklistController>();
-          await checklistController.createMultipleItems(
+          await _checklistRepository.createMultipleItems(
             taskId: createdTask.id!,
             titles: tempChecklistItems,
           );
@@ -128,15 +120,12 @@ class TaskEditorController extends GetxController
         }
         return createdTask;
       } else {
-        print('DEBUG: Updating existing task');
         // Updating an existing task
         await boardController.updateTask(task);
 
         // Also handle any new checklist items for existing tasks
         if (tempChecklistItems.isNotEmpty && editingTask?.id != null) {
-          print('DEBUG: Adding checklist items to existing task');
-          final checklistController = Get.find<ChecklistController>();
-          await checklistController.createMultipleItems(
+          await _checklistRepository.createMultipleItems(
             taskId: editingTask!.id!,
             titles: tempChecklistItems,
           );
@@ -151,8 +140,6 @@ class TaskEditorController extends GetxController
         return task;
       }
     } catch (e, stackTrace) {
-      print('DEBUG: Error in saveTask: $e');
-      print('DEBUG: Stack trace: $stackTrace');
       rethrow;
     }
   }

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:kanbankit/core/services/storage_service.dart';
 import 'package:kanbankit/core/constants/storage_keys_costants/user_pref_keys.dart';
 
@@ -28,5 +29,15 @@ class UserPrefService extends GetxService {
   // Get saved theme mode
   String? getSavedThemeMode() {
     return _storageService.read(UserPrefKeys.theme);
+  }
+
+  // Save onboarding completion status
+  Future<void> setOnboardingCompleted(bool completed) async {
+    await _storageService.write(UserPrefKeys.onboardingCompleted, completed);
+  }
+
+  // Get onboarding completion status
+  bool isOnboardingCompleted() {
+    return _storageService.read(UserPrefKeys.onboardingCompleted) ?? false;
   }
 }

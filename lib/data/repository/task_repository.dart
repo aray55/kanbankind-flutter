@@ -10,15 +10,15 @@ class TaskRepository {
   }
 
   Future<List<Task>> getAllTasks() async {
-    return await _taskDao.getAllTasks();
+    return await _taskDao.getAllTasksWithChecklists();
   }
 
   Future<List<Task>> getTasksByStatus(TaskStatus status) async {
-    return await _taskDao.getTasksByStatus(status);
+    return await _taskDao.getTasksByStatusWithChecklists(status);
   }
 
   Future<Task?> getTaskById(int id) async {
-    return await _taskDao.getTaskById(id);
+    return await _taskDao.getTaskByIdWithChecklist(id);
   }
 
   Future<bool> updateTask(Task task) async {
@@ -32,9 +32,12 @@ class TaskRepository {
   }
 
   Future<bool> moveTaskToStatus(int taskId, TaskStatus newStatus) async {
-    final task = await _taskDao.getTaskById(taskId);
+    final task = await _taskDao.getTaskByIdWithChecklist(taskId);
     if (task != null) {
-      final updatedTask = task.copyWith(status: newStatus);
+      final updatedTask = task.copyWith(
+        status: newStatus,
+        updatedAt: DateTime.now(),
+      );
       return await updateTask(updatedTask);
     }
     return false;
