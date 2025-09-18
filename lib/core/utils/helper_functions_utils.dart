@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
@@ -34,6 +36,31 @@ class HelperFunctionsUtils {
       return Colors.orange;
     } else {
       return Colors.green;
+    }
+  }
+  static String getPriorityDisplayName(int priority) {
+    switch (priority) {
+      case 1:
+        return LocalKeys.high.tr;
+      case 2:
+        return LocalKeys.medium.tr;
+      case 3:
+        return LocalKeys.low.tr;
+      default:
+        return LocalKeys.medium.tr;
+    }
+
+  }
+  static Color getPriorityColor(int priority){
+    switch (priority) {
+      case 1:
+        return Colors.red;
+      case 2:
+        return Colors.orange;
+      case 3:
+        return Colors.green;
+      default:
+        return Colors.orange;
     }
   }
 }

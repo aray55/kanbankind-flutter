@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/core/utils/helper_functions_utils.dart';
+import 'package:kanbankit/core/routes/app_routes.dart';
 import 'package:kanbankit/views/components/text_buttons/app_text_button.dart';
 import 'package:kanbankit/views/widgets/responsive_text.dart';
 import '../../models/task_model.dart';
@@ -27,7 +28,7 @@ class EnhancedTaskCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8.0),
       elevation: 2.0,
       child: InkWell(
-        onTap: () => _showTaskEditor(context),
+        onTap: () => _navigateToTaskDetails(),
         borderRadius: BorderRadius.circular(8.0),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -50,7 +51,6 @@ class EnhancedTaskCard extends StatelessWidget {
                     children: [
                       _buildPriorityIndicator(),
                       PopupMenuButton<String>(
-                     
                         onSelected: (value) {
                           if (value == 'delete') {
                             _showDeleteConfirmation(context);
@@ -62,7 +62,6 @@ class EnhancedTaskCard extends StatelessWidget {
                         },
                         itemBuilder: (context) => [
                           PopupMenuItem(
-                            
                             value: 'edit',
                             child: Row(
                               children: [
@@ -165,15 +164,9 @@ class EnhancedTaskCard extends StatelessWidget {
                     // For wider cards, use row layout with proper constraints
                     return Row(
                       children: [
-                        Expanded(
-                          flex: 3,
-                          child: createdDateWidget,
-                        ),
+                        Expanded(flex: 3, child: createdDateWidget),
                         const SizedBox(width: 8),
-                        Flexible(
-                          flex: 2,
-                          child: dueDateWidget,
-                        ),
+                        Flexible(flex: 2, child: dueDateWidget),
                       ],
                     );
                   }
@@ -216,6 +209,10 @@ class EnhancedTaskCard extends StatelessWidget {
       ),
       child: Icon(icon, size: 12, color: Colors.white),
     );
+  }
+
+  void _navigateToTaskDetails() {
+    Get.toNamed(AppRoutes.taskDetails, arguments: task);
   }
 
   void _showTaskEditor(BuildContext context, {int initialTab = 0}) {

@@ -12,6 +12,8 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color? backgroundColor;
   final bool showLogo;
   final double? logoSize;
+  final PreferredSizeWidget? bottom;
+  final TextOverflow overflow;
 
   const ResponsiveAppBar({
     super.key,
@@ -22,6 +24,8 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor,
     this.showLogo = true,
     this.logoSize,
+    this.bottom,
+    this.overflow = TextOverflow.ellipsis,
   });
 
   @override
@@ -34,23 +38,26 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (screenWidth < 600) {
           return AppBar(
             leading: leading,
-            title: _buildTitleWithLogo(context, true),
+            title: _buildTitleWithLogo(context, true, overflow),
             actions: actions,
             elevation: elevation ?? 0,
             centerTitle: true,
+            bottom: bottom,
+            
           );
         }
         // Tablet/Desktop layout
         else {
           return AppBar(
             leading: leading,
-            title: _buildTitleWithLogo(context, false),
+            title: _buildTitleWithLogo(context, false, overflow),
             actions: actions,
             elevation: elevation ?? 0,
             backgroundColor:
                 backgroundColor ?? Theme.of(context).colorScheme.surface,
             centerTitle: false, // Align title to the left on larger screens
             toolbarHeight: 65, // A bit taller for larger screens
+            bottom: bottom,
           );
         }
       },
@@ -60,11 +67,12 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
-  Widget _buildTitleWithLogo(BuildContext context, bool isMobile) {
+  Widget _buildTitleWithLogo(BuildContext context, bool isMobile,  overflow) {
     if (!showLogo) {
       return AppText(
         title,
         variant: AppTextVariant.h1,
+        overflow: overflow,
       );
     }
 
@@ -91,6 +99,7 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
         AppText(
           title,
           variant: AppTextVariant.h1,
+          overflow: overflow,
         ),
       ],
     );

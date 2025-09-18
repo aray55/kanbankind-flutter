@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kanbankit/core/themes/app_colors.dart';
 import 'package:kanbankit/core/utils/helper_functions_utils.dart';
 import '../../controllers/task_editor_controller.dart';
 import '../../controllers/datetime_picker_controller.dart';

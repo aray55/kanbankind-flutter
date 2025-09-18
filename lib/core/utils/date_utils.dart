@@ -5,11 +5,11 @@ class AppDateUtils {
   static String formatDate(DateTime date) {
     return DateFormat('MMM dd, yyyy').format(date);
   }
-  
+
   static String formatDateTime(DateTime dateTime) {
-    return DateFormat('MMM dd, yyyy HH:mm').format(dateTime);
+    return DateFormat('MM dd, yyyy HH:mm').format(dateTime);
   }
-  
+
   static String formatTime(DateTime time) {
     return DateFormat('HH:mm').format(time);
   }
@@ -79,11 +79,11 @@ class AppDateUtils {
   // Validation and comparison methods
   static bool isToday(DateTime date) {
     final now = DateTime.now();
-    return date.year == now.year && 
-           date.month == now.month && 
-           date.day == now.day;
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
-  
+
   static bool isOverdue(DateTime dueDate) {
     return dueDate.isBefore(DateTime.now());
   }
@@ -91,24 +91,24 @@ class AppDateUtils {
   static bool isTomorrow(DateTime date) {
     final tomorrow = DateTime.now().add(const Duration(days: 1));
     return date.year == tomorrow.year &&
-           date.month == tomorrow.month &&
-           date.day == tomorrow.day;
+        date.month == tomorrow.month &&
+        date.day == tomorrow.day;
   }
 
   static bool isYesterday(DateTime date) {
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
     return date.year == yesterday.year &&
-           date.month == yesterday.month &&
-           date.day == yesterday.day;
+        date.month == yesterday.month &&
+        date.day == yesterday.day;
   }
 
   static bool isThisWeek(DateTime date) {
     final now = DateTime.now();
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
     final endOfWeek = startOfWeek.add(const Duration(days: 6));
-    
+
     return date.isAfter(startOfWeek.subtract(const Duration(days: 1))) &&
-           date.isBefore(endOfWeek.add(const Duration(days: 1)));
+        date.isBefore(endOfWeek.add(const Duration(days: 1)));
   }
 
   static bool isThisMonth(DateTime date) {

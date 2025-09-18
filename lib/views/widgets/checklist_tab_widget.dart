@@ -35,7 +35,6 @@ class _ChecklistTabState extends State<ChecklistTab> {
     super.dispose();
   }
 
-
   void _triggerCelebration() {
     _hasTriggeredCelebration = true;
     _confettiController.play();
@@ -47,7 +46,6 @@ class _ChecklistTabState extends State<ChecklistTab> {
     final isNewTask = controller.editingTask?.id == null;
 
     return Stack(
-      
       children: [
         // Main content
         if (isNewTask)
@@ -112,7 +110,8 @@ class _ChecklistTabState extends State<ChecklistTab> {
                       AppText(
                         LocalKeys.addChecklistItemsForNewTask.tr,
                         variant: AppTextVariant.body,
-                        fontWeight: FontWeight.w600,
+
+                        fontWeight: FontWeight.w300,
                         color: AppColors.primary.withValues(alpha: 0.7),
                       ),
                     ],
@@ -140,9 +139,8 @@ class _ChecklistTabState extends State<ChecklistTab> {
                   TextField(
                     controller: controller.checklistItemController,
                     decoration: InputDecoration(
-                      
                       hintText: LocalKeys.addChecklistItemHint.tr,
-                      
+
                       border: InputBorder.none,
                       prefixIcon: Icon(Icons.add, color: AppColors.primary),
                       suffixIcon: IconButton(

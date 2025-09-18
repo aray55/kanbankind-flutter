@@ -446,11 +446,7 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
         child: TextField(
           controller: _textController,
           focusNode: _focusNode,
-          // style: TextStyle(
-          //   fontSize: 16,
-          //   color: AppColors.onSurface,
-          //   fontWeight: FontWeight.w500,
-          // ),
+       
           decoration: InputDecoration(
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(

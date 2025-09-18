@@ -43,7 +43,7 @@ class AppTheme {
             bodySmall: typography
                 .textTheme(context)
                 .bodySmall
-                ?.copyWith(color: AppColors.textTertiary),
+                ?.copyWith(color: AppColors.black),
           ),
       scaffoldBackgroundColor: colorScheme.surface,
       appBarTheme: AppBarTheme(

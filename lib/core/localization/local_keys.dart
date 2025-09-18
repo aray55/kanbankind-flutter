@@ -92,4 +92,15 @@ class LocalKeys {
   static const String singleLine = 'single_line';
   static const String multipleLines = 'multiple_lines';
   static const String addMultipleItemsHint = 'add_multiple_items_hint';
+  static const String taskNotFound = 'task_not_found';
+  static const String taskDetails = 'task_details';
+  static const String taskInformation = 'task_information';
+  static const String taskProgress = 'task_progress';
+  static const String allTasksCompleted = 'all_tasks_completed';
+  static const String lastUpdated = 'last_updated';
+  static const String taskPriority = 'task_priority';
+  static const String taskDueDate = 'task_due_date';
+  static const String noDescription = 'no_description';
+  static const String noDueDate = 'no_due_date';
+
 }

@@ -5,6 +5,8 @@ import 'package:kanbankit/core/services/user_pref_service.dart';
 import 'package:kanbankit/core/themes/app_theme.dart';
 import 'package:kanbankit/controllers/theme_controller.dart' as theme_ctrl;
 import 'core/localization/local_keys.dart' show LocalKeys;
+import 'core/routes/app_pages.dart';
+import 'core/routes/app_routes.dart';
 import 'views/board/board_page.dart';
 import 'views/splash/splash_screen.dart';
 import 'bindings/board_binding.dart';
@@ -45,6 +47,8 @@ class _KanbanKitAppState extends State<KanbanKitApp> {
           home: _showSplash
               ? SplashScreen(onComplete: _hideSplash)
               : const BoardPage(),
+          initialRoute: _showSplash ? '/' : AppRoutes.board,
+          getPages: AppPages.pages,
           initialBinding: BoardBinding(),
           debugShowCheckedModeBanner: false,
           translations: AppTranslations(),
