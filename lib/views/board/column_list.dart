@@ -7,7 +7,6 @@ import '../../core/utils/helper_functions_utils.dart' show HelperFunctionsUtils;
 import '../../models/task_model.dart';
 import '../../core/enums/task_status.dart';
 import '../components/empty_state.dart' show EmptyState;
-import '../widgets/task_card.dart';
 import '../widgets/responsive_text.dart';
 
 class ColumnList extends StatelessWidget {
@@ -33,7 +32,7 @@ class ColumnList extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        // color: Colors.grey[100],
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Column(

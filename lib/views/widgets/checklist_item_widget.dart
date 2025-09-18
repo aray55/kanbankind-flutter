@@ -7,6 +7,7 @@ import 'package:kanbankit/views/widgets/responsive_text.dart';
 import '../../models/checklist_item_model.dart';
 import '../../core/themes/app_colors.dart';
 import '../../controllers/checklist_controller.dart';
+import '../../controllers/theme_controller.dart';
 import '../components/icon_buttons/icon_button_style.dart';
 
 class ChecklistItemWidget extends StatefulWidget {
@@ -61,14 +62,6 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    _colorAnimation = ColorTween(
-      begin: AppColors.surface,
-      end: AppColors.primary.withValues(alpha: 0.1),
-    ).animate(CurvedAnimation(
-      parent: _animationController, 
-      curve: Curves.easeInOut,
-    ));
-
     _textController = TextEditingController(text: widget.item.title);
     _focusNode = FocusNode();
 
@@ -82,6 +75,23 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Initialize color animation here where Theme.of(context) is available
+    _colorAnimation =
+        ColorTween(
+          begin: Theme.of(context).colorScheme.surface,
+          end: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+        ).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
+  }
+
+  @override
   void dispose() {
     _animationController.dispose();
     _focusNode.removeListener(_onFocusChanged);
@@ -90,13 +100,13 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
     _focusNode.dispose();
     super.dispose();
   }
-  
+
   void _onFocusChanged() {
     if (!_focusNode.hasFocus && _isEditing) {
       _saveEdit();
     }
   }
-  
+
   void _onTextChanged() {
     // Clear error when user starts typing
     if (_hasError && _textController.text.trim().isNotEmpty) {
@@ -126,7 +136,7 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
   void _toggleCompletion() {
     // Provide immediate visual feedback
     HapticFeedback.selectionClick();
-    
+
     if (widget.onToggle != null) {
       widget.onToggle!();
     } else {
@@ -158,19 +168,19 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
 
   void _saveEdit() {
     final newTitle = _textController.text.trim();
-    
+
     // Validate input
     if (newTitle.isEmpty) {
       setState(() {
         _hasError = true;
         _errorMessage = LocalKeys.itemTitleEmpty.tr;
       });
-      
+
       // Shake animation for error feedback
       _animationController.forward().then((_) {
         _animationController.reverse();
       });
-      
+
       HapticFeedback.mediumImpact();
       return;
     }
@@ -180,16 +190,16 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
       try {
         final controller = Get.find<ChecklistController>();
         controller.updateItemTitle(widget.item.id!, newTitle);
-        
+
         // Success feedback
         HapticFeedback.selectionClick();
-        
+
         // Show success snackbar briefly
         Get.showSnackbar(
           GetSnackBar(
             message: LocalKeys.saveChanges.tr,
             duration: const Duration(seconds: 1),
-            backgroundColor: AppColors.primary,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             snackPosition: SnackPosition.BOTTOM,
             margin: const EdgeInsets.all(8),
             borderRadius: 8,
@@ -221,10 +231,7 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
     // Show confirmation dialog for better UX
     Get.dialog(
       AlertDialog(
-        title: AppText(
-          LocalKeys.deleteItem.tr,
-          variant: AppTextVariant.h2,
-        ),
+        title: AppText(LocalKeys.deleteItem.tr, variant: AppTextVariant.h2),
         content: AppText(
           '${LocalKeys.areYouSureDelete.tr} "${widget.item.title}"?',
           variant: AppTextVariant.body,
@@ -235,16 +242,18 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
             child: AppText(
               LocalKeys.cancel.tr,
               variant: AppTextVariant.button,
-              color: AppColors.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           ElevatedButton(
             onPressed: () {
               Get.back();
-              
+
               // Perform delete with haptic feedback
               HapticFeedback.mediumImpact();
-              
+
               if (widget.onDelete != null) {
                 widget.onDelete!();
               } else {
@@ -253,13 +262,13 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: AppColors.white,
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
             ),
             child: AppText(
               LocalKeys.delete.tr,
               variant: AppTextVariant.button,
-              color: AppColors.white,
+              color: Theme.of(context).colorScheme.onError,
             ),
           ),
         ],
@@ -269,6 +278,10 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -282,38 +295,40 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
                 gradient: widget.item.isDone
                     ? LinearGradient(
                         colors: [
-                          AppColors.primary.withValues(alpha: 0.1),
-                          AppColors.surface.withValues(alpha: 0.8),
+                          colorScheme.primary.withValues(alpha: 0.1),
+                          colorScheme.surface.withValues(alpha: 0.8),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       )
                     : LinearGradient(
                         colors: [
-                          AppColors.surface,
-                          AppColors.surface.withValues(alpha: 0.9),
+                          colorScheme.surface,
+                          colorScheme.surface.withValues(alpha: 0.9),
                         ],
                       ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: _hasError
-                      ? AppColors.error
+                      ? colorScheme.error
                       : widget.item.isDone
-                          ? AppColors.primary.withValues(alpha: 0.4)
-                          : AppColors.outline.withValues(alpha: 0.3),
+                      ? colorScheme.primary.withValues(alpha: 0.4)
+                      : colorScheme.outline.withValues(alpha: 0.3),
                   width: _hasError ? 2 : 1,
                 ),
                 boxShadow: [
                   if (!widget.item.isDone && !_hasError)
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.08),
-                      blurRadius: 8,
+                      color: isDarkMode
+                          ? Colors.black.withValues(alpha: 0.3)
+                          : Colors.black.withValues(alpha: 0.08),
+                      blurRadius: isDarkMode ? 12 : 8,
                       offset: const Offset(0, 3),
                       spreadRadius: 0,
                     ),
                   if (_isHovered)
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: colorScheme.primary.withValues(alpha: 0.2),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -338,20 +353,18 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
                             children: [
                               // Enhanced Checkbox with animation
                               _buildAnimatedCheckbox(),
-                              
+
                               const SizedBox(width: 16),
-                              
+
                               // Title with enhanced styling
-                              Expanded(
-                                child: _buildTitleWidget(),
-                              ),
-                              
+                              Expanded(child: _buildTitleWidget()),
+
                               // Action buttons with better spacing
                               if (widget.showActions && !_isEditing) ...[
                                 const SizedBox(width: 8),
                                 _buildActionButtons(),
                               ],
-                              
+
                               // Edit mode buttons
                               if (_isEditing) ...[
                                 const SizedBox(width: 8),
@@ -359,7 +372,7 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
                               ],
                             ],
                           ),
-                          
+
                           // Error message with slide animation
                           if (_hasError && _errorMessage != null)
                             _buildErrorMessage(),
@@ -375,7 +388,7 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
       },
     );
   }
-  
+
   // Helper method to build animated checkbox
   Widget _buildAnimatedCheckbox() {
     return GestureDetector(
@@ -387,34 +400,36 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: widget.item.isDone
-              ? AppColors.primary
+              ? Theme.of(context).colorScheme.primary
               : Colors.transparent,
           border: Border.all(
             color: widget.item.isDone
-                ? AppColors.primary
-                : AppColors.outline,
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.outline,
             width: 2.5,
           ),
           boxShadow: [
             if (widget.item.isDone)
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.3),
                 blurRadius: 8,
                 spreadRadius: 1,
               ),
           ],
         ),
         child: widget.item.isDone
-            ? const Icon(
+            ? Icon(
                 Icons.check,
-                color: AppColors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
                 size: 18,
               )
             : null,
       ),
     );
   }
-  
+
   // Helper method to build title widget
   Widget _buildTitleWidget() {
     if (_isEditing) {
@@ -422,20 +437,20 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: _hasError 
-                ? AppColors.error 
-                : AppColors.outline.withValues(alpha: 0.3),
+            color: _hasError
+                ? Theme.of(context).colorScheme.error
+                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
         child: TextField(
           controller: _textController,
           focusNode: _focusNode,
-          style: TextStyle(
-            fontSize: 16,
-            color: AppColors.onSurface,
-            fontWeight: FontWeight.w500,
-          ),
+          // style: TextStyle(
+          //   fontSize: 16,
+          //   color: AppColors.onSurface,
+          //   fontWeight: FontWeight.w500,
+          // ),
           decoration: InputDecoration(
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(
@@ -444,7 +459,9 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
             ),
             hintText: LocalKeys.editItem.tr,
             hintStyle: TextStyle(
-              color: AppColors.onSurface.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
           ),
           onSubmitted: (_) => _saveEdit(),
@@ -452,7 +469,7 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
         ),
       );
     }
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -461,8 +478,8 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
           variant: AppTextVariant.body,
           fontWeight: widget.item.isDone ? FontWeight.w400 : FontWeight.w500,
           color: widget.item.isDone
-              ? AppColors.onSurface.withValues(alpha: 0.6)
-              : AppColors.onSurface,
+              ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
+              : Theme.of(context).colorScheme.onSurface,
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
         ),
@@ -472,13 +489,15 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
             child: AppText(
               LocalKeys.longPressToEdit.tr,
               variant: AppTextVariant.small,
-              color: AppColors.onSurface.withValues(alpha: 0.4),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.4),
             ),
           ),
       ],
     );
   }
-  
+
   // Helper method to build action buttons
   Widget _buildActionButtons() {
     return Row(
@@ -494,13 +513,15 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
               child: Icon(
                 Icons.edit_outlined,
                 size: 20,
-                color: AppColors.primary.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.7),
               ),
             ),
           ),
-        
+
         const SizedBox(width: 4),
-        
+
         // Delete button
         Tooltip(
           message: LocalKeys.deleteItem.tr,
@@ -510,14 +531,14 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
             child: Icon(
               Icons.delete_outline,
               size: 20,
-              color: AppColors.error.withValues(alpha: 0.8),
+              color: Theme.of(context).colorScheme.error.withValues(alpha: 0.8),
             ),
           ),
         ),
       ],
     );
   }
-  
+
   // Helper method to build edit mode buttons
   Widget _buildEditModeButtons() {
     return Row(
@@ -532,20 +553,22 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.check,
                 size: 18,
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ),
         ),
-        
+
         const SizedBox(width: 4),
-        
+
         // Cancel button
         Tooltip(
           message: LocalKeys.discardChanges.tr,
@@ -555,13 +578,17 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: AppColors.error.withValues(alpha: 0.1),
+                color: Theme.of(
+                  context,
+                ).colorScheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(
                 Icons.close,
                 size: 18,
-                color: AppColors.error.withValues(alpha: 0.8),
+                color: Theme.of(
+                  context,
+                ).colorScheme.error.withValues(alpha: 0.8),
               ),
             ),
           ),
@@ -569,7 +596,7 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
       ],
     );
   }
-  
+
   // Helper method to build error message
   Widget _buildErrorMessage() {
     return AnimatedContainer(
@@ -577,10 +604,10 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColors.error.withValues(alpha: 0.3),
+          color: Theme.of(context).colorScheme.error.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -588,14 +615,14 @@ class _ChecklistItemWidgetState extends State<ChecklistItemWidget>
           Icon(
             Icons.error_outline,
             size: 16,
-            color: AppColors.error,
+            color: Theme.of(context).colorScheme.error,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: AppText(
               _errorMessage!,
               variant: AppTextVariant.small,
-              color: AppColors.error,
+              color: Theme.of(context).colorScheme.error,
             ),
           ),
         ],

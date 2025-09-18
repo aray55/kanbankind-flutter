@@ -207,9 +207,6 @@ class _AddChecklistItemWidgetState extends State<AddChecklistItemWidget> {
                           ? LocalKeys.addMultipleItemsHint.tr
                           : widget.hintText ??
                                 LocalKeys.addChecklistItemHint.tr,
-                      hintStyle: TextStyle(
-                        color: AppColors.onSurface.withValues(alpha: 0.5),
-                      ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.zero,
                     ),

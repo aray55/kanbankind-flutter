@@ -84,8 +84,7 @@ class AppText extends StatelessWidget {
       case AppTextVariant.button:
         return typography.button(context);
       case AppTextVariant.body:
-      default:
-        return typography.body(context);
+      return typography.body(context);
     }
   }
 }

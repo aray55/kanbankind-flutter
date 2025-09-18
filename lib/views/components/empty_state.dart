@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_logo.dart';
 
 class EmptyState extends StatelessWidget {
   final String title;
@@ -6,6 +7,8 @@ class EmptyState extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onActionPressed;
   final String? actionText;
+  final bool showLogo;
+  final double? logoSize;
 
   const EmptyState({
     super.key,
@@ -14,6 +17,8 @@ class EmptyState extends StatelessWidget {
     required this.icon,
     this.onActionPressed,
     this.actionText,
+    this.showLogo = false,
+    this.logoSize,
   });
 
   @override
@@ -24,10 +29,17 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            if (showLogo) ...[
+              AppLogo(
+                size: logoSize ?? 48,
+                showText: false,
+              ),
+              const SizedBox(height: 16),
+            ],
             Icon(
               icon,
               size: 64,
-              color: Colors.grey[400],
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.6),
             ),
             const SizedBox(height: 16),
             Text(

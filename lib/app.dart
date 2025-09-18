@@ -6,10 +6,24 @@ import 'package:kanbankit/core/themes/app_theme.dart';
 import 'package:kanbankit/controllers/theme_controller.dart' as theme_ctrl;
 import 'core/localization/local_keys.dart' show LocalKeys;
 import 'views/board/board_page.dart';
+import 'views/splash/splash_screen.dart';
 import 'bindings/board_binding.dart';
 
-class KanbanKitApp extends StatelessWidget {
+class KanbanKitApp extends StatefulWidget {
   const KanbanKitApp({super.key});
+
+  @override
+  State<KanbanKitApp> createState() => _KanbanKitAppState();
+}
+
+class _KanbanKitAppState extends State<KanbanKitApp> {
+  bool _showSplash = true;
+
+  void _hideSplash() {
+    setState(() {
+      _showSplash = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +42,9 @@ class KanbanKitApp extends StatelessWidget {
           theme: AppTheme.lightTheme(context),
           darkTheme: AppTheme.darkTheme(context),
           themeMode: _getFlutterThemeMode(themeController.themeMode),
-          home: const BoardPage(),
+          home: _showSplash
+              ? SplashScreen(onComplete: _hideSplash)
+              : const BoardPage(),
           initialBinding: BoardBinding(),
           debugShowCheckedModeBanner: false,
           translations: AppTranslations(),

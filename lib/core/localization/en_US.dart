@@ -75,7 +75,7 @@ const Map<String, String> enUS = {
   'complete_all_items': 'Mark all complete',
   'search_checklist_items': 'Search checklist items...',
   'edit_item': 'Edit item',
-  'delete_item': 'Delete item', 
+  'delete_item': 'Delete item',
   'save_changes': 'Save changes',
   'discard_changes': 'Discard changes',
   'item_title_empty': 'Item title cannot be empty',

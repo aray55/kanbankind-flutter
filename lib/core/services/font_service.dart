@@ -14,6 +14,7 @@ class FontService extends GetxService {
   void setScale(double scale) {
     currentScale.value = scale;
   }
+  
   @override
   void onInit() {
     super.onInit();

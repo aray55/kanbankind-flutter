@@ -10,6 +10,8 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
   final double? elevation;
   final Color? backgroundColor;
+  final bool showLogo;
+  final double? logoSize;
 
   const ResponsiveAppBar({
     super.key,
@@ -18,6 +20,8 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leading,
     this.elevation,
     this.backgroundColor,
+    this.showLogo = true,
+    this.logoSize,
   });
 
   @override
@@ -30,14 +34,9 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (screenWidth < 600) {
           return AppBar(
             leading: leading,
-            title: AppText(
-              title,
-              variant: AppTextVariant.h1,
-            ),
+            title: _buildTitleWithLogo(context, true),
             actions: actions,
             elevation: elevation ?? 0,
-            backgroundColor:
-                backgroundColor ?? Theme.of(context).colorScheme.inversePrimary,
             centerTitle: true,
           );
         }
@@ -45,10 +44,7 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
         else {
           return AppBar(
             leading: leading,
-            title: AppText(
-              title,
-              variant: AppTextVariant.h1,
-            ),
+            title: _buildTitleWithLogo(context, false),
             actions: actions,
             elevation: elevation ?? 0,
             backgroundColor:
@@ -63,4 +59,40 @@ class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  Widget _buildTitleWithLogo(BuildContext context, bool isMobile) {
+    if (!showLogo) {
+      return AppText(
+        title,
+        variant: AppTextVariant.h1,
+      );
+    }
+
+    final double logoSizeValue = logoSize ?? (isMobile ? 28 : 32);
+    
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset(
+          'assets/images/app_logo.png',
+          height: logoSizeValue,
+          width: logoSizeValue,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            // Fallback if image fails to load
+            return Icon(
+              Icons.dashboard,
+              size: logoSizeValue,
+              color: Theme.of(context).colorScheme.primary,
+            );
+          },
+        ),
+        const SizedBox(width: 8),
+        AppText(
+          title,
+          variant: AppTextVariant.h1,
+        ),
+      ],
+    );
+  }
 }

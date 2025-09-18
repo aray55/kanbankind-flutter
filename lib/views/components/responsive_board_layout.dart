@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/localization/local_keys.dart' show LocalKeys;
+import '../../core/utils/logger/app_logger.dart';
 import '../../models/task_model.dart';
 import '../../core/enums/task_status.dart';
 import '../board/column_list.dart';
@@ -34,10 +35,12 @@ class ResponsiveBoardLayout extends StatelessWidget {
         // Determine layout based on screen size
         // Use a scrollable layout for tablets and phones
         if (screenWidth < 900) {
+          AppLogger.debug('Screen width: $screenWidth');
           return _buildScrollableLayout(context);
         }
         // Use a desktop layout for wider screens
         else {
+          AppLogger.debug('Screen width: $screenWidth');
           return _buildDesktopLayout(context, constraints);
         }
       },
@@ -45,6 +48,21 @@ class ResponsiveBoardLayout extends StatelessWidget {
   }
 
   Widget _buildScrollableLayout(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Calculate column width based on screen size
+    // For very small screens (< 400px), use smaller columns
+    // For medium screens (400-600px), use medium columns
+    // For larger screens (600-900px), use larger columns
+    double columnWidth;
+    if (screenWidth < 400) {
+      columnWidth = 280; // Minimum width to prevent overflow
+    } else if (screenWidth < 600) {
+      columnWidth = 300;
+    } else {
+      columnWidth = 320;
+    }
+    
     return SingleChildScrollView(
       controller: scrollController,
       scrollDirection: Axis.horizontal,
@@ -52,7 +70,7 @@ class ResponsiveBoardLayout extends StatelessWidget {
         child: Row(
           children: [
             SizedBox(
-              width: 250,
+              width: columnWidth,
               child: ColumnList(
                 title: TaskStatus.todo.displayName,
                 tasks: todoTasks,
@@ -64,7 +82,7 @@ class ResponsiveBoardLayout extends StatelessWidget {
             ),
             const VerticalDivider(width: 1),
             SizedBox(
-              width: 250,
+              width: columnWidth,
               child: ColumnList(
                 title: TaskStatus.inProgress.displayName,
                 tasks: inProgressTasks,
@@ -76,7 +94,7 @@ class ResponsiveBoardLayout extends StatelessWidget {
             ),
             const VerticalDivider(width: 1),
             SizedBox(
-              width: 250,
+              width: columnWidth,
               child: ColumnList(
                 title: TaskStatus.done.displayName,
                 tasks: doneTasks,

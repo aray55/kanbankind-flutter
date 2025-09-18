@@ -74,7 +74,7 @@ const Map<String, String> arYE = {
   'search_checklist_items': 'البحث في عناصر القائمة...',
   'edit_item': 'تحرير العنصر',
   'delete_item': 'حذف العنصر',
-  'save_changes': 'حفظ التغييرات', 
+  'save_changes': 'حفظ التغييرات',
   'discard_changes': 'تجاهل التغييرات',
   'item_title_empty': 'عنوان العنصر لا يمكن أن يكون فارغاً',
   'tap_to_edit': 'اضغط للتحرير',

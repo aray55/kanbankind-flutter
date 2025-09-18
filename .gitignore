@@ -47,4 +47,7 @@ app.*.map.json
 #Read Me files 
 THEME_SWITCHING_GUIDE.md
 DATETIME_PICKER_GUIDE.md
+#Env files
+.env.dev
+
 

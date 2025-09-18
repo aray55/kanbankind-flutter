@@ -190,28 +190,28 @@ class AppTypography {
   // ✅ أنماط نصوص ديناميكية حسب حجم الشاشة
   TextStyle h1(BuildContext context) => TextStyle(
         fontFamily: fontFamily,
-        fontSize: ResponsiveUtils.fontSize(context, 24),
+        fontSize: ResponsiveUtils.fontSize(context, 20),
         fontWeight: FontWeight.bold,
         height: 1.3,
       );
 
   TextStyle h2(BuildContext context) => TextStyle(
         fontFamily: fontFamily,
-        fontSize: ResponsiveUtils.fontSize(context, 20),
+        fontSize: ResponsiveUtils.fontSize(context, 16),
         fontWeight: FontWeight.w600,
         height: 1.3,
       );
 
   TextStyle body(BuildContext context) => TextStyle(
         fontFamily: fontFamily,
-        fontSize: ResponsiveUtils.fontSize(context, 16),
+        fontSize: ResponsiveUtils.fontSize(context, 14),
         fontWeight: FontWeight.normal,
         height: 1.5,
       );
 
   TextStyle small(BuildContext context) => TextStyle(
         fontFamily: fontFamily,
-        fontSize: ResponsiveUtils.fontSize(context, 14),
+        fontSize: ResponsiveUtils.fontSize(context, 12),
         fontWeight: FontWeight.normal,
         height: 1.4,
         color: Colors.grey,
@@ -219,7 +219,7 @@ class AppTypography {
 
   TextStyle button(BuildContext context) => TextStyle(
         fontFamily: fontFamily,
-        fontSize: ResponsiveUtils.fontSize(context, 16),
+        fontSize: ResponsiveUtils.fontSize(context, 12),
         fontWeight: FontWeight.w600,
         letterSpacing: 1.1,
       );
@@ -239,7 +239,7 @@ class AppTypography {
         bodyLarge: body(context),
         bodyMedium: small(context),
         bodySmall: small(context).copyWith(
-          fontSize: ResponsiveUtils.fontSize(context, 12),
+          fontSize: ResponsiveUtils.fontSize(context, 10),
         ),
         labelLarge: button(context),
         labelMedium: button(context).copyWith(

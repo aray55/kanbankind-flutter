@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
-import 'package:kanbankit/core/themes/app_colors.dart';
 import 'package:kanbankit/core/utils/helper_functions_utils.dart';
 import 'package:kanbankit/views/components/text_buttons/app_text_button.dart';
 import 'package:kanbankit/views/widgets/responsive_text.dart';
@@ -126,6 +125,7 @@ class EnhancedTaskCard extends StatelessWidget {
                   final createdDateWidget = AppText(
                     '${LocalKeys.created.tr}: ${AppDateUtils.formatDate(task.createdAt)}',
                     variant: AppTextVariant.body,
+                    overflow: TextOverflow.ellipsis,
                   );
 
                   final dueDateWidget = task.dueDate != null
@@ -141,34 +141,39 @@ class EnhancedTaskCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: AppText(
-                            '${LocalKeys.dueDate.tr}: ${AppDateUtils.formatDate(task.dueDate!)}',
-                            variant: AppTextVariant.body,
+                            '${LocalKeys.dueDate.tr}: ${AppDateUtils.formatDateTime(task.dueDate!)}',
+                            variant: AppTextVariant.small,
                             fontWeight: FontWeight.bold,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         )
                       : null;
 
-                  if (constraints.maxWidth > 200) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(child: createdDateWidget),
-                        if (dueDateWidget != null) dueDateWidget,
-                      ],
-                    );
-                  } else {
+                  // Use column layout for narrow cards (< 280px) to prevent overflow
+                  if (constraints.maxWidth < 280 || dueDateWidget == null) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4.0),
+                        createdDateWidget,
+                        if (dueDateWidget != null) ...[
+                          const SizedBox(height: 4),
+                          dueDateWidget,
+                        ],
+                      ],
+                    );
+                  } else {
+                    // For wider cards, use row layout with proper constraints
+                    return Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
                           child: createdDateWidget,
                         ),
-                        if (dueDateWidget != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4.0),
-                            child: dueDateWidget,
-                          ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          flex: 2,
+                          child: dueDateWidget,
+                        ),
                       ],
                     );
                   }

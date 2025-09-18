@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/core/themes/app_colors.dart';
 import 'package:kanbankit/core/utils/helper_functions_utils.dart';
 import '../../controllers/task_editor_controller.dart';
 import '../../controllers/datetime_picker_controller.dart';
@@ -22,6 +23,7 @@ class TaskDetailsTab extends StatelessWidget {
         children: [
           TextFormField(
             controller: controller.titleController,
+            style: Theme.of(context).textTheme.bodyLarge,
             decoration: InputDecoration(
               labelText: LocalKeys.taskTitle.tr,
               border: OutlineInputBorder(),
@@ -37,6 +39,7 @@ class TaskDetailsTab extends StatelessWidget {
           TextFormField(
             controller: controller.descriptionController,
             maxLines: 4,
+            style: Theme.of(context).textTheme.bodyLarge,
             decoration: InputDecoration(
               labelText: LocalKeys.taskDescription.tr,
               border: OutlineInputBorder(),
@@ -45,11 +48,16 @@ class TaskDetailsTab extends StatelessWidget {
           const SizedBox(height: 16),
           Obx(
             () => DropdownButtonFormField<TaskStatus>(
+              style: Theme.of(context).textTheme.bodyLarge,
+              dropdownColor: Theme.of(context).colorScheme.surface,
               items: TaskStatus.values
                   .map(
                     (s) => DropdownMenuItem(
                       value: s,
-                      child: Text(HelperFunctionsUtils.getStatusDisplayName(s)),
+                      child: Text(
+                        HelperFunctionsUtils.getStatusDisplayName(s),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
                     ),
                   )
                   .toList(),
@@ -66,11 +74,31 @@ class TaskDetailsTab extends StatelessWidget {
           const SizedBox(height: 16),
           Obx(
             () => DropdownButtonFormField<int>(
+              style: Theme.of(context).textTheme.bodyLarge,
+              dropdownColor: Theme.of(context).colorScheme.surface,
               value: controller.selectedPriority.value,
               items: [
-                DropdownMenuItem(value: 1, child: Text(LocalKeys.high.tr)),
-                DropdownMenuItem(value: 2, child: Text(LocalKeys.medium.tr)),
-                DropdownMenuItem(value: 3, child: Text(LocalKeys.low.tr)),
+                DropdownMenuItem(
+                  value: 1,
+                  child: Text(
+                    LocalKeys.high.tr,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 2,
+                  child: Text(
+                    LocalKeys.medium.tr,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 3,
+                  child: Text(
+                    LocalKeys.low.tr,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
               ],
               onChanged: (val) {
                 if (val != null) controller.selectedPriority.value = val;

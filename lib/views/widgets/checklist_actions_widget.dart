@@ -113,20 +113,12 @@ class ChecklistActionsWidget extends StatelessWidget {
                   onChanged: controller.updateSearchQuery,
                   decoration: InputDecoration(
                     hintText: LocalKeys.searchChecklistItems.tr,
-                    hintStyle: TextStyle(
-                      color: AppColors.onSurface.withOpacity(0.5),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: AppColors.onSurface.withOpacity(0.5),
-                    ),
+
+                    prefixIcon: Icon(Icons.search),
                     suffixIcon: controller.searchQuery.isNotEmpty
                         ? IconButton(
                             onPressed: controller.clearSearch,
-                            icon: Icon(
-                              Icons.clear,
-                              color: AppColors.onSurface.withOpacity(0.5),
-                            ),
+                            icon: Icon(Icons.clear),
                           )
                         : null,
                     border: InputBorder.none,
@@ -149,7 +141,7 @@ class ChecklistActionsWidget extends StatelessWidget {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -161,22 +153,16 @@ class ChecklistActionsWidget extends StatelessWidget {
                           color: AppColors.primary,
                         ),
                         const SizedBox(width: 6),
-                        Text(
+                        AppText(
                           '${controller.completedItems}/${controller.totalItems}',
-                          style: TextStyle(
-                            fontSize: compact ? 12 : 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
-                          ),
+                          variant: AppTextVariant.body,
+                          color: AppColors.primary,
                         ),
                         if (!compact) ...[
                           const SizedBox(width: 4),
-                          Text(
+                          AppText(
                             LocalKeys.completed.tr,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.primary.withOpacity(0.7),
-                            ),
+                            variant: AppTextVariant.body,
                           ),
                         ],
                       ],
@@ -189,10 +175,7 @@ class ChecklistActionsWidget extends StatelessWidget {
 
                   // Mark all complete/incomplete
                   PopupMenuButton<String>(
-                    icon: Icon(
-                      Icons.more_vert,
-                      color: AppColors.onSurface.withOpacity(0.6),
-                    ),
+                    icon: Icon(Icons.more_vert),
                     onSelected: (value) {
                       switch (value) {
                         case 'mark_all_complete':

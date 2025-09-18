@@ -21,6 +21,8 @@ class BoardPage extends GetView<BoardController> {
     return Scaffold(
       appBar: ResponsiveAppBar(
         title: LocalKeys.appName.tr,
+        showLogo: true,
+        logoSize: 32,
 
         // backgroundColor:AppColors.surface,
         actions: [
