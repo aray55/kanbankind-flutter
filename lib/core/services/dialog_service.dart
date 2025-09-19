@@ -15,7 +15,7 @@ class DialogService {
     Get.snackbar(
       title,
       message,
-      snackPosition: position,
+      snackPosition: SnackPosition.BOTTOM,
       backgroundColor: backgroundColor ?? AppColors.primary,
       colorText: AppColors.white,
       margin: const EdgeInsets.all(12),
@@ -84,7 +84,7 @@ class DialogService {
     Get.snackbar(
       title,
       message,
-      snackPosition: position,
+      snackPosition: SnackPosition.TOP,
       backgroundColor: backgroundColor ?? AppColors.primary,
       colorText: AppColors.white,
       margin: const EdgeInsets.all(12),
@@ -104,13 +104,14 @@ class DialogService {
     Get.snackbar(
       title,
       message,
-      snackPosition: position,
+      snackPosition: SnackPosition.TOP,
       backgroundColor: backgroundColor ?? AppColors.primary,
       colorText: AppColors.white,
       margin: const EdgeInsets.all(12),
       borderRadius: 12,
       icon: Icon(icon, color: AppColors.white),
       duration: const Duration(seconds: 3),
+      
     );
   }
 

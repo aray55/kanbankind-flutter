@@ -4,7 +4,7 @@ import 'package:kanbankit/views/components/responsive_app_bar.dart';
 import 'package:kanbankit/views/components/state_widgets.dart';
 import 'package:kanbankit/views/widgets/responsive_text.dart';
 import '../../models/task_model.dart';
-import '../../controllers/board_controller.dart';
+import '../../controllers/task_controller.dart';
 import '../../controllers/checklist_controller.dart';
 import '../../controllers/task_editor_controller.dart';
 import '../../core/localization/local_keys.dart';
@@ -24,7 +24,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage>
     with TickerProviderStateMixin {
   late TabController _tabController;
   Task? task;
-  final BoardController _boardController = Get.find<BoardController>();
+  final TaskController _taskController = Get.find<TaskController>();
   final ChecklistController _checklistController = Get.put(
     ChecklistController(),
   );
@@ -205,7 +205,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage>
             onPressed: () async {
               Navigator.pop(context);
               if (task?.id != null) {
-                await _boardController.deleteTask(task!.id!);
+                await _taskController.deleteTask(task!.id!);
                 Get.back(result: {'deleted': true});
               }
             },

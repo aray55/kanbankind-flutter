@@ -90,7 +90,7 @@ class OnboardingController extends GetxController {
     _userPrefService.setOnboardingCompleted(true);
 
     // Navigate to main app
-    Get.offAllNamed(AppRoutes.board);
+    Get.offAllNamed(AppRoutes.boards);
   }
 
   @override

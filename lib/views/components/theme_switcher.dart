@@ -5,6 +5,7 @@ import 'package:kanbankit/controllers/theme_controller.dart'
     as theme_controller;
 import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/views/components/icon_buttons/app_icon_button.dart';
+import '../widgets/responsive_text.dart';
 
 import '../../core/themes/app_colors.dart';
 import 'icon_buttons/icon_button_style.dart';
@@ -59,11 +60,10 @@ class ThemeSwitcher extends StatelessWidget {
                     color: Get.theme.colorScheme.primary,
                   ),
                   const SizedBox(width: 8),
-                  Text(
+                  AppText(
                     LocalKeys.theme.tr,
-                    style: Get.theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    variant: AppTextVariant.h2,
+                    fontWeight: FontWeight.w600,
                   ),
                 ],
               ),
@@ -148,22 +148,20 @@ class ThemeSwitcher extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  AppText(
                     title,
-                    style: Get.theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: isSelected
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                      color: isSelected
-                          ? Get.theme.colorScheme.primary
-                          : Get.theme.colorScheme.onSurface,
-                    ),
+                    variant: AppTextVariant.body,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                    color: isSelected
+                        ? Get.theme.colorScheme.primary
+                        : Get.theme.colorScheme.onSurface,
                   ),
-                  Text(
+                  AppText(
                     subtitle,
-                    style: Get.theme.textTheme.bodySmall?.copyWith(
-                      color: Get.theme.colorScheme.onSurfaceVariant,
-                    ),
+                    variant: AppTextVariant.small,
+                    color: Get.theme.colorScheme.onSurfaceVariant,
                   ),
                 ],
               ),
@@ -201,11 +199,10 @@ class ThemeSwitcherDialog extends StatelessWidget {
                   size: 28,
                 ),
                 const SizedBox(width: 12),
-                Text(
+                AppText(
                   LocalKeys.chooseTheme.tr,
-                  style: Get.theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  variant: AppTextVariant.h2,
+                  fontWeight: FontWeight.w600,
                 ),
                 const Spacer(),
                 IconButton(
@@ -220,7 +217,10 @@ class ThemeSwitcherDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(onPressed: () => Get.back(), child: Text('Done'.tr)),
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: AppText('Done'.tr, variant: AppTextVariant.button),
+                ),
               ],
             ),
           ],
@@ -267,11 +267,10 @@ class ThemeSwitcherBottomSheet extends StatelessWidget {
                 size: 28,
               ),
               const SizedBox(width: 12),
-              Text(
+              AppText(
                 LocalKeys.chooseTheme.tr,
-                style: Get.theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                variant: AppTextVariant.h2,
+                fontWeight: FontWeight.w600,
               ),
             ],
           ),

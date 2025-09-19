@@ -547,8 +547,8 @@ class ChecklistController extends GetxController {
         final movedTask = await _taskMovementService.evaluateAndMoveTask(task);
         if (movedTask != null) {
           _dialogService.showSuccessSnackbar(
-            title:" تم نقل المهمة تلقائيًا",
-            message: "تم نقل المهمة إلى ${movedTask.status.name}",
+            title: LocalKeys.taskMovedAutomatically.tr,
+            message: LocalKeys.taskMovedToStatusAutomatically.tr,
           );
         }
       }

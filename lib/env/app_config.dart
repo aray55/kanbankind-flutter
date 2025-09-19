@@ -36,7 +36,7 @@ static String get flavorName {
   static bool get debug{
     switch (_flavor) {
       case AppFlavor.dev:
-        return false;
+        return true;
       case AppFlavor.staging:
         return false;
       case AppFlavor.prod:

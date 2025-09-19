@@ -1,4 +1,6 @@
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
+import '../localization/local_keys.dart';
 
 class AppDateUtils {
   // Basic formatting methods
@@ -73,6 +75,27 @@ class AppDateUtils {
       } else {
         return 'Now';
       }
+    }
+  }
+
+  // Localized relative time formatting for UI components
+  static String formatRelativeTimeLocalized(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays > 7) {
+      return formatDateShort(dateTime);
+    } else if (difference.inDays > 0) {
+      final count = difference.inDays.toString();
+      return LocalKeys.daysAgo.tr.replaceAll('{count}', count);
+    } else if (difference.inHours > 0) {
+      final count = difference.inHours.toString();
+      return LocalKeys.hoursAgo.tr.replaceAll('{count}', count);
+    } else if (difference.inMinutes > 0) {
+      final count = difference.inMinutes.toString();
+      return LocalKeys.minutesAgo.tr.replaceAll('{count}', count);
+    } else {
+      return LocalKeys.justNow.tr;
     }
   }
 

@@ -4,13 +4,15 @@ import 'package:kanbankit/core/localization/app_translations.dart';
 import 'package:kanbankit/core/services/user_pref_service.dart';
 import 'package:kanbankit/core/themes/app_theme.dart';
 import 'package:kanbankit/controllers/theme_controller.dart' as theme_ctrl;
+import 'package:kanbankit/views/boards/boards_screen.dart';
+import 'bindings/board_binding.dart';
 import 'core/localization/local_keys.dart' show LocalKeys;
 import 'core/routes/app_pages.dart';
 import 'core/routes/app_routes.dart';
-import 'views/board/board_page.dart';
+import 'views/board/task_page.dart';
 import 'views/splash/splash_screen.dart';
 import 'views/onboarding/onboarding_screen.dart';
-import 'bindings/board_binding.dart';
+import 'bindings/task_binding.dart';
 
 class KanbanKitApp extends StatefulWidget {
   const KanbanKitApp({super.key});
@@ -35,7 +37,7 @@ class _KanbanKitAppState extends State<KanbanKitApp> {
     if (!isOnboardingCompleted) {
       return const OnboardingScreen();
     }
-    return const BoardPage();
+    return const BoardsScreen();
   }
 
   String _getInitialRoute() {
@@ -45,7 +47,7 @@ class _KanbanKitAppState extends State<KanbanKitApp> {
     if (!isOnboardingCompleted) {
       return AppRoutes.onboarding;
     }
-    return AppRoutes.board;
+    return AppRoutes.boards;
   }
 
   @override

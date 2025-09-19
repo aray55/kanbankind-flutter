@@ -51,6 +51,46 @@ class DatabaseProvider {
     FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE)
 
     ''');
+    
+    // Create boards table
+    await db.execute('''
+      CREATE TABLE ${AppConstants.boardsTable} (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uuid TEXT NOT NULL UNIQUE,
+        title TEXT NOT NULL CHECK(length(title) <= 255),
+        description TEXT,
+        color TEXT CHECK(length(color) BETWEEN 4 AND 9),
+        position INTEGER DEFAULT 1024,
+        created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+        updated_at INTEGER DEFAULT (strftime('%s','now')),
+        archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0,1)),
+        deleted_at INTEGER
+      )
+    ''');
+    
+    // Create indexes for boards table
+    await db.execute('CREATE INDEX idx_boards_uuid ON ${AppConstants.boardsTable}(uuid)');
+    await db.execute('CREATE INDEX idx_boards_archived ON ${AppConstants.boardsTable}(archived)');
+    await db.execute('CREATE INDEX idx_boards_deleted ON ${AppConstants.boardsTable}(deleted_at)');
+    await db.execute('CREATE INDEX idx_boards_updated_deleted ON ${AppConstants.boardsTable}(updated_at, deleted_at)');
+    
+    // Create trigger for boards table
+    await db.execute('''
+      CREATE TRIGGER set_boards_updated_at
+      AFTER UPDATE ON ${AppConstants.boardsTable}
+      FOR EACH ROW
+      WHEN NEW.title IS NOT OLD.title
+         OR NEW.description IS NOT OLD.description
+         OR NEW.color IS NOT OLD.color
+         OR NEW.position IS NOT OLD.position
+         OR NEW.archived IS NOT OLD.archived
+         OR NEW.deleted_at IS NOT OLD.deleted_at
+      BEGIN
+        UPDATE ${AppConstants.boardsTable}
+        SET updated_at = strftime('%s','now')
+        WHERE id = OLD.id;
+      END
+    ''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {

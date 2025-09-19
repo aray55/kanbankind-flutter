@@ -51,3 +51,5 @@ DATETIME_PICKER_GUIDE.md
 .env.dev
 
 
+#views files
+/lib/views/admin

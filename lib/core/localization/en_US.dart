@@ -136,7 +136,7 @@ const Map<String, String> enUS = {
   "task_moved_to_status_automatically": "Task moved to {status} automatically",
   'deleting': 'Deleting',
   'task_moved_to_status': 'Task moved to {status}',
-  
+
   'single_line': 'Single line',
   'multiple_lines': 'Multiple lines',
   'add_multiple_items': 'Add multiple items',
@@ -167,4 +167,62 @@ const Map<String, String> enUS = {
   "task_moved_automatically": "Task moved to {status} automatically",
   "loading": "Loading...",
   "organize_your_tasks_efficiently": "Organize your tasks efficiently",
+
+  // Board-related translations
+  "create_new_board": "Create New Board",
+  "edit_board": "Edit Board",
+  "set_up_new_board": "Set up your new board",
+  "update_board_settings": "Update your board settings",
+  "board_name": "Board Name",
+  "enter_board_name": "Enter board name",
+  "board_description": "Description",
+  "describe_board_purpose": "Describe what this board is for...",
+  "board_color": "Board Color",
+  "description_optional": "Description (Optional)",
+  "please_enter_board_name": "Please enter a board name",
+  "board_name_too_long": "Board name cannot exceed 255 characters",
+  "hex_color": "Hex Color",
+  "quick_colors": "Quick Colors",
+
+  // Board actions
+  "edit": "Edit",
+  "duplicate": "Duplicate",
+  "archive": "Archive",
+  "archived": "Archived",
+  "just_now": "Just now",
+  "days_ago": "{count}d ago",
+  "hours_ago": "{count}h ago",
+  "minutes_ago": "{count}m ago",
+
+  // Additional UI translations
+  "search_boards": "Search Boards",
+  "archived_boards": "Archived Boards",
+  "your_boards": "Your Boards",
+  "search_results": "Search Results",
+  "no_boards_yet": "No boards yet",
+  "create_first_board":
+      "Create your first board to get started with organizing your tasks",
+  "add_board": "Add Board",
+  "searching_for": "Searching for",
+  "archive_board": "Archive Board",
+  "delete_board": "Delete Board",
+  "duplicate_board": "Duplicate Board",
+  "new_board_name": "New board name",
+  "are_you_sure_archive": "Are you sure you want to archive",
+  "cannot_be_undone": "This action cannot be undone",
+
+  // Archived boards translations
+  "no_archived_boards": "No archived boards",
+  "archived_boards_will_appear_here":
+      "Archived boards will appear here when you archive them",
+  "go_back": "Go Back",
+  "restore_board": "Restore Board",
+  "are_you_sure_restore": "Are you sure you want to restore",
+  "restore": "Restore",
+  "permanently_delete_board": "Permanently Delete Board",
+  "permanently_delete_warning": "Are you sure you want to permanently delete",
+  "permanently_delete": "Permanently Delete",
+  "view_archived_boards": "View Archived Boards",
+  "board_archived_successfully": "Board archived successfully",
+  "board_restored_successfully": "Board restored successfully",
 };

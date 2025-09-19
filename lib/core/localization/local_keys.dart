@@ -140,30 +140,93 @@ class LocalKeys {
   static const String taskMovedToStatus = 'task_moved_to_status{status}';
   static const String taskMovedToStatusAutomatically =
       'task_moved_to_status_automatically';
-      static const String errorLoadingChecklist = 'error_loading_checklist';
-static const String invalidInput = 'invalid_input';
-static const String checklistItemTitleEmpty = 'checklist_item_title_empty';
-static const String checklistItemCreatedSuccessfully = 'checklist_item_created_successfully';
-static const String checklistItemsCreatedSuccessfully = 'checklist_items_created_successfully';
-static const String errorCreatingItem = 'error_creating_item';
-static const String errorCreatingItems = 'error_creating_items';
-static const String checklistItemUpdatedSuccessfully = 'checklist_item_updated_successfully';
-static const String errorUpdatingItem = 'error_updating_item';
-static const String errorTogglingItem = 'error_toggling_item';
-static const String errorDeletingItem = 'error_deleting_item';
-static const String checklistItemDeletedSuccessfully = 'checklist_item_deleted_successfully';
-static const String errorDeletingItems = 'error_deleting_items';
-static const String checklistItemsDeletedSuccessfully = 'checklist_items_deleted_successfully';
-static const String errorReorderingItems = 'error_reordering_items';
-static const String errorMovingItem = 'error_moving_item';
-static const String clearedCompletedItems = 'cleared_completed_items';
-static const String errorClearingItems = 'error_clearing_items';
-static const String markedAllItems = 'marked_all_items';
-static const String errorUpdatingAllItems = 'error_updating_all_items';
-static const String errorSearchingItems = 'error_searching_items';
-static const String duplicatedChecklistItems = 'duplicated_checklist_items';
-static const String errorDuplicatingItems = 'error_duplicating_items';
-static const String taskMovedAutomatically = 'task_moved_automatically';
-static const String loading = 'loading';
-static const String organizeYourTasksEfficiently = 'organize_your_tasks_efficiently';
+  static const String errorLoadingChecklist = 'error_loading_checklist';
+  static const String invalidInput = 'invalid_input';
+  static const String checklistItemTitleEmpty = 'checklist_item_title_empty';
+  static const String checklistItemCreatedSuccessfully =
+      'checklist_item_created_successfully';
+  static const String checklistItemsCreatedSuccessfully =
+      'checklist_items_created_successfully';
+  static const String errorCreatingItem = 'error_creating_item';
+  static const String errorCreatingItems = 'error_creating_items';
+  static const String checklistItemUpdatedSuccessfully =
+      'checklist_item_updated_successfully';
+  static const String errorUpdatingItem = 'error_updating_item';
+  static const String errorTogglingItem = 'error_toggling_item';
+  static const String errorDeletingItem = 'error_deleting_item';
+  static const String checklistItemDeletedSuccessfully =
+      'checklist_item_deleted_successfully';
+  static const String errorDeletingItems = 'error_deleting_items';
+  static const String checklistItemsDeletedSuccessfully =
+      'checklist_items_deleted_successfully';
+  static const String errorReorderingItems = 'error_reordering_items';
+  static const String errorMovingItem = 'error_moving_item';
+  static const String clearedCompletedItems = 'cleared_completed_items';
+  static const String errorClearingItems = 'error_clearing_items';
+  static const String markedAllItems = 'marked_all_items';
+  static const String errorUpdatingAllItems = 'error_updating_all_items';
+  static const String errorSearchingItems = 'error_searching_items';
+  static const String duplicatedChecklistItems = 'duplicated_checklist_items';
+  static const String errorDuplicatingItems = 'error_duplicating_items';
+  static const String taskMovedAutomatically = 'task_moved_automatically';
+  static const String loading = 'loading';
+  static const String organizeYourTasksEfficiently =
+      'organize_your_tasks_efficiently';
+
+  // Board-related keys
+  static const String createNewBoard = 'create_new_board';
+  static const String editBoard = 'edit_board';
+  static const String setUpNewBoard = 'set_up_new_board';
+  static const String updateBoardSettings = 'update_board_settings';
+  static const String boardName = 'board_name';
+  static const String enterBoardName = 'enter_board_name';
+  static const String boardDescription = 'board_description';
+  static const String describeBoardPurpose = 'describe_board_purpose';
+  static const String boardColor = 'board_color';
+  static const String descriptionOptional = 'description_optional';
+  static const String pleaseEnterBoardName = 'please_enter_board_name';
+  static const String boardNameTooLong = 'board_name_too_long';
+  static const String hexColor = 'hex_color';
+  static const String quickColors = 'quick_colors';
+
+  // Board actions
+  static const String edit = 'edit';
+  static const String duplicate = 'duplicate';
+  static const String archive = 'archive';
+  static const String archived = 'archived';
+  static const String justNow = 'just_now';
+  static const String daysAgo = 'days_ago';
+  static const String hoursAgo = 'hours_ago';
+  static const String minutesAgo = 'minutes_ago';
+
+  // Additional UI keys
+  static const String searchBoards = 'search_boards';
+  static const String archivedBoards = 'archived_boards';
+  static const String yourBoards = 'your_boards';
+  static const String searchResults = 'search_results';
+  static const String noBoardsYet = 'no_boards_yet';
+  static const String createFirstBoard = 'create_first_board';
+  static const String addBoard = 'add_board';
+  static const String searchingFor = 'searching_for';
+  static const String archiveBoard = 'archive_board';
+  static const String deleteBoard = 'delete_board';
+  static const String duplicateBoard = 'duplicate_board';
+  static const String newBoardName = 'new_board_name';
+  static const String areYouSureArchive = 'are_you_sure_archive';
+  static const String cannotBeUndone = 'cannot_be_undone';
+
+  // Archived boards keys
+  static const String noArchivedBoards = 'no_archived_boards';
+  static const String archivedBoardsWillAppearHere =
+      'archived_boards_will_appear_here';
+  static const String goBack = 'go_back';
+  static const String restoreBoard = 'restore_board';
+  static const String areYouSureRestore = 'are_you_sure_restore';
+  static const String restore = 'restore';
+  static const String permanentlyDeleteBoard = 'permanently_delete_board';
+  static const String permanentlyDeleteWarning = 'permanently_delete_warning';
+  static const String permanentlyDelete = 'permanently_delete';
+  static const String viewArchivedBoards = 'view_archived_boards';
+  static const String boardArchivedSuccessfully = 'board_archived_successfully';
+  static const String boardRestoredSuccessfully = 'board_restored_successfully';
 }

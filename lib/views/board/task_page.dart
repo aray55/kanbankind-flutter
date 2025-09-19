@@ -3,18 +3,16 @@ import 'package:get/get.dart';
 import 'package:kanbankit/views/components/responsive_app_bar.dart';
 import 'package:kanbankit/views/widgets/language_switcher.dart';
 import 'package:kanbankit/views/components/theme_switcher.dart';
-import '../../controllers/board_controller.dart';
+import '../../controllers/task_controller.dart';
 import '../../core/localization/local_keys.dart' show LocalKeys;
-import '../../core/themes/app_colors.dart' show AppColors;
 import '../components/icon_buttons/app_icon_button.dart';
 import '../components/icon_buttons/icon_button_style.dart';
 import '../components/icon_buttons/icon_button_variant.dart';
 import '../widgets/enhanced_task_editor.dart' show EnhancedTaskEditor;
-import '../widgets/task_editor.dart';
 import '../components/responsive_board_layout.dart';
 
-class BoardPage extends GetView<BoardController> {
-  const BoardPage({super.key});
+class TaskPage extends GetView<TaskController> {
+  const TaskPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -77,9 +75,7 @@ class BoardPage extends GetView<BoardController> {
   }
 
   void _showLanguageSwitcher(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => const LanguageSwitcher(),
-    );
+    // Use bottom sheet instead of dialog
+    LanguageSwitcherBottomSheet.show();
   }
 }

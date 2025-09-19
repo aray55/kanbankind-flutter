@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../models/task_model.dart';
 import '../../core/enums/task_status.dart';
-import '../../controllers/checklist_controller.dart';
-import '../../controllers/board_controller.dart';
+import 'task_controller.dart';
 import '../../data/repository/checklist_item_repository.dart';
 
 class TaskEditorController extends GetxController
@@ -101,7 +100,7 @@ class TaskEditorController extends GetxController
       );
 
 
-      final boardController = Get.find<BoardController>();
+      final boardController = Get.find<TaskController>();
       if (editingTask?.id == null) {
         // Creating a new task
         final createdTask = await boardController.addTask(task);

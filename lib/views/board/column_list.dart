@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/views/widgets/enhanced_task_card.dart';
-import '../../controllers/board_controller.dart';
+import '../../controllers/task_controller.dart';
 import '../../core/localization/local_keys.dart' show LocalKeys;
 import '../../core/utils/helper_functions_utils.dart' show HelperFunctionsUtils;
 import '../../models/task_model.dart';
@@ -111,7 +111,7 @@ class ColumnList extends StatelessWidget {
                           padding: const EdgeInsets.all(8.0),
                           itemCount: tasks.length,
                           itemBuilder: (context, index) {
-                            final boardController = Get.find<BoardController>();
+                            final boardController = Get.find<TaskController>();
                             return LongPressDraggable<Task>(
                               data: tasks[index],
                               onDragStarted: boardController.handleDragStart,
