@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
 import '../../controllers/board_controller.dart';
 import '../../core/utils/date_utils.dart';
-import '../widgets/board_tile_widget.dart';
 import '../widgets/responsive_text.dart';
 import '../components/empty_state.dart';
 import '../components/state_widgets.dart';
