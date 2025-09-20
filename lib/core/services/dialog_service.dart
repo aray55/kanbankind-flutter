@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/core/localization/local_keys.dart';
 
+import '../../views/widgets/responsive_text.dart';
 import '../themes/app_colors.dart' show AppColors;
 
 class DialogService {
@@ -73,6 +75,7 @@ class DialogService {
       barrierDismissible: false,
     );
   }
+
   void showSuccessSnackbar({
     required String title,
     required String message,
@@ -93,6 +96,7 @@ class DialogService {
       duration: const Duration(seconds: 3),
     );
   }
+
   void showErrorSnackbar({
     required String title,
     required String message,
@@ -111,8 +115,76 @@ class DialogService {
       borderRadius: 12,
       icon: Icon(icon, color: AppColors.white),
       duration: const Duration(seconds: 3),
-      
     );
+  }
+
+  /// حوار تأكيد
+
+  /// حوار إدخال نص (مثال: نسخ البورد)
+  Future<String?> promptInput({
+    required String title,
+    String? initialValue,
+    String label = '',
+    String confirmText = 'OK',
+    String cancelText = 'Cancel',
+  }) async {
+    final controller = TextEditingController(text: initialValue);
+    final result = await Get.dialog<String>(
+      AlertDialog(
+        title: AppText(title, variant: AppTextVariant.h2),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: AppText(cancelText, variant: AppTextVariant.button),
+          ),
+          FilledButton(
+            onPressed: () => Get.back(result: controller.text.trim()),
+            child: AppText(confirmText, variant: AppTextVariant.button),
+          ),
+        ],
+      ),
+    );
+    return result;
+  }
+
+  /// حوار بحث
+  Future<String?> searchDialog({
+    required String title,
+    required String hint,
+  }) async {
+    final controller = TextEditingController();
+    final result = await Get.dialog<String>(
+      AlertDialog(
+        title: AppText(title, variant: AppTextVariant.h2),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: hint,
+            border: const OutlineInputBorder(),
+          ),
+          onSubmitted: (value) => Get.back(result: value.trim()),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: AppText(LocalKeys.cancel.tr, variant: AppTextVariant.button),
+          ),
+          FilledButton(
+            onPressed: () => Get.back(result: controller.text.trim()),
+            child: AppText(LocalKeys.searchBoards.tr, variant: AppTextVariant.button),
+          ),
+        ],
+      ),
+    );
+    return result?.trim().isEmpty == true ? null : result?.trim();
   }
 
   void hideLoading() {

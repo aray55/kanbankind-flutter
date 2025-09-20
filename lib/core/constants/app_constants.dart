@@ -5,6 +5,7 @@ class AppConstants {
   static const String tasksTable = 'tasks';
   static const String checklistItemsTable = 'checklist_items';
   static const String boardsTable = 'boards';
+  static const String listTable = 'lists';
 
   // App constants
   static const String appName = 'KanbanKit';

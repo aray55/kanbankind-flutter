@@ -1,0 +1,1 @@
+enum BoardTileMode { active, archived }

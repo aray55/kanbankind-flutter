@@ -1,27 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
+import 'package:kanbankit/core/services/dialog_service.dart';
+import 'package:kanbankit/core/helpers/board_dialog_helper.dart';
+import 'package:kanbankit/views/widgets/boards/boards_grid.dart';
+import 'package:kanbankit/views/widgets/boards/boards_header.dart';
+import 'package:kanbankit/views/widgets/boards/view_mode_toggle.dart';
 import '../../controllers/board_controller.dart';
-import '../widgets/board_tile_widget.dart';
-import '../widgets/add_edit_board_modal.dart';
+import '../../core/enums/board_view_mode.dart';
 import '../widgets/responsive_text.dart';
 import '../widgets/language_switcher.dart';
 import '../components/theme_switcher.dart';
 import '../components/empty_state.dart';
 import '../components/state_widgets.dart';
-import 'archived_boards_screen.dart';
 
-class BoardsScreen extends StatelessWidget {
+class BoardsScreen extends StatefulWidget {
   const BoardsScreen({super.key});
+
+  @override
+  State<BoardsScreen> createState() => _BoardsScreenState();
+}
+
+class _BoardsScreenState extends State<BoardsScreen> {
+  BoardViewMode _currentMode = BoardViewMode.active;
 
   @override
   Widget build(BuildContext context) {
     final boardController = Get.find<BoardController>();
-
     return Scaffold(
       appBar: AppBar(
         title: AppText(
-          LocalKeys.appName.tr,
+          _currentMode == BoardViewMode.active
+              ? LocalKeys.appName.tr
+              : LocalKeys.archivedBoards.tr,
           variant: AppTextVariant.h2,
           fontWeight: FontWeight.bold,
           color: Theme.of(context).colorScheme.onSurface,
@@ -47,96 +58,175 @@ class BoardsScreen extends StatelessWidget {
             ),
             tooltip: LocalKeys.chooseTheme.tr,
           ),
-          // Search button
+          // Search button (only for active boards)
+          if (_currentMode == BoardViewMode.active)
+            IconButton(
+              onPressed: () => BoardDialogHelper.showSearchDialog(context, boardController),
+              icon: Icon(
+                Icons.search,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              tooltip: LocalKeys.searchBoards.tr,
+            ),
+          // Refresh button
           IconButton(
-            onPressed: () => _showSearchDialog(context, boardController),
+            onPressed: () => _refreshCurrentView(boardController),
             icon: Icon(
-              Icons.search,
+              Icons.refresh,
               color: Theme.of(context).colorScheme.onSurface,
             ),
-            tooltip: LocalKeys.searchBoards.tr,
-          ),
-          // More options menu
-          PopupMenuButton<String>(
-            onSelected: (value) => _handleMenuSelection(value, boardController),
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'refresh',
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.refresh,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    const SizedBox(width: 8),
-                    AppText(LocalKeys.refresh.tr, variant: AppTextVariant.body),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'archived',
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.archive,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    const SizedBox(width: 8),
-                    AppText(
-                      LocalKeys.archivedBoards.tr,
-                      variant: AppTextVariant.body,
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            tooltip: LocalKeys.refresh.tr,
           ),
         ],
       ),
-      body: Obx(() {
-        if (boardController.isLoading) {
-          return const LoadingView();
-        }
+      body: Column(
+        children: [
+          // View mode toggle
+          _buildViewModeToggle(context),
 
-        if (!boardController.hasBoards) {
-          return EmptyState(
-            icon: Icons.dashboard_outlined,
-            title: LocalKeys.noBoardsYet.tr,
-            subtitle: LocalKeys.createFirstBoard.tr,
-            actionText: LocalKeys.create.tr,
-            onActionPressed: () => _showAddBoardModal(context),
-          );
-        }
+          // Main content
+          Expanded(
+            child: Obx(() {
+              if (boardController.isLoading) {
+                return const LoadingView();
+              }
 
-        return RefreshIndicator(
-          onRefresh: () => boardController.refresh(),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Search bar (if searching)
-                if (boardController.searchQuery.isNotEmpty)
-                  _buildSearchHeader(context, boardController),
-
-                // Boards count
-                _buildBoardsHeader(context, boardController),
-
-                const SizedBox(height: 16),
-
-                // Boards grid
-                Expanded(child: _buildBoardsGrid(context, boardController)),
-              ],
-            ),
+              if (_currentMode == BoardViewMode.active) {
+                return _buildActiveBoards(context, boardController);
+              } else {
+                return _buildArchivedBoards(context, boardController);
+              }
+            }),
           ),
-        );
-      }),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddBoardModal(context),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        icon: const Icon(Icons.add),
-        label: AppText(LocalKeys.addBoard.tr, variant: AppTextVariant.button),
+        ],
+      ),
+      floatingActionButton: _currentMode == BoardViewMode.active
+          ? FloatingActionButton.extended(
+              onPressed: () => BoardDialogHelper.showAddBoardModal(context),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              icon: const Icon(Icons.add),
+              label: AppText(
+                LocalKeys.addBoard.tr,
+                variant: AppTextVariant.button,
+              ),
+            )
+          : null,
+    );
+  }
+
+  Widget _buildViewModeToggle(BuildContext context) {
+    return ViewModeToggle(
+      currentMode: _currentMode,
+      onModeChanged: _switchToMode,
+    );
+  }
+
+  void _switchToMode(BoardViewMode mode) {
+    if (_currentMode != mode) {
+      setState(() {
+        _currentMode = mode;
+      });
+
+      final boardController = Get.find<BoardController>();
+      if (mode == BoardViewMode.archived) {
+        boardController.loadArchivedBoards();
+      } else {
+        boardController.loadBoards();
+      }
+    }
+  }
+
+  void _refreshCurrentView(BoardController controller) {
+    if (_currentMode == BoardViewMode.active) {
+      controller.refresh();
+    } else {
+      controller.loadArchivedBoards();
+    }
+  }
+
+  Widget _buildActiveBoards(BuildContext context, BoardController controller) {
+    if (!controller.hasBoards) {
+      return EmptyState(
+        icon: Icons.dashboard_outlined,
+        title: LocalKeys.noBoardsYet.tr,
+        subtitle: LocalKeys.createFirstBoard.tr,
+        actionText: LocalKeys.create.tr,
+        onActionPressed: () => BoardDialogHelper.showAddBoardModal(context),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => controller.refresh(),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Search bar (if searching)
+            if (controller.searchQuery.isNotEmpty)
+              _buildSearchHeader(context, controller),
+
+            // Boards count
+            BoardsHeader(controller: controller),
+
+            const SizedBox(height: 16),
+
+            // Boards grid
+            Expanded(
+              child: BoardsGrid(
+                controller: controller,
+                onEdit: (board) => BoardDialogHelper.showEditBoardModal(context, board),
+                onArchive: (board) => BoardDialogHelper.showArchiveConfirmation(context, board),
+                onDelete: (board) => BoardDialogHelper.showDeleteConfirmation(context, board),
+                onDuplicate: (board) =>
+                    BoardDialogHelper.showDuplicateBoardDialog(context, board),
+                onRestore: (board) => BoardDialogHelper.showRestoreConfirmation(context, board),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildArchivedBoards(
+    BuildContext context,
+    BoardController controller,
+  ) {
+    if (!controller.hasArchivedBoards) {
+      return EmptyState(
+        icon: Icons.archive_outlined,
+        title: LocalKeys.noArchivedBoards.tr,
+        subtitle: LocalKeys.archivedBoardsWillAppearHere.tr,
+        actionText: LocalKeys.goBack.tr,
+        onActionPressed: () => _switchToMode(BoardViewMode.active),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => controller.loadArchivedBoards(),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Archived boards header
+            BoardsHeader(controller: controller, isArchived: true),
+
+            const SizedBox(height: 16),
+
+            // Archived boards grid
+            Expanded(
+              child: BoardsGrid(
+                controller: controller,
+                onRestore: (board) => BoardDialogHelper.showRestoreConfirmation(context, board),
+                onDelete: (board) => BoardDialogHelper.showPermanentDeleteConfirmation(context, board),
+                isArchived: true,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -173,240 +263,5 @@ class BoardsScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Widget _buildBoardsHeader(BuildContext context, BoardController controller) {
-    final totalBoards = controller.searchQuery.isEmpty
-        ? controller.totalBoards
-        : controller.filteredBoards.length;
-
-    return Row(
-      children: [
-        AppText(
-          controller.searchQuery.isEmpty
-              ? LocalKeys.yourBoards.tr
-              : LocalKeys.searchResults.tr,
-          variant: AppTextVariant.h2,
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-        const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: AppText(
-            totalBoards.toString(),
-            variant: AppTextVariant.small,
-            color: Theme.of(context).colorScheme.primary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBoardsGrid(BuildContext context, BoardController controller) {
-    final boards = controller.searchQuery.isEmpty
-        ? controller.boards
-        : controller.filteredBoards;
-
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: _getCrossAxisCount(context),
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 1.2,
-      ),
-      itemCount: boards.length,
-      itemBuilder: (context, index) {
-        final board = boards[index];
-        return BoardTileWidget(
-          board: board,
-          onTap: () => _navigateToBoardDetail(context, board),
-          onEdit: () => _showEditBoardModal(context, board),
-          onArchive: () => _showArchiveConfirmation(context, board),
-          onDelete: () => _showDeleteConfirmation(context, board),
-          onDuplicate: () => _showDuplicateBoardDialog(context, board),
-        );
-      },
-    );
-  }
-
-  int _getCrossAxisCount(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    if (width > 1200) return 4;
-    if (width > 800) return 3;
-    if (width > 600) return 2;
-    return 1;
-  }
-
-  void _showAddBoardModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const AddEditBoardModal(),
-    );
-  }
-
-  void _showEditBoardModal(BuildContext context, board) {
-    final boardController = Get.find<BoardController>();
-    boardController.selectBoard(board);
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => AddEditBoardModal(board: board),
-    );
-  }
-
-  void _showSearchDialog(BuildContext context, BoardController controller) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: AppText(LocalKeys.searchBoards.tr, variant: AppTextVariant.h2),
-        content: TextField(
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: LocalKeys.enterBoardName.tr,
-            border: const OutlineInputBorder(),
-          ),
-          onSubmitted: (query) {
-            Navigator.of(context).pop();
-            if (query.trim().isNotEmpty) {
-              controller.updateSearchQuery(query);
-              controller.searchBoards(query);
-            }
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: AppText(LocalKeys.cancel.tr, variant: AppTextVariant.button),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showArchiveConfirmation(BuildContext context, board) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: AppText(LocalKeys.archiveBoard.tr, variant: AppTextVariant.h2),
-        content: AppText(
-          '${LocalKeys.areYouSureArchive.tr} "${board.title}"?',
-          variant: AppTextVariant.body,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: AppText(LocalKeys.cancel.tr, variant: AppTextVariant.button),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Get.find<BoardController>().archiveBoard(board.id!);
-            },
-            child: AppText(
-              LocalKeys.archive.tr,
-              variant: AppTextVariant.button,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDeleteConfirmation(BuildContext context, board) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: AppText(LocalKeys.deleteBoard.tr, variant: AppTextVariant.h2),
-        content: AppText(
-          '${LocalKeys.areYouSureDelete.tr} "${board.title}"? ${LocalKeys.cannotBeUndone.tr}.',
-          variant: AppTextVariant.body,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: AppText(LocalKeys.cancel.tr, variant: AppTextVariant.button),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Get.find<BoardController>().deleteBoard(board.id!);
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: AppText(
-              LocalKeys.delete.tr,
-              variant: AppTextVariant.button,
-              color: Theme.of(context).colorScheme.onError,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDuplicateBoardDialog(BuildContext context, board) {
-    final textController = TextEditingController(text: '${board.title} (Copy)');
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: AppText(LocalKeys.duplicateBoard.tr, variant: AppTextVariant.h2),
-        content: TextField(
-          controller: textController,
-          decoration: InputDecoration(
-            labelText: LocalKeys.newBoardName.tr,
-            border: const OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: AppText(LocalKeys.cancel.tr, variant: AppTextVariant.button),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Get.find<BoardController>().duplicateBoard(
-                board.id!,
-                textController.text,
-              );
-            },
-            child: AppText(
-              LocalKeys.duplicate.tr,
-              variant: AppTextVariant.button,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleMenuSelection(String value, BoardController controller) {
-    switch (value) {
-      case 'refresh':
-        controller.refresh();
-        break;
-      case 'archived':
-        Navigator.of(Get.context!).push(
-          MaterialPageRoute(builder: (context) => const ArchivedBoardsScreen()),
-        );
-        break;
-    }
-  }
-
-  void _navigateToBoardDetail(BuildContext context, board) {
-    // Navigate to board detail screen
-    // Get.toNamed('/board-detail', arguments: board);
   }
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
-import '../../../controllers/board_controller.dart';
-import '../../../models/board_model.dart';
-import 'color_picker_widget.dart';
-import 'responsive_text.dart';
+import '../../../../controllers/board_controller.dart';
+import '../../../../models/board_model.dart';
+import '../color_picker_widget.dart';
+import '../responsive_text.dart';
 
 class AddEditBoardModal extends StatefulWidget {
   final Board? board;
