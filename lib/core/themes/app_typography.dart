@@ -42,6 +42,13 @@ class AppTypography {
     height: 1.5,
   );
 
+  TextStyle body2(BuildContext context) => TextStyle(
+    fontFamily: fontFamily,
+    fontSize: ResponsiveUtils.fontSize(context, 12),
+    fontWeight: FontWeight.normal,
+    height: 1.5,
+  );
+
   TextStyle small(BuildContext context) => TextStyle(
     fontFamily: fontFamily,
     fontSize: ResponsiveUtils.fontSize(context, 10),

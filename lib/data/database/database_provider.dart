@@ -116,18 +116,18 @@ CREATE TABLE IF NOT EXISTS ${AppConstants.listTable} (
 ''');
 
     await db.execute('''
-CREATE INDEX IF NOT EXISTS idx_lists_board_id ON lists(board_id);
-CREATE INDEX IF NOT EXISTS idx_lists_archived ON lists(archived);
-CREATE INDEX IF NOT EXISTS idx_lists_position ON lists(position);
-CREATE INDEX IF NOT EXISTS idx_lists_updated_at ON lists(updated_at);
+CREATE INDEX IF NOT EXISTS idx_lists_board_id ON ${AppConstants.listTable}(board_id);
+CREATE INDEX IF NOT EXISTS idx_lists_archived ON ${AppConstants.listTable}(archived);
+CREATE INDEX IF NOT EXISTS idx_lists_position ON ${AppConstants.listTable}(position);
+CREATE INDEX IF NOT EXISTS idx_lists_updated_at ON ${AppConstants.listTable}(updated_at);
 ''');
 
     await db.execute('''
 CREATE TRIGGER IF NOT EXISTS set_lists_updated_at
-AFTER UPDATE ON lists
+AFTER UPDATE ON ${AppConstants.listTable}
 FOR EACH ROW
 BEGIN
-  UPDATE lists
+  UPDATE ${AppConstants.listTable}
   SET updated_at = strftime('%s','now')
   WHERE id = OLD.id;
 END;

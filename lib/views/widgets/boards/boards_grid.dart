@@ -6,6 +6,7 @@ import 'board_tile_widget.dart';
 class BoardsGrid extends StatelessWidget {
   final bool isArchived;
   final BoardController controller;
+  final Function? onTap;
   final Function? onEdit;
   final Function? onArchive;
   final Function? onDelete;
@@ -16,6 +17,7 @@ class BoardsGrid extends StatelessWidget {
     super.key,
     required this.controller,
     this.isArchived = false,
+    this.onTap,
     this.onEdit,
     this.onArchive,
     this.onDelete,
@@ -47,7 +49,7 @@ class BoardsGrid extends StatelessWidget {
         return BoardTileWidget(
           board: board,
           mode: isArchived ? BoardTileMode.archived : BoardTileMode.active,
-          onTap: isArchived ? null : () => onEdit?.call(board),
+          onTap: isArchived ? null : () => onTap?.call(board),
           onEdit: isArchived ? null : () => onEdit?.call(board),
           onArchive: isArchived ? null : () => onArchive?.call(board),
           onDelete: () =>

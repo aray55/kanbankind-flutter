@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
-import 'package:kanbankit/core/services/dialog_service.dart';
 import 'package:kanbankit/core/helpers/board_dialog_helper.dart';
 import 'package:kanbankit/views/widgets/boards/boards_grid.dart';
 import 'package:kanbankit/views/widgets/boards/boards_header.dart';
@@ -176,6 +175,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
             Expanded(
               child: BoardsGrid(
                 controller: controller,
+                onTap: (board) => controller.navigateToLists(board.id!),
                 onEdit: (board) => BoardDialogHelper.showEditBoardModal(context, board),
                 onArchive: (board) => BoardDialogHelper.showArchiveConfirmation(context, board),
                 onDelete: (board) => BoardDialogHelper.showDeleteConfirmation(context, board),

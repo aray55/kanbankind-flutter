@@ -5,7 +5,7 @@ import 'package:kanbankit/core/themes/app_typography.dart';
 import '../../core/localization/local_keys.dart' show LocalKeys;
 import '../../core/services/font_service.dart';
 
-enum AppTextVariant { h1, h2, body, small, button }
+enum AppTextVariant { h1, h2, body, small, button, body2 }
 
 class AppText extends StatelessWidget {
   final String text;
@@ -84,7 +84,9 @@ class AppText extends StatelessWidget {
       case AppTextVariant.button:
         return typography.button(context);
       case AppTextVariant.body:
-      return typography.body(context);
+        return typography.body(context);
+      case AppTextVariant.body2:
+        return typography.body2(context);
     }
   }
 }

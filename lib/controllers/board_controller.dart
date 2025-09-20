@@ -701,4 +701,9 @@ class BoardController extends GetxController {
       return 0;
     }
   }
+
+  // Navigation helper to lists screen
+  void navigateToLists(int boardId) {
+    Get.toNamed('/list_screen/$boardId');
+  }
 }
