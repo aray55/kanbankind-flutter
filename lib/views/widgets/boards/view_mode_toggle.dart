@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../../../core/enums/board_view_mode.dart';
 import '../responsive_text.dart';
-import '../../../core/localization/local_keys.dart';
 
 class ViewModeToggle extends StatelessWidget {
   final BoardViewMode currentMode;
+  final String activeLabel;
+  final String archivedLabel;
   final Function(BoardViewMode) onModeChanged;
 
   const ViewModeToggle({
     super.key,
     required this.currentMode,
+    required this.activeLabel,
+    required this.archivedLabel,
     required this.onModeChanged,
   });
 
@@ -28,13 +30,13 @@ class ViewModeToggle extends StatelessWidget {
             context,
             mode: BoardViewMode.active,
             icon: Icons.dashboard_outlined,
-            label: LocalKeys.yourBoards.tr,
+            label: activeLabel,
           ),
           _buildToggleButton(
             context,
             mode: BoardViewMode.archived,
             icon: Icons.archive_outlined,
-            label: LocalKeys.archivedBoards.tr,
+            label: archivedLabel,
           ),
         ],
       ),

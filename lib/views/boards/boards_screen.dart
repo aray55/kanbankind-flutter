@@ -7,6 +7,7 @@ import 'package:kanbankit/views/widgets/boards/boards_header.dart';
 import 'package:kanbankit/views/widgets/boards/view_mode_toggle.dart';
 import '../../controllers/board_controller.dart';
 import '../../core/enums/board_view_mode.dart';
+import '../../core/routes/app_routes.dart';
 import '../widgets/responsive_text.dart';
 import '../widgets/language_switcher.dart';
 import '../components/theme_switcher.dart';
@@ -39,6 +40,16 @@ class _BoardsScreenState extends State<BoardsScreen> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         actions: [
+          // Card demo button (only for active boards)
+          if (_currentMode == BoardViewMode.active)
+            IconButton(
+              onPressed: () => Get.toNamed(AppRoutes.cardDemo),
+              icon: Icon(
+                Icons.widgets,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              tooltip: 'Card Components Demo',
+            ),
           // Language switcher
           IconButton(
             onPressed: () => LanguageSwitcherBottomSheet.show(),
@@ -60,7 +71,8 @@ class _BoardsScreenState extends State<BoardsScreen> {
           // Search button (only for active boards)
           if (_currentMode == BoardViewMode.active)
             IconButton(
-              onPressed: () => BoardDialogHelper.showSearchDialog(context, boardController),
+              onPressed: () =>
+                  BoardDialogHelper.showSearchDialog(context, boardController),
               icon: Icon(
                 Icons.search,
                 color: Theme.of(context).colorScheme.onSurface,
@@ -116,6 +128,8 @@ class _BoardsScreenState extends State<BoardsScreen> {
 
   Widget _buildViewModeToggle(BuildContext context) {
     return ViewModeToggle(
+      activeLabel: LocalKeys.yourLists.tr,
+      archivedLabel: LocalKeys.archivedLists.tr,
       currentMode: _currentMode,
       onModeChanged: _switchToMode,
     );
@@ -176,12 +190,16 @@ class _BoardsScreenState extends State<BoardsScreen> {
               child: BoardsGrid(
                 controller: controller,
                 onTap: (board) => controller.navigateToLists(board.id!),
-                onEdit: (board) => BoardDialogHelper.showEditBoardModal(context, board),
-                onArchive: (board) => BoardDialogHelper.showArchiveConfirmation(context, board),
-                onDelete: (board) => BoardDialogHelper.showDeleteConfirmation(context, board),
+                onEdit: (board) =>
+                    BoardDialogHelper.showEditBoardModal(context, board),
+                onArchive: (board) =>
+                    BoardDialogHelper.showArchiveConfirmation(context, board),
+                onDelete: (board) =>
+                    BoardDialogHelper.showDeleteConfirmation(context, board),
                 onDuplicate: (board) =>
                     BoardDialogHelper.showDuplicateBoardDialog(context, board),
-                onRestore: (board) => BoardDialogHelper.showRestoreConfirmation(context, board),
+                onRestore: (board) =>
+                    BoardDialogHelper.showRestoreConfirmation(context, board),
               ),
             ),
           ],
@@ -220,8 +238,13 @@ class _BoardsScreenState extends State<BoardsScreen> {
             Expanded(
               child: BoardsGrid(
                 controller: controller,
-                onRestore: (board) => BoardDialogHelper.showRestoreConfirmation(context, board),
-                onDelete: (board) => BoardDialogHelper.showPermanentDeleteConfirmation(context, board),
+                onRestore: (board) =>
+                    BoardDialogHelper.showRestoreConfirmation(context, board),
+                onDelete: (board) =>
+                    BoardDialogHelper.showPermanentDeleteConfirmation(
+                      context,
+                      board,
+                    ),
                 isArchived: true,
               ),
             ),

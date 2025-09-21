@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
 
@@ -83,18 +84,31 @@ class DialogService {
     SnackPosition position = SnackPosition.BOTTOM,
     IconData icon = Icons.check_circle_outline,
   }) {
-    Get.closeAllSnackbars();
-    Get.snackbar(
-      title,
-      message,
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: backgroundColor ?? AppColors.primary,
-      colorText: AppColors.white,
-      margin: const EdgeInsets.all(12),
-      borderRadius: 12,
-      icon: Icon(icon, color: AppColors.white),
-      duration: const Duration(seconds: 3),
-    );
+    // Use a delayed call to avoid snackbar controller initialization issues
+    Future.delayed(Duration.zero, () {
+      try {
+        Get.closeAllSnackbars();
+        Get.snackbar(
+          title,
+          message,
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: backgroundColor ?? AppColors.primary,
+          colorText: AppColors.white,
+          margin: const EdgeInsets.all(12),
+          borderRadius: 12,
+          icon: Icon(icon, color: AppColors.white),
+          duration: const Duration(seconds: 3),
+        );
+      } catch (e) {
+        // Fallback to a simple snackbar if there's an issue
+        try {
+          Get.snackbar(title, message, snackPosition: SnackPosition.TOP);
+        } catch (e) {
+          // If all else fails, at least print to console
+          debugPrint('Snackbar error: $e');
+        }
+      }
+    });
   }
 
   void showErrorSnackbar({
@@ -104,18 +118,31 @@ class DialogService {
     SnackPosition position = SnackPosition.BOTTOM,
     IconData icon = Icons.error_outline,
   }) {
-    Get.closeAllSnackbars();
-    Get.snackbar(
-      title,
-      message,
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: backgroundColor ?? AppColors.primary,
-      colorText: AppColors.white,
-      margin: const EdgeInsets.all(12),
-      borderRadius: 12,
-      icon: Icon(icon, color: AppColors.white),
-      duration: const Duration(seconds: 3),
-    );
+    // Use a delayed call to avoid snackbar controller initialization issues
+    Future.delayed(Duration.zero, () {
+      try {
+        Get.closeAllSnackbars();
+        Get.snackbar(
+          title,
+          message,
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: backgroundColor ?? AppColors.primary,
+          colorText: AppColors.white,
+          margin: const EdgeInsets.all(12),
+          borderRadius: 12,
+          icon: Icon(icon, color: AppColors.white),
+          duration: const Duration(seconds: 3),
+        );
+      } catch (e) {
+        // Fallback to a simple snackbar if there's an issue
+        try {
+          Get.snackbar(title, message, snackPosition: SnackPosition.TOP);
+        } catch (e) {
+          // If all else fails, at least print to console
+          debugPrint('Snackbar error: $e');
+        }
+      }
+    });
   }
 
   /// حوار تأكيد
@@ -179,7 +206,10 @@ class DialogService {
           ),
           FilledButton(
             onPressed: () => Get.back(result: controller.text.trim()),
-            child: AppText(LocalKeys.searchBoards.tr, variant: AppTextVariant.button),
+            child: AppText(
+              LocalKeys.searchBoards.tr,
+              variant: AppTextVariant.button,
+            ),
           ),
         ],
       ),

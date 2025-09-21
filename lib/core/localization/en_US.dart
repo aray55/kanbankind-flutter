@@ -225,4 +225,72 @@ const Map<String, String> enUS = {
   "view_archived_boards": "View Archived Boards",
   "board_archived_successfully": "Board archived successfully",
   "board_restored_successfully": "Board restored successfully",
+
+  //List Transalation
+  "your_lists": "Your Lists",
+  "archived_lists": "Archived Lists",
+
+  // List-related translations
+  "search_lists": "Search Lists",
+  "archive_all_lists": "Archive All Lists",
+  "restore_all_lists": "Restore All Lists",
+  "board_settings": "Board Settings",
+  "add_list": "Add List",
+  "no_archived_lists": "No Archived Lists",
+  "archived_lists_will_appear_here_description":
+      "Archived lists will appear here when you archive them.",
+  "no_lists_found": "No Lists Found",
+  "no_lists_match_search":
+      "No lists match your search criteria. Try a different search term.",
+  "clear_search": "Clear Search",
+  "no_lists_yet": "No Lists Yet",
+  "create_first_list_description":
+      "Create your first list to organize tasks in this board.",
+  "create_list": "Create List",
+  "list_selected": "List Selected",
+  "tapped_on_list": "Tapped on list: {title}",
+  "archive_list": "Archive List",
+  "confirm_archive_list": "Are you sure you want to archive \"{title}\"?",
+  "delete_list": "Delete List",
+  "confirm_delete_list":
+      "Are you sure you want to permanently delete \"{title}\"? This action cannot be undone.",
+  "duplicate_list": "Duplicate List",
+  "enter_name_for_duplicated_list": "Enter a name for the duplicated list:",
+  "move_to_board": "Move to Board",
+  "move_to_board_description":
+      "Move to board functionality will be implemented soon.",
+  "archive_all_lists_dialog": "Archive All Lists",
+  "confirm_archive_all_lists":
+      "Are you sure you want to archive all lists in this board?",
+  "restore_all_lists_dialog": "Restore All Lists",
+  "confirm_restore_all_lists":
+      "Are you sure you want to restore all archived lists?",
+  "board_settings_dialog": "Board Settings",
+  "board_settings_description":
+      "Board settings functionality will be implemented soon.",
+  "enter_list_name": "Enter list name...",
+  "archive_all": "Archive All",
+  "restore_all": "Restore All",
+  "board_settings_title": "Board Settings",
+
+  // Card-related translations
+  "status": "Status",
+  "completed_at": "Completed At",
+  "description": "Description",
+  "add_card": "Add Card",
+  "edit_card": "Edit Card",
+  "card_title": "Card Title",
+  "card_description": "Card Description",
+  "save": "Save",
+  "please_enter_card_title": "Please enter a card title",
+  "card_added_successfully": "Card added successfully",
+  "card_updated_successfully": "Card updated successfully",
+  "card_deleted_successfully": "Card deleted successfully",
+  "failed_to_add_card": "Failed to add card",
+  "failed_to_update_card": "Failed to update card",
+  "failed_to_delete_card": "Failed to delete card",
+  "backlog": "Backlog",
+  "inProgress": "In Progress",
+  "blocked": "Blocked",
+  "inReview": "In Review",
 };

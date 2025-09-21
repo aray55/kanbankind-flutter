@@ -5,9 +5,11 @@ import 'package:kanbankit/views/lists/board_lists_route_screen.dart';
 import '../../bindings/board_binding.dart';
 import '../../bindings/task_binding.dart';
 import '../../bindings/list_binding.dart';
+import '../../bindings/card_binding.dart'; // Add this import
 import '../../views/board/task_page.dart';
 import '../../views/task_details/task_details_page.dart' show TaskDetailsPage;
 import '../../views/onboarding/onboarding_screen.dart' show OnboardingScreen;
+import '../../views/widgets/cards/card_demo_page.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -28,6 +30,11 @@ class AppPages {
       name: AppRoutes.listScreen,
       page: () => const BoardListsRouteScreen(),
       binding: ListBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.cardDemo, // Add this page
+      page: () => const CardDemoPage(),
+      binding: CardBinding(), // Use CardBinding instead of ListBinding
     ),
   ];
 }

@@ -1,10 +1,11 @@
 import 'package:sqflite/sqflite.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/constants/database_constants.dart';
 import '../../models/board_model.dart';
 import 'database_provider.dart';
 
 class BoardDao {
-  static const String _tableName = AppConstants.boardsTable;
+  static const String _tableName = DatabaseConstants.boardsTable;
 
   // Get database instance
   Future<Database> get _database async {

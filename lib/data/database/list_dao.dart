@@ -1,10 +1,11 @@
 import 'package:sqflite/sqflite.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/constants/database_constants.dart';
 import '../../models/list_model.dart';
 import 'database_provider.dart';
 
 class ListDao {
-  static const String _tableName = AppConstants.listTable;
+  static const String _tableName = DatabaseConstants.listTable;
 
   // Get database instance
   Future<Database> get _database async {

@@ -1,10 +1,10 @@
+import 'package:kanbankit/core/constants/database_constants.dart';
 import 'package:sqflite/sqflite.dart';
-import '../../core/constants/app_constants.dart';
 import '../../models/checklist_item_model.dart';
 import 'database_provider.dart';
 
 class ChecklistItemDao {
-  static const String _tableName = AppConstants.checklistItemsTable;
+  static const String _tableName = DatabaseConstants.checklistItemsTable;
 
   // Get database instance
   Future<Database> get _database async {

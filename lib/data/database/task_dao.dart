@@ -1,3 +1,4 @@
+import '../../core/constants/database_constants.dart';
 import '../../models/task_model.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/enums/task_status.dart';
@@ -15,13 +16,13 @@ class TaskDao {
     final taskData = task.toMap();
     // Remove id if it exists to ensure auto-increment works properly
     taskData.remove('id');
-    return await db.insert(AppConstants.tasksTable, taskData);
+    return await db.insert(DatabaseConstants.tasksTable, taskData);
   }
 
   Future<List<Task>> getAllTasks() async {
     final db = await _databaseProvider.database;
     final List<Map<String, dynamic>> maps = await db.query(
-      AppConstants.tasksTable,
+      DatabaseConstants.tasksTable,
       orderBy: 'created_at DESC',
     );
     return List.generate(maps.length, (i) => Task.fromMap(maps[i]));
@@ -47,7 +48,7 @@ class TaskDao {
   Future<List<Task>> getTasksByStatus(TaskStatus status) async {
     final db = await _databaseProvider.database;
     final List<Map<String, dynamic>> maps = await db.query(
-      AppConstants.tasksTable,
+      DatabaseConstants.tasksTable,
       where: 'status = ?',
       whereArgs: [status.value],
       orderBy: 'created_at DESC',
@@ -75,7 +76,7 @@ class TaskDao {
   Future<Task?> getTaskById(int id) async {
     final db = await _databaseProvider.database;
     final List<Map<String, dynamic>> maps = await db.query(
-      AppConstants.tasksTable,
+      DatabaseConstants.tasksTable,
       where: 'id = ?',
       whereArgs: [id],
       limit: 1,
@@ -99,7 +100,7 @@ class TaskDao {
   Future<int> updateTask(Task task) async {
     final db = await _databaseProvider.database;
     return await db.update(
-      AppConstants.tasksTable,
+      DatabaseConstants.tasksTable,
       task.toMap(),
       where: 'id = ?',
       whereArgs: [task.id],
@@ -112,7 +113,7 @@ class TaskDao {
     await _checklistItemDao.deleteByTaskId(id);
     // Then delete the task itself
     return await db.delete(
-      AppConstants.tasksTable,
+      DatabaseConstants.tasksTable,
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -123,7 +124,7 @@ class TaskDao {
     // First delete all checklist items
     await _checklistItemDao.deleteAll();
     // Then delete all tasks
-    return await db.delete(AppConstants.tasksTable);
+    return await db.delete(DatabaseConstants.tasksTable);
   }
 
   // Insert task with checklist items

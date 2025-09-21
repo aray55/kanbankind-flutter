@@ -218,4 +218,70 @@ const Map<String, String> arYE = {
   "view_archived_boards": "عرض اللوحات المؤرشفة",
   "board_archived_successfully": "تم أرشفة اللوحة بنجاح",
   "board_restored_successfully": "تم استعادة اللوحة بنجاح",
+
+  //List Transalation
+  "your_lists": "قوائمك",
+  "archived_lists": "قوائم مؤرشفة",
+
+  // List-related translations
+  "search_lists": "البحث في القوائم",
+  "archive_all_lists": "أرشفة جميع القوائم",
+  "restore_all_lists": "استعادة جميع القوائم",
+  "board_settings": "إعدادات اللوحة",
+  "add_list": "إضافة قائمة",
+  "no_archived_lists": "لا توجد قوائم مؤرشفة",
+  "archived_lists_will_appear_here_description":
+      "ستظهر القوائم المؤرشفة هنا عندما تقوم بأرشفتها.",
+  "no_lists_found": "لم يتم العثور على قوائم",
+  "no_lists_match_search":
+      "لا توجد قوائم تطابق معايير البحث الخاصة بك. حاول استخدام مصطلح بحث مختلف.",
+  "clear_search": "مسح البحث",
+  "no_lists_yet": "لا توجد قوائم بعد",
+  "create_first_list_description":
+      "أنشئ قائمتك الأولى لتنظيم المهام في هذه اللوحة.",
+  "create_list": "إنشاء قائمة",
+  "list_selected": "تم اختيار القائمة",
+  "tapped_on_list": "تم النقر على القائمة: {title}",
+  "archive_list": "أرشفة القائمة",
+  "confirm_archive_list": "هل أنت متأكد أنك تريد أرشفة \"{title}\"؟",
+  "delete_list": "حذف القائمة",
+  "confirm_delete_list":
+      "هل أنت متأكد أنك تريد حذف \"{title}\" نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
+  "duplicate_list": "نسخ القائمة",
+  "enter_name_for_duplicated_list": "أدخل اسماً للقائمة المنسوخة:",
+  "move_to_board": "نقل إلى لوحة",
+  "move_to_board_description": "سيتم تنفيذ وظيفة النقل إلى لوحة قريباً.",
+  "archive_all_lists_dialog": "أرشفة جميع القوائم",
+  "confirm_archive_all_lists":
+      "هل أنت متأكد أنك تريد أرشفة جميع القوائم في هذه اللوحة؟",
+  "restore_all_lists_dialog": "استعادة جميع القوائم",
+  "confirm_restore_all_lists":
+      "هل أنت متأكد أنك تريد استعادة جميع القوائم المؤرشفة؟",
+  "board_settings_dialog": "إعدادات اللوحة",
+  "board_settings_description": "سيتم تنفيذ وظيفة إعدادات اللوحة قريباً.",
+  "enter_list_name": "أدخل اسم القائمة...",
+  "archive_all": "أرشفة الكل",
+  "restore_all": "استعادة الكل",
+  "board_settings_title": "إعدادات اللوحة",
+
+  // Card-related translations
+  "status": "الحالة",
+  "completed_at": "تم الإكمال في",
+  "description": "الوصف",
+  "add_card": "إضافة بطاقة",
+  "edit_card": "تعديل البطاقة",
+  "card_title": "عنوان البطاقة",
+  "card_description": "وصف البطاقة",
+  "save": "حفظ",
+  "please_enter_card_title": "الرجاء إدخال عنوان للبطاقة",
+  "card_added_successfully": "تمت إضافة البطاقة بنجاح",
+  "card_updated_successfully": "تم تحديث البطاقة بنجاح",
+  "card_deleted_successfully": "تم حذف البطاقة بنجاح",
+  "failed_to_add_card": "فشل في إضافة البطاقة",
+  "failed_to_update_card": "فشل في تحديث البطاقة",
+  "failed_to_delete_card": "فشل في حذف البطاقة",
+  "backlog": "متأخر",
+  "inProgress": "قيد التنفيذ",
+  "blocked": "محظور",
+  "inReview": "قيد المراجعة",
 };

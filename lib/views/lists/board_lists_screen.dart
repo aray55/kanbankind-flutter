@@ -4,6 +4,7 @@ import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/core/services/dialog_service.dart';
 import 'package:kanbankit/views/widgets/lists/lists_header.dart';
 import 'package:kanbankit/views/widgets/lists/list_tile_widget.dart';
+import 'package:kanbankit/views/widgets/lists/list_column_widget.dart';
 import 'package:kanbankit/views/widgets/lists/add_edit_list_modal.dart';
 import '../../controllers/list_controller.dart';
 import '../../models/board_model.dart';
@@ -17,10 +18,7 @@ import '../components/state_widgets.dart';
 class BoardListsScreen extends StatefulWidget {
   final Board board;
 
-  const BoardListsScreen({
-    super.key,
-    required this.board,
-  });
+  const BoardListsScreen({super.key, required this.board});
 
   @override
   State<BoardListsScreen> createState() => _BoardListsScreenState();
@@ -36,7 +34,7 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
     super.initState();
     _listController = Get.find<ListController>();
     _dialogService = Get.find<DialogService>();
-    
+
     // Set the board ID and load lists
     _listController.setBoardId(widget.board.id!);
   }
@@ -64,7 +62,7 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
                 Icons.search,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
-              tooltip: 'Search Lists',
+              tooltip: LocalKeys.searchLists.tr,
             ),
           // Refresh button
           IconButton(
@@ -90,7 +88,7 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
                     children: [
                       const Icon(Icons.archive, size: 18),
                       const SizedBox(width: 12),
-                      const Text('Archive All Lists'),
+                      Text(LocalKeys.archiveAllLists.tr),
                     ],
                   ),
                 ),
@@ -101,7 +99,7 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
                     children: [
                       const Icon(Icons.unarchive, size: 18),
                       const SizedBox(width: 12),
-                      const Text('Restore All Lists'),
+                      Text(LocalKeys.restoreAllLists.tr),
                     ],
                   ),
                 ),
@@ -112,7 +110,7 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
                   children: [
                     const Icon(Icons.settings, size: 18),
                     const SizedBox(width: 12),
-                    const Text('Board Settings'),
+                    Text(LocalKeys.boardSettings.tr),
                   ],
                 ),
               ),
@@ -145,7 +143,7 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
           ? FloatingActionButton.extended(
               onPressed: () => _showAddListModal(context),
               icon: const Icon(Icons.add),
-              label: Text('Add List'),
+              label: Text(LocalKeys.addList.tr),
               backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Theme.of(context).colorScheme.onPrimary,
             )
@@ -158,6 +156,8 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ViewModeToggle(
         currentMode: _currentMode,
+        activeLabel: LocalKeys.yourLists.tr,
+        archivedLabel: LocalKeys.archivedLists.tr,
         onModeChanged: (mode) {
           setState(() {
             _currentMode = mode;
@@ -173,27 +173,8 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
       final lists = _listController.filteredLists;
       final searchQuery = _listController.searchQuery;
 
-      return Column(
-        children: [
-          // Lists header
-          ListsHeader(
-            boardTitle: widget.board.title,
-            totalLists: lists.length,
-            searchQuery: searchQuery.isEmpty ? null : searchQuery,
-            onClearSearch: searchQuery.isEmpty ? null : () {
-              _listController.clearSearch();
-              _listController.loadListsForBoard(widget.board.id!, showLoading: false);
-            },
-          ),
-
-          // Lists content
-          Expanded(
-            child: lists.isEmpty
-                ? _buildEmptyState(context, isArchived: false)
-                : _buildListsGrid(context, lists),
-          ),
-        ],
-      );
+      // For active lists view, show the Kanban board layout
+      return _buildKanbanBoard(context, lists, isArchived: false);
     });
   }
 
@@ -201,6 +182,7 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
     return Obx(() {
       final archivedLists = _listController.archivedLists;
 
+      // For archived lists view, show the list view as before
       return Column(
         children: [
           // Lists header
@@ -222,7 +204,95 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
     });
   }
 
-  Widget _buildListsGrid(BuildContext context, List<ListModel> lists, {bool isArchived = false}) {
+  Widget _buildKanbanBoard(
+    BuildContext context,
+    List<ListModel> lists, {
+    bool isArchived = false,
+  }) {
+    if (lists.isEmpty) {
+      return _buildEmptyState(context, isArchived: false);
+    }
+
+    // Filter out archived lists and sort by position
+    final activeLists = lists.where((list) => list.isActive).toList()
+      ..sort((a, b) => a.position.compareTo(b.position));
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Add lists as columns
+          ...activeLists.map((list) {
+            return ListColumnWidget(
+              list: list,
+              onListUpdated: (updatedList) {
+                _listController.updateList(updatedList);
+              },
+              onListDeleted: (list) {
+                _handleDeleteList(list);
+              },
+              onListArchived: (list) {
+                _handleArchiveList(list);
+              },
+            );
+          }).toList(),
+
+          // Add new list column
+          _buildAddListColumn(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddListColumn(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: 280,
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      child: Card(
+        elevation: 2,
+        shadowColor: colorScheme.shadow.withValues(alpha: 0.1),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: InkWell(
+          onTap: () => _showAddListModal(context),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: colorScheme.outline.withValues(alpha: 0.2),
+                width: 2,
+              ),
+              color: colorScheme.surface,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.add, size: 48, color: colorScheme.primary),
+                const SizedBox(height: 16),
+                AppText(
+                  LocalKeys.addList.tr,
+                  variant: AppTextVariant.h2,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListsGrid(
+    BuildContext context,
+    List<ListModel> lists, {
+    bool isArchived = false,
+  }) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: lists.length,
@@ -252,8 +322,8 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
   Widget _buildEmptyState(BuildContext context, {required bool isArchived}) {
     if (isArchived) {
       return EmptyState(
-        title: 'No Archived Lists',
-        subtitle: 'Archived lists will appear here when you archive them.',
+        title: LocalKeys.noArchivedLists.tr,
+        subtitle: LocalKeys.archivedListsWillAppearHereDescription.tr,
         icon: Icons.archive_outlined,
       );
     }
@@ -261,22 +331,25 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
     final hasSearchQuery = _listController.searchQuery.isNotEmpty;
     if (hasSearchQuery) {
       return EmptyState(
-        title: 'No Lists Found',
-        subtitle: 'No lists match your search criteria. Try a different search term.',
+        title: LocalKeys.noListsFound.tr,
+        subtitle: LocalKeys.noListsMatchSearch.tr,
         icon: Icons.search_off,
-        actionText: 'Clear Search',
+        actionText: LocalKeys.clearSearch.tr,
         onActionPressed: () {
           _listController.clearSearch();
-          _listController.loadListsForBoard(widget.board.id!, showLoading: false);
+          _listController.loadListsForBoard(
+            widget.board.id!,
+            showLoading: false,
+          );
         },
       );
     }
 
     return EmptyState(
-      title: 'No Lists Yet',
-      subtitle: 'Create your first list to organize tasks in this board.',
+      title: LocalKeys.noListsYet.tr,
+      subtitle: LocalKeys.createFirstListDescription.tr,
       icon: Icons.view_column_outlined,
-      actionText: 'Create List',
+      actionText: LocalKeys.createList.tr,
       onActionPressed: () => _showAddListModal(context),
     );
   }
@@ -285,15 +358,15 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
   void _handleListTap(ListModel list) {
     // TODO: Navigate to list details or tasks view
     _dialogService.showSnack(
-      title: 'List Selected',
-      message: 'Tapped on list: ${list.title}',
+      title: LocalKeys.listSelected.tr,
+      message: LocalKeys.tappedOnList.trParams({'title': list.title}),
     );
   }
 
   void _handleArchiveList(ListModel list) async {
     final confirmed = await _dialogService.confirm(
-      title: 'Archive List',
-      message: 'Are you sure you want to archive "${list.title}"?',
+      title: LocalKeys.archiveList.tr,
+      message: LocalKeys.confirmArchiveList.trParams({'title': list.title}),
       confirmText: LocalKeys.archive.tr,
       cancelText: LocalKeys.cancel.tr,
     );
@@ -309,8 +382,8 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
 
   void _handleDeleteList(ListModel list) async {
     final confirmed = await _dialogService.confirm(
-      title: 'Delete List',
-      message: 'Are you sure you want to permanently delete "${list.title}"? This action cannot be undone.',
+      title: LocalKeys.deleteList.tr,
+      message: LocalKeys.confirmDeleteList.trParams({'title': list.title}),
       confirmText: LocalKeys.delete.tr,
       cancelText: LocalKeys.cancel.tr,
     );
@@ -322,8 +395,8 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
 
   void _handleDuplicateList(ListModel list) async {
     final result = await _dialogService.promptInput(
-      title: 'Duplicate List',
-      label: 'Enter a name for the duplicated list:',
+      title: LocalKeys.duplicateList.tr,
+      label: LocalKeys.enterNameForDuplicatedList.tr,
       initialValue: '${list.title} (Copy)',
     );
 
@@ -335,8 +408,8 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
   void _handleMoveToBoard(ListModel list) {
     // TODO: Implement move to board functionality
     _dialogService.showSnack(
-      title: 'Move to Board',
-      message: 'Move to board functionality will be implemented soon.',
+      title: LocalKeys.moveToBoard.tr,
+      message: LocalKeys.moveToBoardDescription.tr,
     );
   }
 
@@ -356,9 +429,9 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
 
   void _handleArchiveAllLists() async {
     final confirmed = await _dialogService.confirm(
-      title: 'Archive All Lists',
-      message: 'Are you sure you want to archive all lists in this board?',
-      confirmText: 'Archive All',
+      title: LocalKeys.archiveAllListsDialog.tr,
+      message: LocalKeys.confirmArchiveAllLists.tr,
+      confirmText: LocalKeys.archiveAll.tr,
       cancelText: LocalKeys.cancel.tr,
     );
 
@@ -369,9 +442,9 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
 
   void _handleRestoreAllLists() async {
     final confirmed = await _dialogService.confirm(
-      title: 'Restore All Lists',
-      message: 'Are you sure you want to restore all archived lists?',
-      confirmText: 'Restore All',
+      title: LocalKeys.restoreAllListsDialog.tr,
+      message: LocalKeys.confirmRestoreAllLists.tr,
+      confirmText: LocalKeys.restoreAll.tr,
       cancelText: LocalKeys.cancel.tr,
     );
 
@@ -383,44 +456,45 @@ class _BoardListsScreenState extends State<BoardListsScreen> {
   void _handleBoardSettings() {
     // TODO: Navigate to board settings or show board edit modal
     _dialogService.showSnack(
-      title: 'Board Settings',
-      message: 'Board settings functionality will be implemented soon.',
+      title: LocalKeys.boardSettingsDialog.tr,
+      message: LocalKeys.boardSettingsDescription.tr,
     );
   }
 
   // Modal and dialog methods
   void _showAddListModal(BuildContext context) {
-    AddEditListModal.show(
-      context,
-      boardId: widget.board.id!,
-    );
+    AddEditListModal.show(context, boardId: widget.board.id!);
   }
 
   void _showEditListModal(BuildContext context, ListModel list) {
-    AddEditListModal.show(
-      context,
-      list: list,
-      boardId: widget.board.id!,
-    );
+    AddEditListModal.show(context, list: list, boardId: widget.board.id!);
   }
 
   void _showSearchDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Search Lists'),
+        title: Text(LocalKeys.searchLists.tr),
         content: TextField(
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Enter list name...',
-            prefixIcon: Icon(Icons.search),
+          decoration: InputDecoration(
+            hintText: LocalKeys.enterListName.tr,
+            prefixIcon: Icon(
+              Icons.search,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
           ),
           onSubmitted: (query) {
             Navigator.of(context).pop();
             if (query.trim().isNotEmpty) {
               _listController.searchListsInBoard(query);
             } else {
-              _listController.loadListsForBoard(widget.board.id!, showLoading: false);
+              _listController.loadListsForBoard(
+                widget.board.id!,
+                showLoading: false,
+              );
             }
           },
         ),

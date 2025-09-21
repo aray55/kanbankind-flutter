@@ -215,6 +215,23 @@ class LocalKeys {
   static const String areYouSureArchive = 'are_you_sure_archive';
   static const String cannotBeUndone = 'cannot_be_undone';
 
+  // Card-related keys
+  static const String status = 'status';
+  static const String completedAt = 'completed_at';
+  static const String description = 'description';
+  static const String addCard = 'add_card';
+  static const String editCard = 'edit_card';
+  static const String cardTitle = 'card_title';
+  static const String cardDescription = 'card_description';
+  static const String save = 'save';
+  static const String pleaseEnterCardTitle = 'please_enter_card_title';
+  static const String cardAddedSuccessfully = 'card_added_successfully';
+  static const String cardUpdatedSuccessfully = 'card_updated_successfully';
+  static const String cardDeletedSuccessfully = 'card_deleted_successfully';
+  static const String failedToAddCard = 'failed_to_add_card';
+  static const String failedToUpdateCard = 'failed_to_update_card';
+  static const String failedToDeleteCard = 'failed_to_delete_card';
+
   // Archived boards keys
   static const String noArchivedBoards = 'no_archived_boards';
   static const String archivedBoardsWillAppearHere =
@@ -229,4 +246,44 @@ class LocalKeys {
   static const String viewArchivedBoards = 'view_archived_boards';
   static const String boardArchivedSuccessfully = 'board_archived_successfully';
   static const String boardRestoredSuccessfully = 'board_restored_successfully';
+  static const String yourLists = 'your_lists';
+  static const String archivedLists = 'archived_lists';
+
+  // List-related keys
+  static const String searchLists = 'search_lists';
+  static const String archiveAllLists = 'archive_all_lists';
+  static const String restoreAllLists = 'restore_all_lists';
+  static const String boardSettings = 'board_settings';
+  static const String addList = 'add_list';
+  static const String noArchivedLists = 'no_archived_lists';
+  static const String archivedListsWillAppearHereDescription =
+      'archived_lists_will_appear_here_description';
+  static const String noListsFound = 'no_lists_found';
+  static const String noListsMatchSearch = 'no_lists_match_search';
+  static const String clearSearch = 'clear_search';
+  static const String noListsYet = 'no_lists_yet';
+  static const String createFirstListDescription =
+      'create_first_list_description';
+  static const String createList = 'create_list';
+  static const String listSelected = 'list_selected';
+  static const String tappedOnList = 'tapped_on_list';
+  static const String archiveList = 'archive_list';
+  static const String confirmArchiveList = 'confirm_archive_list';
+  static const String deleteList = 'delete_list';
+  static const String confirmDeleteList = 'confirm_delete_list';
+  static const String duplicateList = 'duplicate_list';
+  static const String enterNameForDuplicatedList =
+      'enter_name_for_duplicated_list';
+  static const String moveToBoard = 'move_to_board';
+  static const String moveToBoardDescription = 'move_to_board_description';
+  static const String archiveAllListsDialog = 'archive_all_lists_dialog';
+  static const String confirmArchiveAllLists = 'confirm_archive_all_lists';
+  static const String restoreAllListsDialog = 'restore_all_lists_dialog';
+  static const String confirmRestoreAllLists = 'confirm_restore_all_lists';
+  static const String boardSettingsDialog = 'board_settings_dialog';
+  static const String boardSettingsDescription = 'board_settings_description';
+  static const String enterListName = 'enter_list_name';
+  static const String archiveAll = 'archive_all';
+  static const String restoreAll = 'restore_all';
+  static const String boardSettingsTitle = 'board_settings_title';
 }
