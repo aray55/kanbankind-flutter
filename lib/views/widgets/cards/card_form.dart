@@ -72,7 +72,7 @@ class _CardFormState extends State<CardForm> {
                 ),
                 IconButton(
                   icon: FaIcon(
-                    FontAwesomeIcons.times,
+                    FontAwesomeIcons.xmark,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                   onPressed: () => Navigator.of(context).pop(),
@@ -89,6 +89,7 @@ class _CardFormState extends State<CardForm> {
                 border: const OutlineInputBorder(),
                 hintText: LocalKeys.pleaseEnterCardTitle.tr,
               ),
+
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return LocalKeys.pleaseEnterCardTitle.tr;
