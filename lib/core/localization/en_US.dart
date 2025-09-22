@@ -293,4 +293,7 @@ const Map<String, String> enUS = {
   "inProgress": "In Progress",
   "blocked": "Blocked",
   "inReview": "In Review",
-};
+  "list_name": "List Name",
+  'update_list_settings': 'Update List Settings',
+  'setup_new_list': 'Set up a new list for your board',
+  };

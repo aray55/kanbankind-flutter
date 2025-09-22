@@ -124,11 +124,9 @@ class CardController extends GetxController {
         status: status?.value,
       );
 
-      // Add to cards if it belongs to current list
-      if (listId == _currentListId.value) {
-        _cards.add(card);
-        _sortCardsByPosition();
-      }
+      // Add to cards list (we now load all cards, so always add)
+      _cards.add(card);
+      _sortCardsByPosition();
 
       _dialogService.showSuccessSnackbar(
         title: LocalKeys.success.tr,
@@ -399,13 +397,14 @@ class CardController extends GetxController {
         newPosition: newPosition,
       );
       if (updatedCard != null) {
-        // Remove from current list if it's the current list
-        if (newListId == _currentListId.value) {
-          _cards.add(updatedCard);
-          _sortCardsByPosition();
+        // Update the card in the list (since we load all cards now)
+        final index = _cards.indexWhere((card) => card.id == cardId);
+        if (index != -1) {
+          _cards[index] = updatedCard;
         } else {
-          _cards.removeWhere((card) => card.id == cardId);
+          _cards.add(updatedCard);
         }
+        _sortCardsByPosition();
 
         _dialogService.showSuccessSnackbar(
           title: LocalKeys.success.tr,
@@ -465,5 +464,12 @@ class CardController extends GetxController {
   // Sort cards by position
   void _sortCardsByPosition() {
     _cards.sort((a, b) => a.position.compareTo(b.position));
+  }
+
+  // Method to refresh cards for a specific list
+  Future<void> refreshCardsForList(int listId) async {
+    if (listId == _currentListId.value) {
+      await loadCardsForList(listId, showLoading: false);
+    }
   }
 }

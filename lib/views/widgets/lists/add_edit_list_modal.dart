@@ -10,11 +10,7 @@ class AddEditListModal extends StatefulWidget {
   final ListModel? list;
   final int boardId;
 
-  const AddEditListModal({
-    super.key,
-    this.list,
-    required this.boardId,
-  });
+  const AddEditListModal({super.key, this.list, required this.boardId});
 
   @override
   State<AddEditListModal> createState() => _AddEditListModalState();
@@ -29,10 +25,7 @@ class AddEditListModal extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => AddEditListModal(
-        list: list,
-        boardId: boardId,
-      ),
+      builder: (context) => AddEditListModal(list: list, boardId: boardId),
     );
   }
 }
@@ -159,13 +152,12 @@ class _AddEditListModalState extends State<AddEditListModal> {
                     const SizedBox(height: 4),
                     AppText(
                       isEditing
-                          ? 'Update list settings'
-                          : 'Set up a new list for your board',
+                          ? LocalKeys.updateListSettings.tr
+                          : LocalKeys.setupNewList.tr,
                       variant: AppTextVariant.body2,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ],
                 ),
@@ -182,7 +174,7 @@ class _AddEditListModalState extends State<AddEditListModal> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AppText(
-          'List Name',
+          LocalKeys.listName.tr,
           variant: AppTextVariant.body2,
           fontWeight: FontWeight.w600,
           color: Theme.of(context).colorScheme.onSurface,
@@ -191,10 +183,12 @@ class _AddEditListModalState extends State<AddEditListModal> {
         TextFormField(
           controller: _listController.titleController,
           decoration: InputDecoration(
-            hintText: 'Enter list name',
+            hintText: LocalKeys.enterListName.tr,
             prefixIcon: Icon(
               Icons.view_column,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -205,7 +199,9 @@ class _AddEditListModalState extends State<AddEditListModal> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.5),
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -229,16 +225,24 @@ class _AddEditListModalState extends State<AddEditListModal> {
           },
           textInputAction: TextInputAction.next,
           maxLength: 255,
-          buildCounter: (context, {required currentLength, required isFocused, maxLength}) {
-            return Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: AppText(
-                '$currentLength/${maxLength ?? 255}',
-                variant: AppTextVariant.body2,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
-            );
-          },
+          buildCounter:
+              (
+                context, {
+                required currentLength,
+                required isFocused,
+                maxLength,
+              }) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: AppText(
+                    '$currentLength/${maxLength ?? 255}',
+                    variant: AppTextVariant.body2,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                );
+              },
         ),
       ],
     );
@@ -255,17 +259,20 @@ class _AddEditListModalState extends State<AddEditListModal> {
           color: Theme.of(context).colorScheme.onSurface,
         ),
         const SizedBox(height: 8),
-        Obx(() => ColorPickerWidget(
-              selectedColor: _listController.selectedColor,
-              onColorSelected: _listController.setSelectedColor,
-            )),
+        Obx(
+          () => ColorPickerWidget(
+            selectedColor: _listController.selectedColor,
+            onColorSelected: _listController.setSelectedColor,
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildActionButtons(BuildContext context) {
     return Obx(() {
-      final isLoading = _listController.isCreating || _listController.isUpdating;
+      final isLoading =
+          _listController.isCreating || _listController.isUpdating;
 
       return Row(
         children: [
@@ -278,9 +285,7 @@ class _AddEditListModalState extends State<AddEditListModal> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                side: BorderSide(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
+                side: BorderSide(color: Theme.of(context).colorScheme.outline),
               ),
               child: AppText(
                 LocalKeys.cancel.tr,
@@ -336,7 +341,7 @@ class _AddEditListModalState extends State<AddEditListModal> {
       } else {
         await _listController.createListFromForm(widget.boardId);
       }
-      
+
       // Close modal on success
       if (mounted) {
         Navigator.of(context).pop();

@@ -1,9 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/models/list_model.dart';
 import 'package:kanbankit/views/widgets/lists/add_edit_list_modal.dart';
-import 'package:kanbankit/core/utils/helper_functions_utils.dart';
 import 'package:kanbankit/core/services/dialog_service.dart';
 import 'package:kanbankit/controllers/list_controller.dart';
 import 'package:kanbankit/views/components/text_buttons/app_text_button.dart';
@@ -13,6 +13,7 @@ import 'package:kanbankit/models/card_model.dart';
 import 'package:kanbankit/views/widgets/cards/card_tile_widget.dart';
 import 'package:kanbankit/views/widgets/cards/add_card_button.dart';
 import 'package:kanbankit/views/widgets/cards/card_form.dart';
+import 'package:flutter/services.dart';
 import '../responsive_text.dart';
 
 class ListColumnWidget extends StatefulWidget {
@@ -20,6 +21,8 @@ class ListColumnWidget extends StatefulWidget {
   final Function(ListModel) onListUpdated;
   final Function(ListModel) onListDeleted;
   final Function(ListModel) onListArchived;
+  final VoidCallback? onDragStart;
+  final VoidCallback? onDragEnd;
 
   const ListColumnWidget({
     super.key,
@@ -27,6 +30,8 @@ class ListColumnWidget extends StatefulWidget {
     required this.onListUpdated,
     required this.onListDeleted,
     required this.onListArchived,
+    this.onDragStart,
+    this.onDragEnd,
   });
 
   @override
@@ -44,16 +49,26 @@ class _ListColumnWidgetState extends State<ListColumnWidget> {
     _listController = Get.find<ListController>();
     _dialogService = Get.find<DialogService>();
 
-    // Ensure CardController is registered
+    // Ensure CardController is registered as a singleton
     if (!Get.isRegistered<CardController>()) {
-      Get.lazyPut<CardController>(() => CardController());
+      Get.put<CardController>(CardController(), permanent: true);
     }
 
     // Get the registered CardController instance
     _cardController = Get.find<CardController>();
 
     // Load cards for this list
-    _cardController.setListId(widget.list.id!, showLoading: false);
+    _loadCardsForList();
+  }
+
+  Future<void> _loadCardsForList() async {
+    // Load all cards so that each list can filter its own cards
+    await _cardController.loadAllCards(showLoading: false);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -192,61 +207,130 @@ class _ListColumnWidgetState extends State<ListColumnWidget> {
         ),
       ),
       child: Obx(() {
+        // Filter cards for this specific list
+        final listCards = _cardController.cards
+            .where((card) => card.listId == widget.list.id!)
+            .toList();
+
         // Show loading indicator while cards are loading
-        if (_cardController.isLoading) {
+        if (_cardController.isLoading && listCards.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
         // Show cards or empty state
-        if (_cardController.cards.isEmpty) {
+        if (listCards.isEmpty) {
           return _buildEmptyState();
         }
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: _cardController.cards.length + 1, // +1 for the add button
-          itemBuilder: (context, index) {
-            // Last item is the add button
-            if (index == _cardController.cards.length) {
-              return AddCardButton(listId: widget.list.id!);
-            }
+        return DragTarget<CardModel>(
+          onAcceptWithDetails: (details) {
+            // Handle dropping a card into this list
+            _handleCardDropped(details.data, widget.list.id!);
+          },
+          onWillAcceptWithDetails: (details) {
+            // Only accept cards that are not from this list
+            return details.data!.listId != widget.list.id!;
+          },
+          onLeave: (data) {
+            // Optional: Handle when a draggable leaves the target
+            
+          },
+          builder: (context, candidateData, rejectedData) {
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: listCards.length + 1, // +1 for the add button
+              itemBuilder: (context, index) {
+                // Last item is the add button
+                if (index == listCards.length) {
+                  return AddCardButton(listId: widget.list.id!);
+                }
 
-            // Card items
-            final card = _cardController.cards[index];
-            return CardTile(card: card);
+                // Card items with drag support
+                final card = listCards[index];
+                return _buildDraggableCard(card);
+              },
+            );
           },
         );
       }),
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.task_outlined,
-              size: 48,
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.3),
-            ),
-            const SizedBox(height: 16),
-            AppText(
-              LocalKeys.noTasks.tr,
-              variant: AppTextVariant.body,
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-            const SizedBox(height: 16),
-            AddCardButton(listId: widget.list.id!),
-          ],
+  Widget _buildDraggableCard(CardModel card) {
+    return LongPressDraggable<CardModel>(
+      data: card,
+      feedback: Material(
+        elevation: 4,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          width: 250,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(card.title, maxLines: 2, overflow: TextOverflow.ellipsis),
         ),
       ),
+      childWhenDragging: Opacity(opacity: 0.5, child: CardTile(card: card)),
+      dragAnchorStrategy: pointerDragAnchorStrategy,
+      onDragStarted: () {
+        print('Drag started');
+        // Notify parent that dragging has started
+        widget.onDragStart?.call();
+      },
+      onDragCompleted: () {
+        print('Drag completed');
+        widget.onDragEnd?.call();
+      },
+      onDraggableCanceled: (velocity, offset) {
+        print('Drag canceled');
+        widget.onDragEnd?.call();
+      },
+      child: CardTile(card: card),
+    );
+  }
+
+
+  Widget _buildEmptyState() {
+    return DragTarget<CardModel>(
+      onAcceptWithDetails: (details) {
+        // Handle dropping a card into this empty list
+        _handleCardDropped(details.data, widget.list.id!);
+      },
+      onWillAccept: (data) {
+        // Only accept cards that are not from this list
+        return data != null && data.listId != widget.list.id!;
+      },
+      builder: (context, candidateData, rejectedData) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.task_outlined,
+                  size: 48,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.3),
+                ),
+                const SizedBox(height: 16),
+                AppText(
+                  LocalKeys.noTasks.tr,
+                  variant: AppTextVariant.body,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                const SizedBox(height: 16),
+                AddCardButton(listId: widget.list.id!),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -301,6 +385,21 @@ class _ListColumnWidgetState extends State<ListColumnWidget> {
         widget.onListDeleted(widget.list);
         break;
     }
+  }
+
+  void _handleCardDropped(CardModel card, int newListId) {
+    // Move the card to the new list
+    _cardController.moveCardToList(card.id!, newListId).then((_) {
+      // Refresh all cards to reflect the card movement
+      _cardController.loadAllCards(showLoading: false);
+      // Also refresh the lists to reflect the card movement
+      _listController.refreshAfterCardMovement();
+    });
+  }
+
+  // Method to refresh cards in this list
+  Future<void> refreshCards() async {
+    await _cardController.loadAllCards(showLoading: false);
   }
 
   void _showEditListModal() {

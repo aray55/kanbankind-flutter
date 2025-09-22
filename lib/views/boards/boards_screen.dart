@@ -40,16 +40,6 @@ class _BoardsScreenState extends State<BoardsScreen> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         actions: [
-          // Card demo button (only for active boards)
-          if (_currentMode == BoardViewMode.active)
-            IconButton(
-              onPressed: () => Get.toNamed(AppRoutes.cardDemo),
-              icon: Icon(
-                Icons.widgets,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              tooltip: 'Card Components Demo',
-            ),
           // Language switcher
           IconButton(
             onPressed: () => LanguageSwitcherBottomSheet.show(),

@@ -283,7 +283,10 @@ class LocalKeys {
   static const String boardSettingsDialog = 'board_settings_dialog';
   static const String boardSettingsDescription = 'board_settings_description';
   static const String enterListName = 'enter_list_name';
+  static const String listName = 'list_name';
   static const String archiveAll = 'archive_all';
   static const String restoreAll = 'restore_all';
   static const String boardSettingsTitle = 'board_settings_title';
+  static const String updateListSettings = 'update_list_settings';
+  static const String setupNewList = 'setup_new_list';
 }

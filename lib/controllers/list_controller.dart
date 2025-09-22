@@ -36,8 +36,8 @@ class ListController extends GetxController {
     return _lists
         .where(
           (list) => list.title.toLowerCase().contains(
-                _searchQuery.value.toLowerCase(),
-              ),
+            _searchQuery.value.toLowerCase(),
+          ),
         )
         .toList();
   }
@@ -121,7 +121,9 @@ class ListController extends GetxController {
 
     try {
       _isLoading.value = true;
-      final archivedLists = await _repository.getArchivedListsByBoardId(_currentBoardId.value);
+      final archivedLists = await _repository.getArchivedListsByBoardId(
+        _currentBoardId.value,
+      );
       _archivedLists.assignAll(archivedLists);
     } catch (e) {
       _dialogService.showErrorSnackbar(
@@ -330,7 +332,10 @@ class ListController extends GetxController {
       final success = await _repository.unarchiveList(listId);
       if (success) {
         _archivedLists.removeWhere((list) => list.id == listId);
-        await loadListsForBoard(_currentBoardId.value, showLoading: false); // Refresh active lists
+        await loadListsForBoard(
+          _currentBoardId.value,
+          showLoading: false,
+        ); // Refresh active lists
 
         _dialogService.showSuccessSnackbar(
           title: LocalKeys.success.tr,
@@ -662,6 +667,13 @@ class ListController extends GetxController {
     }
   }
 
+  // Refresh lists and their cards after card movement
+  Future<void> refreshAfterCardMovement() async {
+    if (_currentBoardId.value != 0) {
+      await loadListsForBoard(_currentBoardId.value, showLoading: false);
+    }
+  }
+
   // Get recent lists for current board
   Future<List<ListModel>> getRecentLists({int limit = 5}) async {
     try {
@@ -717,7 +729,9 @@ class ListController extends GetxController {
     if (_currentBoardId.value == 0) return;
 
     try {
-      final success = await _repository.archiveListsByBoardId(_currentBoardId.value);
+      final success = await _repository.archiveListsByBoardId(
+        _currentBoardId.value,
+      );
       if (success) {
         await loadListsForBoard(_currentBoardId.value, showLoading: false);
         await loadArchivedLists();
@@ -744,7 +758,9 @@ class ListController extends GetxController {
     if (_currentBoardId.value == 0) return;
 
     try {
-      final success = await _repository.unarchiveListsByBoardId(_currentBoardId.value);
+      final success = await _repository.unarchiveListsByBoardId(
+        _currentBoardId.value,
+      );
       if (success) {
         await loadListsForBoard(_currentBoardId.value, showLoading: false);
         await loadArchivedLists();

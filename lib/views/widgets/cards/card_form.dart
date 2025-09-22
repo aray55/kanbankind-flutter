@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/models/card_model.dart';
 import 'package:kanbankit/controllers/card_controller.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/core/enums/card_status.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
+
+import '../../components/icon_buttons/app_icon_button.dart';
 
 class CardForm extends StatefulWidget {
   final CardModel? card; // null for new card, provided for editing
@@ -59,16 +63,18 @@ class _CardFormState extends State<CardForm> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                AppText(
                   widget.card == null
                       ? LocalKeys.addCard.tr
                       : LocalKeys.editCard.tr,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  variant: AppTextVariant.body2,
+                  fontWeight: FontWeight.bold,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close),
+                  icon: FaIcon(
+                    FontAwesomeIcons.times,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -147,14 +153,19 @@ class _CardFormState extends State<CardForm> {
   void _saveCard(CardController controller) {
     if (widget.card == null) {
       // Create new card
-      controller.createCard(
-        listId: widget.listId,
-        title: _titleController.text,
-        description: _descriptionController.text.isEmpty
-            ? null
-            : _descriptionController.text,
-        status: _selectedStatus,
-      );
+      controller
+          .createCard(
+            listId: widget.listId,
+            title: _titleController.text,
+            description: _descriptionController.text.isEmpty
+                ? null
+                : _descriptionController.text,
+            status: _selectedStatus,
+          )
+          .then((_) {
+            // Refresh all cards after creation to update all list columns
+            controller.loadAllCards(showLoading: false);
+          });
     } else {
       // Update existing card
       final updatedCard = widget.card!.copyWith(
@@ -164,7 +175,10 @@ class _CardFormState extends State<CardForm> {
             : _descriptionController.text,
         status: _selectedStatus,
       );
-      controller.updateCard(updatedCard);
+      controller.updateCard(updatedCard).then((_) {
+        // Refresh all cards after update
+        controller.loadAllCards(showLoading: false);
+      });
     }
 
     Navigator.of(context).pop();

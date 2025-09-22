@@ -222,6 +222,7 @@ const Map<String, String> arYE = {
   //List Transalation
   "your_lists": "قوائمك",
   "archived_lists": "قوائم مؤرشفة",
+  "list_name": "اسم القائمة",
 
   // List-related translations
   "search_lists": "البحث في القوائم",
@@ -284,4 +285,6 @@ const Map<String, String> arYE = {
   "inProgress": "قيد التنفيذ",
   "blocked": "محظور",
   "inReview": "قيد المراجعة",
+  'update_list_settings': 'تحديث إعدادات القائمة',
+  'setup_new_list': 'إعداد قائمة جديدة لלוחك',
 };
