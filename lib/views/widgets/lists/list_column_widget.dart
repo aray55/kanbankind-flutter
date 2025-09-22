@@ -74,7 +74,7 @@ class ListColumnWidget extends StatelessWidget {
 
           // Footer
           ListFooterWidget(
-            onAddTask: _showAddTaskModal,
+            onAddCard: _showAddCardModal,
           ),
         ],
       ),
@@ -116,11 +116,9 @@ class ListColumnWidget extends StatelessWidget {
   }
 
   void _handleChangeColor() {
-    // TODO: Implement color change functionality
-    // This can be implemented later when color picker is needed
   }
 
-  void _showAddTaskModal() {
+  void _showAddCardModal() {
     // Get context from the current widget tree
     final context = Get.context!;
     

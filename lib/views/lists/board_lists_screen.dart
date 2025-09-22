@@ -626,7 +626,7 @@ import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/core/services/dialog_service.dart';
 import 'package:kanbankit/views/widgets/lists/lists_header.dart';
 import 'package:kanbankit/views/widgets/lists/list_tile_widget.dart';
-import 'package:kanbankit/views/widgets/lists/list_column_widget.dart';
+import 'package:kanbankit/views/widgets/lists/draggable_list_column.dart';
 import 'package:kanbankit/views/widgets/lists/add_edit_list_modal.dart';
 import '../../controllers/list_controller.dart';
 import '../../controllers/card_controller.dart';
@@ -849,22 +849,88 @@ class BoardListsScreen extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ...activeLists.map((list) {
-                return ListColumnWidget(
-                  list: list,
-                  onListUpdated: (updatedList) =>
-                      _listController.updateList(updatedList),
-                  onListDeleted: (list) => _handleDeleteList(list),
-                  onListArchived: (list) => _handleArchiveList(list),
-                  onDragStart: _dragController.handleDragStart,
-                  onDragEnd: _dragController.handleDragEnd,
-                );
+              ...activeLists.asMap().entries.map((entry) {
+                final index = entry.key;
+                final list = entry.value;
+                
+                return _buildDraggableListColumn(list, index, activeLists);
               }),
               _buildAddListColumn(context),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDraggableListColumn(ListModel list, int index, List<ListModel> allLists) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Drop zone before the column (for inserting at this position)
+        if (index == 0) _buildDropZone(0, allLists),
+        
+        // The draggable column
+        DraggableListColumn(
+          list: list,
+          onListUpdated: (updatedList) =>
+              _listController.updateList(updatedList),
+          onListDeleted: (list) => _handleDeleteList(list),
+          onListArchived: (list) => _handleArchiveList(list),
+          onDragStart: _dragController.handleDragStart,
+          onDragEnd: _dragController.handleDragEnd,
+          onListReordered: _handleListReordered,
+        ),
+        
+        // Drop zone after the column (for inserting after this position)
+        _buildDropZone(index + 1, allLists),
+      ],
+    );
+  }
+
+  Widget _buildDropZone(int targetIndex, List<ListModel> allLists) {
+    return DragTarget<ListModel>(
+      onAcceptWithDetails: (details) {
+        _handleListReordered(details.data, targetIndex);
+      },
+      onWillAcceptWithDetails: (details) {
+        // Accept any list that's not already at this position
+        final currentIndex = allLists.indexWhere((l) => l.id == details.data.id);
+        return currentIndex != targetIndex && currentIndex != targetIndex - 1;
+      },
+      builder: (context, candidateData, rejectedData) {
+        final isActive = candidateData.isNotEmpty;
+        final colorScheme = Theme.of(context).colorScheme;
+        
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          width: isActive ? 20 : 6,
+          height: isActive ? 300 : 80,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            color: isActive 
+                ? colorScheme.primary.withValues(alpha: 0.3)
+                : colorScheme.outline.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
+            border: isActive 
+                ? Border.all(
+                    color: colorScheme.primary,
+                    width: 2,
+                  )
+                : null,
+          ),
+          child: isActive
+              ? Center(
+                  child: Icon(
+                    Icons.add_circle,
+                    color: colorScheme.primary,
+                    size: 24,
+                  ),
+                )
+              : null,
+        );
+      },
     );
   }
 
@@ -1020,6 +1086,46 @@ class BoardListsScreen extends StatelessWidget {
       title: LocalKeys.moveToBoard.tr,
       message: LocalKeys.moveToBoardDescription.tr,
     );
+  }
+
+  void _handleListReordered(ListModel draggedList, int newIndex) async {
+    try {
+      // Get current active lists sorted by position
+      final currentLists = _listController.lists
+          .where((l) => l.isActive)
+          .toList()
+        ..sort((a, b) => a.position.compareTo(b.position));
+
+      // Remove the dragged list from its current position
+      final oldIndex = currentLists.indexWhere((l) => l.id == draggedList.id);
+      if (oldIndex == -1) return;
+
+      // Create a new list with updated positions
+      final reorderedLists = List<ListModel>.from(currentLists);
+      reorderedLists.removeAt(oldIndex);
+      
+      // Insert at new position (clamp to valid range)
+      final insertIndex = newIndex.clamp(0, reorderedLists.length);
+      reorderedLists.insert(insertIndex, draggedList);
+
+      // Update positions for all lists
+      for (int i = 0; i < reorderedLists.length; i++) {
+        reorderedLists[i] = reorderedLists[i].copyWith(position: i.toDouble());
+      }
+
+      // Save the new order
+      await _listController.reorderLists(reorderedLists);
+      
+      _dialogService.showSnack(
+        title: LocalKeys.success.tr,
+        message: 'تم إعادة ترتيب القائمة بنجاح',
+      );
+    } catch (e) {
+      _dialogService.showSnack(
+        title: 'خطأ',
+        message: 'حدث خطأ أثناء إعادة ترتيب القائمة: $e',
+      );
+    }
   }
 
   void _handleMenuAction(String action) {

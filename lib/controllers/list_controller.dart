@@ -76,6 +76,8 @@ class ListController extends GetxController {
     await loadListsForBoard(boardId, showLoading: showLoading);
   }
 
+//Update list Color
+
   // Load lists for a specific board
   Future<void> loadListsForBoard(int boardId, {bool showLoading = true}) async {
     try {

@@ -5,11 +5,11 @@ import 'package:kanbankit/views/components/text_buttons/app_text_button.dart';
 import 'package:kanbankit/views/components/text_buttons/button_variant.dart';
 
 class ListFooterWidget extends StatelessWidget {
-  final VoidCallback onAddTask;
+  final VoidCallback onAddCard;
 
   const ListFooterWidget({
     super.key,
-    required this.onAddTask,
+    required this.onAddCard,
   });
 
   @override
@@ -32,8 +32,8 @@ class ListFooterWidget extends StatelessWidget {
         ),
       ),
       child: AppTextButton(
-        onPressed: onAddTask,
-        label: LocalKeys.addTask.tr,
+        onPressed: onAddCard,
+        label: LocalKeys.addCard.tr,
         leadingIcon: Icons.add,
         variant: AppButtonVariant.secondary,
       ),
