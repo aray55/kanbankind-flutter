@@ -123,7 +123,7 @@ class CardActions extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop(); // Close detail modal
-                controller.deleteCard(card.id!);
+                controller.softDeleteCard(card.id!);
               },
               child: Text(LocalKeys.delete.tr),
             ),

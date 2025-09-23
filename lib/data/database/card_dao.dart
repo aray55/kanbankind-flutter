@@ -1,7 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import '../../core/constants/database_constants.dart';
 import '../../models/card_model.dart';
-import '../../core/enums/card_status.dart';
 import 'database_provider.dart';
 
 class CardDao {
@@ -128,7 +127,7 @@ class CardDao {
   }
 
   // Delete card (hard delete)
-  Future<int> delete(int id) async {
+  Future<int> hardDelete(int id) async {
     final db = await _database;
     return await db.delete(_tableName, where: 'id = ?', whereArgs: [id]);
   }
@@ -201,7 +200,19 @@ class CardDao {
       whereArgs: [id],
     );
   }
-
+  //Soft delete Method
+  Future<int> softDelete(int id)async{
+    final db=await _database;
+    return await db.update(
+      _tableName,
+      {
+        'deleted_at': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        'updated_at': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
   // Reorder cards within a list (batch update positions)
   Future<void> reorderCards(List<CardModel> cards) async {
     final db = await _database;

@@ -7,6 +7,7 @@ import 'package:kanbankit/core/enums/card_status.dart';
 import 'package:kanbankit/controllers/card_controller.dart';
 import 'card_form.dart';
 import 'card_actions.dart';
+import '../checklist_items/checklist_section.dart';
 
 class CardDetailModal extends StatelessWidget {
   final CardModel card;
@@ -118,6 +119,19 @@ class CardDetailModal extends StatelessWidget {
                 Text(
                   card.description!,
                   style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16.0),
+              ],
+
+              // Checklists Section
+              if (card.id != null) ...[
+                ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxHeight: 400, // Limit height to prevent overflow
+                  ),
+                  child: ChecklistSection(
+                    cardId: card.id!,
+                  ),
                 ),
                 const SizedBox(height: 16.0),
               ],

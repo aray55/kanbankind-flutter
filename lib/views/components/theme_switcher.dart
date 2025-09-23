@@ -7,7 +7,6 @@ import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/views/components/icon_buttons/app_icon_button.dart';
 import '../widgets/responsive_text.dart';
 
-import '../../core/themes/app_colors.dart';
 import 'icon_buttons/icon_button_style.dart';
 import 'icon_buttons/icon_button_variant.dart';
 

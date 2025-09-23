@@ -364,11 +364,11 @@ class BoardController extends GetxController {
   }
 
   // Delete board (soft delete)
-  Future<void> deleteBoard(int boardId) async {
+  Future<void> softDeleteBoard(int boardId) async {
     try {
       _isDeleting.value = true;
 
-      final success = await _repository.deleteBoard(boardId);
+      final success = await _repository.softDeleteBoard(boardId);
       if (success) {
         _boards.removeWhere((board) => board.id == boardId);
         _archivedBoards.removeWhere((board) => board.id == boardId);
@@ -398,11 +398,11 @@ class BoardController extends GetxController {
   }
 
   // Permanently delete board (hard delete)
-  Future<void> permanentlyDeleteBoard(int boardId) async {
+  Future<void> hardDeleteBoard(int boardId) async {
     try {
       _isDeleting.value = true;
 
-      final success = await _repository.permanentlyDeleteBoard(boardId);
+      final success = await _repository.hardDeleteBoard(boardId);
       if (success) {
         _boards.removeWhere((board) => board.id == boardId);
         _archivedBoards.removeWhere((board) => board.id == boardId);

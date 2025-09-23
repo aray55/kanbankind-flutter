@@ -1,6 +1,5 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/constants/database_constants.dart';
 
 class DatabaseProvider {
@@ -28,30 +27,6 @@ class DatabaseProvider {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS ${DatabaseConstants.tasksTable} (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        description TEXT NOT NULL,
-        status TEXT NOT NULL,
-        created_at INTEGER NOT NULL,
-        due_date INTEGER,
-        priority INTEGER NOT NULL DEFAULT 2,
-        updated_at INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS ${DatabaseConstants.checklistItemsTable} (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    task_id INTEGER NOT NULL,        -- رابط بالمهمة
-    title TEXT NOT NULL,
-    is_done INTEGER NOT NULL DEFAULT 0, -- 0 = false, 1 = true
-    position INTEGER NOT NULL DEFAULT 0,
-    created_at INTEGER NOT NULL,
-    FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE)
-
-    ''');
-
     // Create boards table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS ${DatabaseConstants.boardsTable} (
@@ -111,6 +86,7 @@ CREATE TABLE IF NOT EXISTS ${DatabaseConstants.listTable} (
   created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
   updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
   archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0,1)),
+  deleted_at INTEGER,
   FOREIGN KEY(board_id) REFERENCES boards(id) ON DELETE CASCADE
 );
 ''');
@@ -120,6 +96,7 @@ CREATE INDEX IF NOT EXISTS idx_lists_board_id ON ${DatabaseConstants.listTable}(
 CREATE INDEX IF NOT EXISTS idx_lists_archived ON ${DatabaseConstants.listTable}(archived);
 CREATE INDEX IF NOT EXISTS idx_lists_position ON ${DatabaseConstants.listTable}(position);
 CREATE INDEX IF NOT EXISTS idx_lists_updated_at ON ${DatabaseConstants.listTable}(updated_at);
+CREATE INDEX IF NOT EXISTS idx_lists_deleted_at ON ${DatabaseConstants.listTable}(deleted_at);
 ''');
 
     await db.execute('''
@@ -143,6 +120,7 @@ CREATE TABLE IF NOT EXISTS ${DatabaseConstants.cardsTable} (
   status TEXT NOT NULL DEFAULT 'todo',
   completed_at INTEGER,
   archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0,1)),
+  deleted_at INTEGER,
   created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
   updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
   FOREIGN KEY(list_id) REFERENCES lists(id) ON DELETE CASCADE
@@ -155,6 +133,7 @@ CREATE INDEX IF NOT EXISTS idx_cards_archived ON ${DatabaseConstants.cardsTable}
 CREATE INDEX IF NOT EXISTS idx_cards_position ON ${DatabaseConstants.cardsTable}(position);
 CREATE INDEX IF NOT EXISTS idx_cards_status ON ${DatabaseConstants.cardsTable}(status);
 CREATE INDEX IF NOT EXISTS idx_cards_updated_at ON ${DatabaseConstants.cardsTable}(updated_at);
+CREATE INDEX IF NOT EXISTS idx_cards_deleted_at ON ${DatabaseConstants.cardsTable}(deleted_at);
 ''');
 
     await db.execute('''
@@ -166,45 +145,92 @@ BEGIN
   SET updated_at = strftime('%s','now')
   WHERE id = OLD.id;
 END;''');
+    // Create checklists table
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS ${DatabaseConstants.checklistsTable} (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  card_id INTEGER NOT NULL,
+  title TEXT NOT NULL CHECK(length(title) <= 255),
+  position REAL NOT NULL DEFAULT 1024,
+  archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0,1)),
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  deleted_at INTEGER,
+  FOREIGN KEY(card_id) REFERENCES ${DatabaseConstants.cardsTable}(id) ON DELETE CASCADE
+);
+''');
+
+    // Create indexes for checklists table
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_checklists_card_id ON ${DatabaseConstants.checklistsTable}(card_id);
+CREATE INDEX IF NOT EXISTS idx_checklists_archived ON ${DatabaseConstants.checklistsTable}(archived);
+CREATE INDEX IF NOT EXISTS idx_checklists_position ON ${DatabaseConstants.checklistsTable}(position);
+CREATE INDEX IF NOT EXISTS idx_checklists_updated_deleted ON ${DatabaseConstants.checklistsTable}(updated_at, deleted_at);
+''');
+
+    // Create trigger for checklists table
+    await db.execute('''
+CREATE TRIGGER IF NOT EXISTS set_checklists_updated_at
+AFTER UPDATE ON ${DatabaseConstants.checklistsTable}
+FOR EACH ROW
+WHEN NEW.title IS NOT OLD.title
+   OR NEW.position IS NOT OLD.position
+   OR NEW.archived IS NOT OLD.archived
+   OR NEW.deleted_at IS NOT OLD.deleted_at
+BEGIN
+  UPDATE ${DatabaseConstants.checklistsTable}
+  SET updated_at = strftime('%s','now')
+  WHERE id = OLD.id;
+END;
+''');
+
+    // Create checklist_items table
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS ${DatabaseConstants.checklistItemsTable} (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  checklist_id INTEGER NOT NULL,
+  title TEXT NOT NULL CHECK(length(title) <= 255),
+  is_done INTEGER NOT NULL DEFAULT 0 CHECK(is_done IN (0,1)),
+  position REAL NOT NULL DEFAULT 1024,
+  archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0,1)),
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  deleted_at INTEGER,
+  FOREIGN KEY(checklist_id) REFERENCES ${DatabaseConstants.checklistsTable}(id) ON DELETE CASCADE
+);
+''');
+
+    // Create indexes for checklist_items table
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_checklist_items_checklist_id ON ${DatabaseConstants.checklistItemsTable}(checklist_id);
+CREATE INDEX IF NOT EXISTS idx_checklist_items_is_done ON ${DatabaseConstants.checklistItemsTable}(is_done);
+CREATE INDEX IF NOT EXISTS idx_checklist_items_archived ON ${DatabaseConstants.checklistItemsTable}(archived);
+CREATE INDEX IF NOT EXISTS idx_checklist_items_position ON ${DatabaseConstants.checklistItemsTable}(position);
+CREATE INDEX IF NOT EXISTS idx_checklist_items_updated_deleted ON ${DatabaseConstants.checklistItemsTable}(updated_at, deleted_at);
+''');
+
+    // Create trigger for checklist_items table
+    await db.execute('''
+CREATE TRIGGER IF NOT EXISTS set_checklist_items_updated_at
+AFTER UPDATE ON ${DatabaseConstants.checklistItemsTable}
+FOR EACH ROW
+WHEN NEW.title IS NOT OLD.title
+   OR NEW.is_done IS NOT OLD.is_done
+   OR NEW.position IS NOT OLD.position
+   OR NEW.archived IS NOT OLD.archived
+   OR NEW.deleted_at IS NOT OLD.deleted_at
+BEGIN
+  UPDATE ${DatabaseConstants.checklistItemsTable}
+  SET updated_at = strftime('%s','now')
+  WHERE id = OLD.id;
+END;
+''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     // Handle database migrations here
-    if (oldVersion < 2) {
-      // Migration to version 2: Add cards table
-      await db.execute('''
-CREATE TABLE IF NOT EXISTS ${DatabaseConstants.cardsTable} (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  list_id INTEGER NOT NULL,
-  title TEXT NOT NULL CHECK(length(title) <= 255),
-  description TEXT,
-  position REAL NOT NULL DEFAULT 1024,
-  status TEXT NOT NULL DEFAULT '',
-  completed_at INTEGER,
-  archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0,1)),
-  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
-  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
-  FOREIGN KEY(list_id) REFERENCES lists(id) ON DELETE CASCADE
-);
-''');
-
-      await db.execute('''
-CREATE INDEX IF NOT EXISTS idx_cards_list_id ON ${DatabaseConstants.cardsTable}(list_id);
-CREATE INDEX IF NOT EXISTS idx_cards_archived ON ${DatabaseConstants.cardsTable}(archived);
-CREATE INDEX IF NOT EXISTS idx_cards_position ON ${DatabaseConstants.cardsTable}(position);
-CREATE INDEX IF NOT EXISTS idx_cards_status ON ${DatabaseConstants.cardsTable}(status);
-CREATE INDEX IF NOT EXISTS idx_cards_updated_at ON ${DatabaseConstants.cardsTable}(updated_at);
-''');
-
-      await db.execute('''
-CREATE TRIGGER IF NOT EXISTS set_cards_updated_at
-AFTER UPDATE ON ${DatabaseConstants.cardsTable}
-FOR EACH ROW
-BEGIN
-  UPDATE ${DatabaseConstants.cardsTable}
-  SET updated_at = strftime('%s','now')
-  WHERE id = OLD.id;
-END;''');
+    if (oldVersion < newVersion) {
+     
     }
   }
 

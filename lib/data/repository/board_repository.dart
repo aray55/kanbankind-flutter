@@ -120,13 +120,13 @@ class BoardRepository {
   }
 
   // Soft delete board
-  Future<bool> deleteBoard(int id) async {
+  Future<bool> softDeleteBoard(int id) async {
     final result = await _boardDao.softDelete(id);
     return result > 0;
   }
 
-  // Permanently delete board
-  Future<bool> permanentlyDeleteBoard(int id) async {
+  // Hard delete board
+  Future<bool> hardDeleteBoard(int id) async {
     final result = await _boardDao.hardDelete(id);
     return result > 0;
   }

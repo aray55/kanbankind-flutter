@@ -1,4 +1,3 @@
-import '../../models/check_list_progress_model.dart' show ChecklistProgress;
 import '../../models/checklist_item_model.dart';
 import '../database/checklist_item_dao.dart';
 
@@ -6,19 +5,24 @@ class ChecklistItemRepository {
   final ChecklistItemDao _dao = ChecklistItemDao();
 
   // Create a new checklist item
-  Future<ChecklistItem> createChecklistItem({
-    required int taskId,
+  Future<ChecklistItemModel> createChecklistItem({
+    required int checklistId,
     required String title,
-    int? position,
+    double? position,
   }) async {
-    // If no position is provided, set it to the end of the list
-    if (position == null) {
-      final existingItems = await _dao.getByTaskId(taskId);
-      position = existingItems.length;
+    // Validate title
+    if (title.trim().isEmpty || title.length > 255) {
+      throw ArgumentError('Title must be between 1 and 255 characters');
     }
 
-    final item = ChecklistItem(
-      taskId: taskId,
+    // If no position is provided, set it to the end of the list
+    if (position == null) {
+      final existingItems = await _dao.getByChecklistId(checklistId);
+      position = (existingItems.length + 1) * 1024.0;
+    }
+
+    final item = ChecklistItemModel(
+      checklistId: checklistId,
       title: title.trim(),
       position: position,
     );
@@ -28,18 +32,25 @@ class ChecklistItemRepository {
   }
 
   // Create multiple checklist items
-  Future<List<ChecklistItem>> createMultipleItems({
-    required int taskId,
+  Future<List<ChecklistItemModel>> createMultipleItems({
+    required int checklistId,
     required List<String> titles,
   }) async {
-    final existingItems = await _dao.getByTaskId(taskId);
-    int startPosition = existingItems.length;
+    // Validate titles
+    for (final title in titles) {
+      if (title.trim().isEmpty || title.length > 255) {
+        throw ArgumentError('All titles must be between 1 and 255 characters');
+      }
+    }
+
+    final existingItems = await _dao.getByChecklistId(checklistId);
+    double startPosition = (existingItems.length + 1) * 1024.0;
 
     final items = titles.asMap().entries.map((entry) {
-      return ChecklistItem(
-        taskId: taskId,
+      return ChecklistItemModel(
+        checklistId: checklistId,
         title: entry.value.trim(),
-        position: startPosition + entry.key,
+        position: startPosition + (entry.key * 1024.0),
       );
     }).toList();
 
@@ -50,18 +61,45 @@ class ChecklistItemRepository {
     }).toList();
   }
 
-  // Get all checklist items for a task
-  Future<List<ChecklistItem>> getChecklistItemsByTaskId(int taskId) async {
-    return await _dao.getByTaskId(taskId);
+  // Get all checklist items for a checklist
+  Future<List<ChecklistItemModel>> getChecklistItemsByChecklistId(
+    int checklistId, {
+    bool includeArchived = false,
+    bool includeDeleted = false,
+  }) async {
+    return await _dao.getByChecklistId(
+      checklistId,
+      includeArchived: includeArchived,
+      includeDeleted: includeDeleted,
+    );
+  }
+
+  // Get active checklist items for a checklist
+  Future<List<ChecklistItemModel>> getActiveChecklistItems(int checklistId) async {
+    return await _dao.getByChecklistId(checklistId);
+  }
+
+  // Get completed items for a checklist
+  Future<List<ChecklistItemModel>> getCompletedItems(int checklistId) async {
+    return await _dao.getCompletedByChecklistId(checklistId);
+  }
+
+  // Get pending items for a checklist
+  Future<List<ChecklistItemModel>> getPendingItems(int checklistId) async {
+    return await _dao.getPendingByChecklistId(checklistId);
   }
 
   // Get a specific checklist item
-  Future<ChecklistItem?> getChecklistItemById(int id) async {
+  Future<ChecklistItemModel?> getChecklistItemById(int id) async {
     return await _dao.getById(id);
   }
 
   // Update checklist item
-  Future<ChecklistItem?> updateChecklistItem(ChecklistItem item) async {
+  Future<ChecklistItemModel?> updateChecklistItem(ChecklistItemModel item) async {
+    if (!item.isValidTitle) {
+      throw ArgumentError('Title must be between 1 and 255 characters');
+    }
+
     final updatedRows = await _dao.update(item);
     if (updatedRows > 0) {
       return item;
@@ -70,7 +108,11 @@ class ChecklistItemRepository {
   }
 
   // Update checklist item title
-  Future<ChecklistItem?> updateChecklistItemTitle(int id, String newTitle) async {
+  Future<ChecklistItemModel?> updateChecklistItemTitle(int id, String newTitle) async {
+    if (newTitle.trim().isEmpty || newTitle.length > 255) {
+      throw ArgumentError('Title must be between 1 and 255 characters');
+    }
+
     final item = await _dao.getById(id);
     if (item == null) return null;
 
@@ -84,7 +126,7 @@ class ChecklistItemRepository {
   }
 
   // Toggle checklist item completion status
-  Future<ChecklistItem?> toggleChecklistItemDone(int id) async {
+  Future<ChecklistItemModel?> toggleChecklistItemDone(int id) async {
     final item = await _dao.getById(id);
     if (item == null) return null;
 
@@ -92,106 +134,200 @@ class ChecklistItemRepository {
     return item.copyWith(isDone: !item.isDone);
   }
 
-  // Mark checklist item as done
-  Future<ChecklistItem?> markChecklistItemDone(int id, bool isDone) async {
+  // Mark checklist item as completed
+  Future<ChecklistItemModel?> markChecklistItemCompleted(int id) async {
     final item = await _dao.getById(id);
     if (item == null) return null;
 
-    final updatedItem = item.copyWith(isDone: isDone);
-    final updatedRows = await _dao.update(updatedItem);
-    
-    if (updatedRows > 0) {
-      return updatedItem;
+    await _dao.markAsCompleted(id);
+    return item.copyWith(isDone: true);
+  }
+
+  // Mark checklist item as pending
+  Future<ChecklistItemModel?> markChecklistItemPending(int id) async {
+    final item = await _dao.getById(id);
+    if (item == null) return null;
+
+    await _dao.markAsPending(id);
+    return item.copyWith(isDone: false);
+  }
+
+  // Delete checklist item (soft delete)
+  Future<bool> deleteChecklistItem(int id) async {
+    final deletedRows = await _dao.softDelete(id);
+    return deletedRows > 0;
+  }
+
+  // Hard delete checklist item
+  Future<bool> hardDeleteChecklistItem(int id) async {
+    final deletedRows = await _dao.hardDelete(id);
+    return deletedRows > 0;
+  }
+
+  // Restore deleted checklist item
+  Future<ChecklistItemModel?> restoreChecklistItem(int id) async {
+    final restoredRows = await _dao.restore(id);
+    if (restoredRows > 0) {
+      return await _dao.getById(id);
+    }
+    return null;
+  }
+
+  // Archive checklist item
+  Future<ChecklistItemModel?> archiveChecklistItem(int id) async {
+    final archivedRows = await _dao.setArchived(id, true);
+    if (archivedRows > 0) {
+      return await _dao.getById(id);
+    }
+    return null;
+  }
+
+  // Unarchive checklist item
+  Future<ChecklistItemModel?> unarchiveChecklistItem(int id) async {
+    final unarchivedRows = await _dao.setArchived(id, false);
+    if (unarchivedRows > 0) {
+      return await _dao.getById(id);
     }
     return null;
   }
 
   // Reorder checklist items
-  Future<List<ChecklistItem>> reorderChecklistItems(List<ChecklistItem> items) async {
-    // Update positions based on the new order
-    final reorderedItems = items.asMap().entries.map((entry) {
-      return entry.value.copyWith(position: entry.key);
-    }).toList();
-
-    await _dao.updatePositions(reorderedItems);
-    return reorderedItems;
+  Future<List<ChecklistItemModel>> reorderChecklistItems(List<ChecklistItemModel> items) async {
+    await _dao.reorderChecklistItems(items);
+    return items;
   }
 
   // Move checklist item to a new position
-  Future<List<ChecklistItem>> moveChecklistItem(int itemId, int newPosition) async {
-    final item = await _dao.getById(itemId);
-    if (item == null) return [];
-
-    final allItems = await _dao.getByTaskId(item.taskId);
-    
-    // Remove the item from its current position
-    allItems.removeWhere((i) => i.id == itemId);
-    
-    // Insert it at the new position
-    allItems.insert(newPosition, item);
-    
-    // Update all positions
-    return await reorderChecklistItems(allItems);
-  }
-
-  // Delete checklist item
-  Future<bool> deleteChecklistItem(int id) async {
-    final deletedRows = await _dao.delete(id);
-    return deletedRows > 0;
-  }
-
-  // Delete multiple checklist items
-  Future<bool> deleteMultipleItems(List<int> ids) async {
-    if (ids.isEmpty) return true;
-    
-    await _dao.deleteBatch(ids);
-    return true;
-  }
-
-  // Delete all checklist items for a task
-  Future<bool> deleteAllItemsForTask(int taskId) async {
-    final deletedRows = await _dao.deleteByTaskId(taskId);
-    return deletedRows >= 0;
-  }
-
-  // Get checklist progress for a task
-  Future<ChecklistProgress> getChecklistProgress(int taskId) async {
-    final total = await _dao.getCountByTaskId(taskId);
-    final completed = await _dao.getCompletedCountByTaskId(taskId);
-    final percentage = await _dao.getProgressByTaskId(taskId);
-
-    return ChecklistProgress(
-      total: total,
-      completed: completed,
-      percentage: percentage,
-    );
+  Future<ChecklistItemModel?> moveChecklistItem(int itemId, double newPosition) async {
+    final updatedRows = await _dao.updatePosition(itemId, newPosition);
+    if (updatedRows > 0) {
+      return await _dao.getById(itemId);
+    }
+    return null;
   }
 
   // Search checklist items
-  Future<List<ChecklistItem>> searchChecklistItems(String query, {int? taskId}) async {
+  Future<List<ChecklistItemModel>> searchChecklistItems(
+    String query, {
+    int? checklistId,
+    bool includeArchived = false,
+    bool includeDeleted = false,
+  }) async {
     if (query.trim().isEmpty) {
-      if (taskId != null) {
-        return await _dao.getByTaskId(taskId);
+      if (checklistId != null) {
+        return await _dao.getByChecklistId(
+          checklistId,
+          includeArchived: includeArchived,
+          includeDeleted: includeDeleted,
+        );
       }
-      return await _dao.getAll();
+      return await _dao.getAll(
+        includeArchived: includeArchived,
+        includeDeleted: includeDeleted,
+      );
     }
     
-    return await _dao.searchByTitle(query.trim(), taskId: taskId);
+    if (checklistId != null) {
+      return await _dao.searchInChecklist(
+        checklistId,
+        query.trim(),
+        includeArchived: includeArchived,
+        includeDeleted: includeDeleted,
+      );
+    }
+    
+    return await _dao.search(
+      query.trim(),
+      includeArchived: includeArchived,
+      includeDeleted: includeDeleted,
+    );
   }
 
-  // Duplicate checklist items from one task to another
-  Future<List<ChecklistItem>> duplicateChecklistItems({
-    required int fromTaskId,
-    required int toTaskId,
+  // Get checklist progress
+  Future<Map<String, dynamic>> getChecklistProgress(int checklistId) async {
+    final stats = await _dao.getStatsByChecklistId(checklistId);
+    final progress = await _dao.getProgressByChecklistId(checklistId);
+    
+    return {
+      'total': stats['total'] ?? 0,
+      'completed': stats['completed'] ?? 0,
+      'pending': stats['pending'] ?? 0,
+      'archived': stats['archived'] ?? 0,
+      'progress': progress,
+    };
+  }
+
+  // Get archived items
+  Future<List<ChecklistItemModel>> getArchivedItems(int checklistId) async {
+    return await _dao.getArchivedByChecklistId(checklistId);
+  }
+
+  // Get deleted items
+  Future<List<ChecklistItemModel>> getDeletedItems(int checklistId) async {
+    return await _dao.getDeletedByChecklistId(checklistId);
+  }
+
+  // Batch operations
+  Future<void> batchToggleDone(List<int> ids) async {
+    await _dao.batchToggleDone(ids);
+  }
+
+  Future<void> batchMarkAsCompleted(List<int> ids) async {
+    await _dao.batchMarkAsCompleted(ids);
+  }
+
+  Future<void> batchMarkAsPending(List<int> ids) async {
+    await _dao.batchMarkAsPending(ids);
+  }
+
+  Future<void> batchDelete(List<int> ids) async {
+    await _dao.batchSoftDelete(ids);
+  }
+
+  Future<void> batchArchive(List<int> ids) async {
+    await _dao.batchSetArchived(ids, true);
+  }
+
+  Future<void> batchUnarchive(List<int> ids) async {
+    await _dao.batchSetArchived(ids, false);
+  }
+
+  // Clear completed items
+  Future<bool> clearCompletedItems(int checklistId) async {
+    final completedItems = await _dao.getCompletedByChecklistId(checklistId);
+    if (completedItems.isEmpty) return true;
+    
+    final ids = completedItems.map((item) => item.id!).toList();
+    await _dao.batchSoftDelete(ids);
+    return true;
+  }
+
+  // Mark all items as completed/pending
+  Future<void> markAllItemsCompleted(int checklistId) async {
+    final items = await _dao.getByChecklistId(checklistId);
+    final ids = items.map((item) => item.id!).toList();
+    await _dao.batchMarkAsCompleted(ids);
+  }
+
+  Future<void> markAllItemsPending(int checklistId) async {
+    final items = await _dao.getByChecklistId(checklistId);
+    final ids = items.map((item) => item.id!).toList();
+    await _dao.batchMarkAsPending(ids);
+  }
+
+  // Duplicate checklist items
+  Future<List<ChecklistItemModel>> duplicateChecklistItems({
+    required int fromChecklistId,
+    required int toChecklistId,
     bool copyCompletionStatus = false,
   }) async {
-    final sourceItems = await _dao.getByTaskId(fromTaskId);
+    final sourceItems = await _dao.getByChecklistId(fromChecklistId);
     
     if (sourceItems.isEmpty) return [];
 
     final newItems = sourceItems.map((item) {
-      return ChecklistItem(
-        taskId: toTaskId,
+      return ChecklistItemModel(
+        checklistId: toChecklistId,
         title: item.title,
         isDone: copyCompletionStatus ? item.isDone : false,
         position: item.position,
@@ -205,56 +341,9 @@ class ChecklistItemRepository {
     }).toList();
   }
 
-  // Get statistics for all tasks
-  Future<Map<int, ChecklistProgress>> getAllTasksProgress() async {
-    final allItems = await _dao.getAll();
-    final Map<int, ChecklistProgress> progressMap = {};
-
-    // Group items by task ID
-    final Map<int, List<ChecklistItem>> itemsByTask = {};
-    for (final item in allItems) {
-      itemsByTask.putIfAbsent(item.taskId, () => []).add(item);
-    }
-
-    // Calculate progress for each task
-    for (final entry in itemsByTask.entries) {
-      final taskId = entry.key;
-      final items = entry.value;
-      final completed = items.where((item) => item.isDone).length;
-      final total = items.length;
-      final percentage = total > 0 ? completed / total : 0.0;
-
-      progressMap[taskId] = ChecklistProgress(
-        total: total,
-        completed: completed,
-        percentage: percentage,
-      );
-    }
-
-    return progressMap;
-  }
-
-  // Clear all completed items for a task
-  Future<bool> clearCompletedItems(int taskId) async {
-    final items = await _dao.getByTaskId(taskId);
-    final completedIds = items.where((item) => item.isDone).map((item) => item.id!).toList();
-    
-    if (completedIds.isEmpty) return true;
-    
-    await _dao.deleteBatch(completedIds);
-    return true;
-  }
-
-  // Mark all items as done/undone for a task
-  Future<List<ChecklistItem>> markAllItems(int taskId, bool isDone) async {
-    final items = await _dao.getByTaskId(taskId);
-    
-    if (items.isEmpty) return [];
-
-    final updatedItems = items.map((item) => item.copyWith(isDone: isDone)).toList();
-    await _dao.updateBatch(updatedItems);
-    
-    return updatedItems;
+  // Delete all items for a checklist (cascade delete)
+  Future<int> deleteAllItemsForChecklist(int checklistId) async {
+    return await _dao.deleteByChecklistId(checklistId);
   }
 }
 

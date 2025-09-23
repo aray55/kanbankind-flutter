@@ -74,7 +74,7 @@ class BoardDialogHelper {
     );
     
     if (confirmed) {
-      Get.find<BoardController>().deleteBoard(board.id!);
+      Get.find<BoardController>().softDeleteBoard(board.id!);
     }
   }
 
@@ -126,7 +126,7 @@ class BoardDialogHelper {
     );
     
     if (confirmed) {
-      Get.find<BoardController>().permanentlyDeleteBoard(board.id!);
+      Get.find<BoardController>().hardDeleteBoard(board.id!);
     }
   }
 }

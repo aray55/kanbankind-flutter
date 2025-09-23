@@ -1,5 +1,4 @@
 import 'package:sqflite/sqflite.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/constants/database_constants.dart';
 import '../../models/list_model.dart';
 import 'database_provider.dart';
@@ -101,7 +100,7 @@ class ListDao {
   }
 
   // Delete list (hard delete)
-  Future<int> delete(int id) async {
+  Future<int> hardDelete(int id) async {
     final db = await _database;
     return await db.delete(_tableName, where: 'id = ?', whereArgs: [id]);
   }
@@ -204,6 +203,20 @@ class ListDao {
     );
 
     return maps.map((map) => ListModel.fromMap(map)).toList();
+  }
+
+  //Soft Delete Method
+  Future<int> softDelete(int id)async{
+    final db=await _database;
+    return await db.update(
+      _tableName,
+      {
+        'deleted_at':DateTime.now().millisecondsSinceEpoch~/1000,
+        'updated_at':DateTime.now().millisecondsSinceEpoch~/1000,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   // Search lists by title across all boards

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/controllers/datetime_picker_controller.dart';
 import 'package:kanbankit/core/themes/app_colors.dart';
-import 'package:kanbankit/core/themes/app_typography.dart';
 import 'package:kanbankit/views/widgets/responsive_text.dart';
 
 class DateTimePicker extends StatelessWidget {

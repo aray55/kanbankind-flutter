@@ -3,11 +3,9 @@ import 'package:kanbankit/views/boards/boards_screen.dart';
 import 'package:kanbankit/views/lists/board_lists_route_screen.dart';
 
 import '../../bindings/board_binding.dart';
-import '../../bindings/task_binding.dart';
 import '../../bindings/list_binding.dart';
 import '../../bindings/card_binding.dart'; // Add this import
-import '../../views/board/task_page.dart';
-import '../../views/task_details/task_details_page.dart' show TaskDetailsPage;
+// import '../../views/task_details/task_details_page.dart' show TaskDetailsPage;
 import '../../views/onboarding/onboarding_screen.dart' show OnboardingScreen;
 import '../../views/widgets/cards/card_list_view.dart';
 import 'app_routes.dart';
@@ -20,12 +18,12 @@ class AppPages {
       page: () => const BoardsScreen(),
       binding: BoardBinding(),
     ),
-    GetPage(
-      name: AppRoutes.task,
-      page: () => const TaskPage(),
-      binding: TaskBinding(),
-    ),
-    GetPage(name: AppRoutes.taskDetails, page: () => const TaskDetailsPage()),
+    // GetPage(
+    //   name: AppRoutes.task,
+    //   page: () => const TaskPage(),
+    //   binding: TaskBinding(),
+    // ),
+    // GetPage(name: AppRoutes.taskDetails, page: () => const TaskDetailsPage()),
     GetPage(
       name: AppRoutes.listScreen,
       page: () => const BoardListsRouteScreen(),

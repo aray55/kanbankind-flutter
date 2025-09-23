@@ -7,6 +7,7 @@ class ListModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool archived;
+  final DateTime? deletedAt;
 
   ListModel({
     this.id,
@@ -17,6 +18,7 @@ class ListModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     this.archived = false,
+    this.deletedAt,
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
@@ -30,6 +32,7 @@ class ListModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? archived,
+    DateTime? deletedAt,
   }) {
     return ListModel(
       id: id ?? this.id,
@@ -40,6 +43,7 @@ class ListModel {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       archived: archived ?? this.archived,
+      deletedAt: deletedAt ?? this.deletedAt,
     );
   }
 
@@ -53,6 +57,9 @@ class ListModel {
       'created_at': createdAt.millisecondsSinceEpoch ~/ 1000, // Convert to seconds for SQLite
       'updated_at': updatedAt.millisecondsSinceEpoch ~/ 1000,
       'archived': archived ? 1 : 0,
+      'deleted_at': deletedAt != null
+          ? deletedAt!.millisecondsSinceEpoch ~/ 1000
+          : null,
     };
 
     // Only include id if it's not null (for updates)
@@ -85,11 +92,17 @@ class ListModel {
         (map['updated_at'] as int) * 1000,
       ),
       archived: (map['archived'] as int) == 1,
+      deletedAt: map['deleted_at'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              (map['deleted_at'] as int) * 1000,
+            )
+          : null,
     );
   }
 
   // Helper methods
-  bool get isActive => !archived;
+  bool get isDeleted => deletedAt != null;
+  bool get isActive => !archived && !isDeleted;
 
   // Validation helpers
   bool get isValidColor {
@@ -113,6 +126,7 @@ class ListModel {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'archived': archived,
+      'deleted_at': deletedAt?.toIso8601String(),
     };
   }
 
@@ -126,12 +140,15 @@ class ListModel {
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       archived: json['archived'] as bool? ?? false,
+      deletedAt: json['deleted_at'] != null
+          ? DateTime.parse(json['deleted_at'] as String)
+          : null,
     );
   }
 
   @override
   String toString() {
-    return 'ListModel{id: $id, boardId: $boardId, title: $title, position: $position, archived: $archived}';
+    return 'ListModel{id: $id, boardId: $boardId, title: $title, position: $position, archived: $archived, deleted: $isDeleted}';
   }
 
   @override
@@ -145,7 +162,8 @@ class ListModel {
         other.position == position &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
-        other.archived == archived;
+        other.archived == archived &&
+        other.deletedAt == deletedAt;
   }
 
   @override
@@ -157,6 +175,7 @@ class ListModel {
         position.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode ^
-        archived.hashCode;
+        archived.hashCode ^
+        deletedAt.hashCode;
   }
 }

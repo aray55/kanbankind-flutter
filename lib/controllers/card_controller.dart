@@ -362,11 +362,11 @@ class CardController extends GetxController {
     }
   }
 
-  // Delete card
-  Future<void> deleteCard(int id) async {
+  // Delete card (soft delete)
+  Future<void> softDeleteCard(int id) async {
     try {
       _isDeleting.value = true;
-      final success = await _repository.deleteCard(id);
+      final success = await _repository.softDeleteCard(id);
       if (success) {
         _cards.removeWhere((card) => card.id == id);
         _dialogService.showSuccessSnackbar(

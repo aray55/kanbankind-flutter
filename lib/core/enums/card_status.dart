@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import '../localization/local_keys.dart';
 
 enum CardStatus {
   backlog,

@@ -10,6 +10,7 @@ class CardModel {
   final CardStatus status;
   final DateTime? completedAt;
   final bool archived;
+  final DateTime? deletedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -22,6 +23,7 @@ class CardModel {
     this.status = CardStatus.todo,
     this.completedAt,
     this.archived = false,
+    this.deletedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) : createdAt = createdAt ?? DateTime.now(),
@@ -37,6 +39,7 @@ class CardModel {
     CardStatus? status,
     DateTime? completedAt,
     bool? archived,
+    DateTime? deletedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -49,6 +52,7 @@ class CardModel {
       status: status ?? this.status,
       completedAt: completedAt ?? this.completedAt,
       archived: archived ?? this.archived,
+      deletedAt: deletedAt ?? this.deletedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -66,6 +70,9 @@ class CardModel {
           ? completedAt!.millisecondsSinceEpoch ~/ 1000
           : null, // Convert to seconds for SQLite
       'archived': archived ? 1 : 0,
+      'deleted_at': deletedAt != null
+          ? deletedAt!.millisecondsSinceEpoch ~/ 1000
+          : null,
       'created_at':
           createdAt.millisecondsSinceEpoch ~/
           1000, // Convert to seconds for SQLite
@@ -104,6 +111,11 @@ class CardModel {
             ) // Convert from seconds to milliseconds
           : null,
       archived: (map['archived'] as int) == 1,
+      deletedAt: map['deleted_at'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              (map['deleted_at'] as int) * 1000,
+            )
+          : null,
       createdAt: DateTime.fromMillisecondsSinceEpoch(
         (map['created_at'] as int) * 1000,
       ), // Convert from seconds to milliseconds
@@ -114,7 +126,8 @@ class CardModel {
   }
 
   /// Helper methods
-  bool get isActive => !archived;
+  bool get isDeleted => deletedAt != null;
+  bool get isActive => !archived && !isDeleted;
   bool get isCompleted => completedAt != null;
 
   /// Validation helpers
@@ -131,6 +144,7 @@ class CardModel {
       'status': status.value,
       'completed_at': completedAt?.toIso8601String(),
       'archived': archived,
+      'deleted_at': deletedAt?.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
@@ -148,6 +162,9 @@ class CardModel {
           ? DateTime.parse(json['completed_at'] as String)
           : null,
       archived: json['archived'] as bool? ?? false,
+      deletedAt: json['deleted_at'] != null
+          ? DateTime.parse(json['deleted_at'] as String)
+          : null,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
@@ -155,7 +172,7 @@ class CardModel {
 
   @override
   String toString() {
-    return 'CardModel{id: $id, listId: $listId, title: $title, position: $position, status: ${status.value}, archived: $archived}';
+    return 'CardModel{id: $id, listId: $listId, title: $title, position: $position, status: ${status.value}, archived: $archived, deleted: $isDeleted}';
   }
 
   @override
@@ -170,6 +187,7 @@ class CardModel {
         other.status == status &&
         other.completedAt == completedAt &&
         other.archived == archived &&
+        other.deletedAt == deletedAt &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -184,6 +202,7 @@ class CardModel {
         status.hashCode ^
         completedAt.hashCode ^
         archived.hashCode ^
+        deletedAt.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode;
   }

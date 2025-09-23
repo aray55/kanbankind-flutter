@@ -7,7 +7,6 @@ import 'package:kanbankit/views/widgets/boards/boards_header.dart';
 import 'package:kanbankit/views/widgets/boards/view_mode_toggle.dart';
 import '../../controllers/board_controller.dart';
 import '../../core/enums/board_view_mode.dart';
-import '../../core/routes/app_routes.dart';
 import '../widgets/responsive_text.dart';
 import '../widgets/language_switcher.dart';
 import '../components/theme_switcher.dart';

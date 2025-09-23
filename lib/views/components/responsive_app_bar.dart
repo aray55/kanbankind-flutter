@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kanbankit/core/themes/app_typography.dart';
 import 'package:kanbankit/views/widgets/responsive_text.dart';
 
-import '../../core/themes/app_theme.dart';
 
 class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;

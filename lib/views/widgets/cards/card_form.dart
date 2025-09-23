@@ -6,8 +6,8 @@ import 'package:kanbankit/controllers/card_controller.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/core/enums/card_status.dart';
 import 'package:kanbankit/views/widgets/responsive_text.dart';
+import '../checklists/checklist_section.dart';
 
-import '../../components/icon_buttons/app_icon_button.dart';
 
 class CardForm extends StatefulWidget {
   final CardModel? card; // null for new card, provided for editing
@@ -53,12 +53,13 @@ class _CardFormState extends State<CardForm> {
         right: 20.0,
         top: 20.0,
       ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -131,7 +132,22 @@ class _CardFormState extends State<CardForm> {
                 }
               },
             ),
-            const SizedBox(height: 24.0),
+            const SizedBox(height: 16.0),
+
+            // Checklists Section (only for editing existing cards)
+            if (widget.card != null && widget.card!.id != null) ...[
+              ChecklistSection(
+                cardId: widget.card!.id!,
+                isEditable: true,
+                showArchivedButton: false, // Keep it simple in the form
+              ),
+              const SizedBox(height: 16.0),
+            ],
+
+            // Note: Checklists can be added after card creation
+            // This follows Trello's UX pattern of "create first, enhance later"
+
+            const SizedBox(height: 8.0),
 
             // Save button
             SizedBox(
@@ -146,6 +162,7 @@ class _CardFormState extends State<CardForm> {
               ),
             ),
           ],
+          ),
         ),
       ),
     );

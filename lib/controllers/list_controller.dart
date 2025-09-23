@@ -24,6 +24,7 @@ class ListController extends GetxController {
   // Form controllers for list creation/editing
   final TextEditingController titleController = TextEditingController();
   final TextEditingController colorController = TextEditingController();
+  
   final RxString _selectedColor = '#2196F3'.obs;
 
   // Getters

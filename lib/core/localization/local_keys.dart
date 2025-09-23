@@ -289,4 +289,83 @@ class LocalKeys {
   static const String boardSettingsTitle = 'board_settings_title';
   static const String updateListSettings = 'update_list_settings';
   static const String setupNewList = 'setup_new_list';
+  static const String updateList='update_list';
+
+  //Checklist keys
+  static const String addChecklist = 'add_checklist';
+  static const String editChecklist = 'edit_checklist';
+  static const String checklistName = 'checklist_name';
+  static const String checklistTitle = 'checklist_title';
+  static const String checklists = 'checklists';
+  static const String noChecklists = 'no_checklists';
+  static const String noChecklistFound = 'no_checklist_found';
+  static const String noChecklistMatchSearch = 'no_checklist_match_search';
+  static const String enterChecklistTitle = 'enter_checklist_title';
+  static const String checklistTitleRequired = 'checklist_title_required';
+  static const String checklistTitleTooLong = 'checklist_title_too_long';
+  static const String checklistTitleEmpty = 'checklist_title_empty';
+  static const String archivedChecklists = 'archived_checklists';
+  static const String noArchivedChecklists = 'no_archived_checklists';
+  static const String addChecklistToGetStarted = 'add_checklist_to_get_started';
+  static const String viewArchived = 'view_archived';
+  static const String progress = 'progress';
+  static const String checklistOptions = 'checklist_options';
+  static const String rename = 'rename';
+  static const String editChecklistTitle = 'edit_checklist_title';
+  static const String createCopyOfChecklist = 'create_copy_of_checklist';
+  static const String hideChecklistFromView = 'hide_checklist_from_view';
+  static const String restoreChecklistToView = 'restore_checklist_to_view';
+  static const String moveToCard = 'move_to_card';
+  static const String moveChecklistToAnotherCard = 'move_checklist_to_another_card';
+  static const String deleteChecklistPermanently = 'delete_checklist_permanently';
+  static const String deleteChecklist = 'delete_checklist';
+  static const String deleteChecklistConfirmation = 'delete_checklist_confirmation';
+  static const String duplicateChecklist = 'duplicate_checklist';
+  static const String copy = 'copy';
+  static const String unarchive = 'unarchive';
+  static const String options = 'options';
+  static const String noCards = 'no_cards';
+  static const String noCardsDescription = 'no_cards_found';
+  
+  // Checklist Item Keys
+  static const String checklistItemCreated = 'checklist_item_created';
+  static const String checklistItemsCreated = 'checklist_items_created';
+  static const String checklistItemUpdated = 'checklist_item_updated';
+  static const String checklistItemDeleted = 'checklist_item_deleted';
+  static const String checklistItemArchived = 'checklist_item_archived';
+  static const String checklistItemUnarchived = 'checklist_item_unarchived';
+  static const String completedItemsCleared = 'completed_items_cleared';
+  static const String allItemsMarkedCompleted = 'all_items_marked_completed';
+  static const String allItemsMarkedPending = 'all_items_marked_pending';
+  static const String editChecklistItem = 'edit_checklist_item';
+  static const String addChecklistItemDescription = 'add_checklist_item_description';
+  static const String itemOptions = 'item_options';
+  static const String itemTitle = 'item_title';
+  static const String editItemDescription = 'edit_item_description';
+  static const String markAsCompleted = 'mark_as_completed';
+  static const String markAsCompletedDescription = 'mark_as_completed_description';
+  static const String markAsPending = 'mark_as_pending';
+  static const String markAsPendingDescription = 'mark_as_pending_description';
+  static const String archiveItem = 'archive_item';
+  static const String archiveItemDescription = 'archive_item_description';
+  static const String unarchiveItem = 'unarchive_item';
+  static const String unarchiveItemDescription = 'unarchive_item_description';
+  static const String deleteItemDescription = 'delete_item_description';
+  static const String deleteItemConfirmation = 'delete_item_confirmation';
+  static const String itemTitleRequired = 'item_title_required';
+  static const String itemTitleTooLong = 'item_title_too_long';
+  static const String enterItemTitle = 'enter_item_title';
+  
+  // Additional UI Keys (only new ones)
+  static const String editChecklistItemDescription = 'edit_checklist_item_description';
+  static const String of_ = 'of';
+  static const String addFirstChecklistItem = 'add_first_checklist_item';
+  static const String renameChecklistDescription = 'rename_checklist_description';
+  static const String archiveChecklistDescription = 'archive_checklist_description';
+  static const String unarchiveChecklistDescription = 'unarchive_checklist_description';
+  static const String duplicateChecklistDescription = 'duplicate_checklist_description';
+  static const String deleteChecklistDescription = 'delete_checklist_description';
+  static const String noChecklistsDescription = 'no_checklists_description';
+  static const String createFirstChecklist = 'create_first_checklist';
+  static const String renameChecklist = 'rename_checklist';
 }

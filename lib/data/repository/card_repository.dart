@@ -146,8 +146,14 @@ class CardRepository {
   }
 
   // Delete card
-  Future<bool> deleteCard(int id) async {
-    final result = await _cardDao.delete(id);
+  Future<bool> softDeleteCard(int id) async {
+    final result = await _cardDao.softDelete(id);
+    return result > 0;
+  }
+
+  // Hard delete card
+  Future<bool> hardDeleteCard(int id) async {
+    final result = await _cardDao.hardDelete(id);
     return result > 0;
   }
 

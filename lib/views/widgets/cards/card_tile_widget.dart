@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanbankit/models/card_model.dart';
-import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/core/enums/card_status.dart';
 import 'package:kanbankit/controllers/card_controller.dart';
 import 'card_detail_modal.dart';
 import 'card_title_text.dart';
 import 'card_description_preview.dart';
 import 'card_status_chip.dart';
+import 'card_checklist_indicator.dart';
 
 class CardTile extends StatelessWidget {
   final CardModel card;
@@ -89,6 +89,18 @@ class CardTile extends StatelessWidget {
                 ),
               ],
             ),
+
+            // Checklist indicator (if card has checklists)
+            if (card.id != null) ...[
+              const SizedBox(height: 6.0),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: CardChecklistIndicator(
+                  cardId: card.id!,
+                  compact: true,
+                ),
+              ),
+            ],
           ],
         ),
       ),

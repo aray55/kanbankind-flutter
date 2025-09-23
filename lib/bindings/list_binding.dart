@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../controllers/list_controller.dart';
 import '../controllers/board_controller.dart';
 import '../controllers/card_controller.dart';
+import '../controllers/checklists_controller.dart';
 import '../core/services/dialog_service.dart';
 
 class ListBinding extends Bindings {
@@ -22,5 +23,8 @@ class ListBinding extends Bindings {
 
     // Register CardController
     Get.lazyPut<CardController>(() => CardController());
+    
+    // Register ChecklistsController (needed for card checklist functionality)
+    Get.lazyPut<ChecklistsController>(() => ChecklistsController());
   }
 }

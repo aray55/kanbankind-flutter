@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kanbankit/core/enums/card_status.dart';
 
 class CardStatusChip extends StatelessWidget {
   final String status;

@@ -124,7 +124,13 @@ class ListRepository {
 
   // Delete list
   Future<bool> deleteList(int id) async {
-    final result = await _listDao.delete(id);
+    final result = await _listDao.softDelete(id);
+    return result > 0;
+  }
+
+  // Hard delete list
+  Future<bool> hardDeleteList(int id) async {
+    final result = await _listDao.hardDelete(id);
     return result > 0;
   }
 

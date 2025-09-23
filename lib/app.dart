@@ -9,10 +9,8 @@ import 'bindings/board_binding.dart';
 import 'core/localization/local_keys.dart' show LocalKeys;
 import 'core/routes/app_pages.dart';
 import 'core/routes/app_routes.dart';
-import 'views/board/task_page.dart';
 import 'views/splash/splash_screen.dart';
 import 'views/onboarding/onboarding_screen.dart';
-import 'bindings/task_binding.dart';
 
 class KanbanKitApp extends StatefulWidget {
   const KanbanKitApp({super.key});

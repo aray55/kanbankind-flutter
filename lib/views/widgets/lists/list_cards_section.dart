@@ -4,8 +4,7 @@ import 'package:kanbankit/controllers/card_controller.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
 import 'package:kanbankit/models/card_model.dart';
 import 'package:kanbankit/models/list_model.dart';
-import 'package:kanbankit/views/widgets/cards/add_card_button.dart';
-import '../responsive_text.dart';
+import 'package:kanbankit/views/components/empty_state.dart';
 import 'card_draggable_widget.dart';
 
 class ListCardsSection extends StatelessWidget {
@@ -81,40 +80,20 @@ class ListCardsSection extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return DragTarget<CardModel>(
       onAcceptWithDetails: (details) {
         // Handle dropping a card into this empty list
         onCardDropped?.call(details.data, list.id!);
       },
-      onWillAccept: (data) {
+      onWillAcceptWithDetails: (details) {
         // Only accept cards that are not from this list
-        return data != null && data.listId != list.id!;
+        return details.data.listId != list.id!;
       },
       builder: (context, candidateData, rejectedData) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.task_outlined,
-                  size: 48,
-                  color: colorScheme.onSurface.withValues(alpha: 0.3),
-                ),
-                const SizedBox(height: 16),
-                AppText(
-                  LocalKeys.noTasks.tr,
-                  variant: AppTextVariant.body,
-                  color: colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-                const SizedBox(height: 16),
-                AddCardButton(listId: list.id!),
-              ],
-            ),
-          ),
+        return EmptyState(
+          icon: Icons.task_outlined,
+          title: LocalKeys.noCards.tr,
+          subtitle: LocalKeys.noCardsDescription.tr,
         );
       },
     );

@@ -144,7 +144,7 @@ class _AddEditListModalState extends State<AddEditListModal> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AppText(
-                      isEditing ? 'Edit List' : 'Create New List',
+                      isEditing ? LocalKeys.updateListSettings.tr : LocalKeys.createList.tr,
                       variant: AppTextVariant.h2,
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.onSurface,
