@@ -4,10 +4,12 @@ import 'package:kanbankit/models/card_model.dart';
 import 'package:kanbankit/core/enums/card_status.dart';
 import 'package:kanbankit/controllers/card_controller.dart';
 import 'card_detail_modal.dart';
+import 'card_due_date.dart';
 import 'card_title_text.dart';
 import 'card_description_preview.dart';
 import 'card_status_chip.dart';
 import 'card_checklist_indicator.dart';
+import 'card_cover_widget.dart';
 
 class CardTile extends StatelessWidget {
   final CardModel card;
@@ -19,7 +21,8 @@ class CardTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final cardController = Get.find<CardController>();
 
-    return GestureDetector(
+
+      return GestureDetector(
       onTap: onTap ?? () => _openCardDetail(context),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8.0),
@@ -32,19 +35,25 @@ class CardTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Card cover (if exists) - show at the top
+            if (card.hasCover)
+              CardCoverWidget(
+                card: card,
+                height: 80,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(8),
+                ),
+              ),
+
             // Title and completion indicator row
             Row(
               children: [
-                // Title
                 Expanded(child: CardTitleText(title: card.title, maxLines: 2)),
-                // Completion indicator circle
                 GestureDetector(
                   onTap: () {
                     if (card.isCompleted) {
-                      // Mark as incomplete
                       cardController.uncompleteCard(card.id!);
                     } else {
-                      // Mark as complete
                       cardController.completeCard(card.id!);
                     }
                   },
@@ -73,21 +82,74 @@ class CardTile extends StatelessWidget {
             const SizedBox(height: 6.0),
 
             // Status indicator and description preview
-            Row(
-              children: [
-                // Status indicator
-                if (card.status != CardStatus.todo)
-                  CardStatusChip(status: card.status.getDisplayName()),
-                if (card.status != CardStatus.todo) const SizedBox(width: 8.0),
-
-                // Description preview
-                Expanded(
-                  child: CardDescriptionPreview(
-                    description: card.description,
-                    maxLines: 1,
-                  ),
-                ),
-              ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // If we have both status and due date, use a more compact layout
+                if (card.status != CardStatus.todo && card.dueDate != null) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // First row: Status and Due Date
+                      Row(
+                        children: [
+                          Flexible(
+                            child: CardStatusChip(status: card.status.getDisplayName()),
+                          ),
+                          const SizedBox(width: 8.0),
+                          Flexible(
+                            child: CardDueDateWidget(
+                              dueDate: card.dueDate,
+                              isCompleted: card.isCompleted,
+                              showStatus: false, // Disable status badges in card tiles to prevent overflow
+                              compact: true, // Use compact mode in card tiles
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Second row: Description
+                      if (card.description != null && card.description!.isNotEmpty) ...[
+                        const SizedBox(height: 4.0),
+                        CardDescriptionPreview(
+                          description: card.description,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ],
+                  );
+                } else {
+                  // Single row layout when we have fewer elements
+                  return Row(
+                    children: [
+                      // Status indicator
+                      if (card.status != CardStatus.todo) ...[
+                        Flexible(
+                          child: CardStatusChip(status: card.status.getDisplayName()),
+                        ),
+                        const SizedBox(width: 8.0),
+                      ],
+                      // Due date widget with flexible sizing
+                      if (card.dueDate != null) ...[
+                        Flexible(
+                          child: CardDueDateWidget(
+                            dueDate: card.dueDate,
+                            isCompleted: card.isCompleted,
+                            showStatus: false, // Disable status badges in card tiles to prevent overflow
+                            compact: true, // Use compact mode in card tiles
+                          ),
+                        ),
+                        const SizedBox(width: 8.0),
+                      ],
+                      // Description preview
+                      Expanded(
+                        child: CardDescriptionPreview(
+                          description: card.description,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
 
             // Checklist indicator (if card has checklists)
@@ -95,10 +157,7 @@ class CardTile extends StatelessWidget {
               const SizedBox(height: 6.0),
               Align(
                 alignment: Alignment.centerLeft,
-                child: CardChecklistIndicator(
-                  cardId: card.id!,
-                  compact: true,
-                ),
+                child: CardChecklistIndicator(cardId: card.id!, compact: true),
               ),
             ],
           ],

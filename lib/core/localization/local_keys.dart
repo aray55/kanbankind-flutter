@@ -18,6 +18,7 @@ class LocalKeys {
   static const String priority = 'priority';
   static const String dueDate = 'due_date';
   static const String selectDueDate = 'select_due_date';
+  static const String removeDueDate = 'remove_due_date';
   static const String high = 'high';
   static const String medium = 'medium';
   static const String low = 'low';
@@ -368,4 +369,43 @@ class LocalKeys {
   static const String noChecklistsDescription = 'no_checklists_description';
   static const String createFirstChecklist = 'create_first_checklist';
   static const String renameChecklist = 'rename_checklist';
+  
+  // Image Picker Keys
+  static const String selectImageSource = 'select_image_source';
+  static const String selectFromGallery = 'select_from_gallery';
+  static const String takePhoto = 'take_photo';
+  static const String removeImage = 'remove_image';
+  static const String currentImage = 'current_image';
+  static const String chooseFromExistingPhotos = 'choose_from_existing_photos';
+  static const String captureNewPhoto = 'capture_new_photo';
+  static const String removeCurrentImage = 'remove_current_image';
+  static const String closeWithoutChanges = 'close_without_changes';
+  static const String confirmRemoveImage = 'confirm_remove_image';
+  static const String imageSelectedSuccessfully = 'image_selected_successfully';
+  static const String imageRemovedSuccessfully = 'image_removed_successfully';
+  static const String noImageSelected = 'no_image_selected';
+  static const String errorPickingImage = 'error_picking_image';
+  static const String errorRemovingImage = 'error_removing_image';
+  static const String remove = 'remove';
+  
+  // Card Cover Keys
+  static const String cardCover = 'card_cover';
+  static const String addCover = 'add_cover';
+  static const String changeCover = 'change_cover';
+  static const String removeCover = 'remove_cover';
+  static const String coverColor = 'cover_color';
+  static const String coverImage = 'cover_image';
+  static const String selectCoverType = 'select_cover_type';
+  static const String chooseCoverColor = 'choose_cover_color';
+  static const String chooseCoverImage = 'choose_cover_image';
+  static const String noCover = 'no_cover';
+  static const String coverUpdatedSuccessfully = 'cover_updated_successfully';
+  static const String coverRemovedSuccessfully = 'cover_removed_successfully';
+  static const String setDueDate = 'set_due_date';
+  
+  // Due Date Status Keys
+  static const String dueDateComplete = 'due_date_complete';
+  static const String dueDateOverdue = 'due_date_overdue';
+  static const String dueDateDueToday = 'due_date_due_today';
+  static const String dueDateDueSoon = 'due_date_due_soon';
 }

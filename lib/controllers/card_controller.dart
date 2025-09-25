@@ -6,6 +6,8 @@ import 'package:kanbankit/models/card_model.dart';
 import 'package:kanbankit/data/repository/card_repository.dart';
 import 'package:kanbankit/core/enums/card_status.dart';
 
+import '../core/utils/logger/app_logger.dart';
+
 class CardController extends GetxController {
   final CardRepository _repository = CardRepository();
   final DialogService _dialogService = Get.find<DialogService>();
@@ -104,6 +106,7 @@ class CardController extends GetxController {
     String? description,
     double? position,
     CardStatus? status,
+    DateTime? dueDate,
   }) async {
     if (title.trim().isEmpty) {
       _dialogService.showErrorSnackbar(
@@ -122,6 +125,7 @@ class CardController extends GetxController {
         description: description?.trim(),
         position: position,
         status: status?.value,
+        dueDate: dueDate,
       );
 
       // Add to cards list (we now load all cards, so always add)
@@ -154,6 +158,7 @@ class CardController extends GetxController {
         final index = _cards.indexWhere((c) => c.id == card.id);
         if (index != -1) {
           _cards[index] = updatedCard;
+          _cards.refresh();
         }
 
         _dialogService.showSuccessSnackbar(
@@ -182,6 +187,7 @@ class CardController extends GetxController {
         final index = _cards.indexWhere((c) => c.id == id);
         if (index != -1) {
           _cards[index] = updatedCard;
+          _cards.refresh();
         }
 
         _dialogService.showSuccessSnackbar(
@@ -208,6 +214,7 @@ class CardController extends GetxController {
         final index = _cards.indexWhere((c) => c.id == id);
         if (index != -1) {
           _cards[index] = updatedCard;
+          _cards.refresh();
         }
 
         _dialogService.showSuccessSnackbar(
@@ -234,6 +241,7 @@ class CardController extends GetxController {
         final index = _cards.indexWhere((c) => c.id == id);
         if (index != -1) {
           _cards[index] = updatedCard;
+          _cards.refresh();
         }
 
         _dialogService.showSuccessSnackbar(
@@ -301,10 +309,13 @@ class CardController extends GetxController {
 
         final index = _cards.indexWhere((card) => card.id == id);
         if (index != -1) {
-          _cards[index] = _cards[index].copyWith(
+          final updatedCard = _cards[index].copyWith(
             completedAt: DateTime.now(),
             status: CardStatus.done,
+            updatedAt: DateTime.now(),
           );
+          _cards[index] = updatedCard;
+          _cards.refresh();
         }
 
         // Use a delayed call to avoid snackbar controller issues
@@ -337,10 +348,13 @@ class CardController extends GetxController {
 
         final index = _cards.indexWhere((card) => card.id == id);
         if (index != -1) {
-          _cards[index] = _cards[index].copyWith(
-            completedAt: null,
+          final updatedCard = _cards[index].copyWith(
+            clearCompletedAt: true, // Clear completed date
             status: CardStatus.todo,
+            updatedAt: DateTime.now(),
           );
+          _cards[index] = updatedCard;
+          _cards.refresh();
         }
 
         // Use a delayed call to avoid snackbar controller issues
@@ -472,4 +486,188 @@ class CardController extends GetxController {
       await loadCardsForList(listId, showLoading: false);
     }
   }
+  //Change cover color
+  Future<void> changeCoverColor(int cardId, String coverColor) async {
+    try {
+      AppLogger.info('Attempting to change cover color for card $cardId to: "$coverColor"');
+      final success = await _repository.changeCoverColor(cardId, coverColor);
+      AppLogger.info('Repository changeCoverColor returned: $success');
+      
+      if (success) {
+        final index = _cards.indexWhere((card) => card.id == cardId);
+        AppLogger.info('Found card at index: $index');
+        
+        if (index != -1) {
+          // Create a new card instance with updated cover color
+          final updatedCard = coverColor.isEmpty 
+            ? _cards[index].copyWith(
+                clearCoverColor: true, // Only clear flag when removing
+                updatedAt: DateTime.now(),
+              )
+            : _cards[index].copyWith(
+                coverColor: coverColor, // Only set color when adding/changing
+                updatedAt: DateTime.now(),
+              );
+          AppLogger.info('Updated card cover color: ${updatedCard.coverColor}');
+          
+          // Replace the card in the list to trigger reactivity
+          _cards[index] = updatedCard;
+          // Force refresh of the observable list
+          _cards.refresh();
+        }
+
+        _dialogService.showSuccessSnackbar(
+          title: LocalKeys.success.tr,
+          message: coverColor.isEmpty 
+              ? 'Cover color removed successfully'
+              : 'Cover color changed successfully',
+        );
+      } else {
+        AppLogger.warning('Repository changeCoverColor returned false');
+        _dialogService.showErrorSnackbar(
+          title: LocalKeys.error.tr,
+          message: 'Failed to update cover color in database',
+        );
+      }
+    } catch (e) {
+      _dialogService.showErrorSnackbar(
+        title: LocalKeys.error.tr,
+        message: 'Failed to change cover color: ${e.toString()}',
+      );
+      AppLogger.error('Failed to change cover color: ${e.toString()}');
+    }
+  }
+  //Change cover image
+  Future<void> changeCoverImage(int cardId, String coverImage) async {
+    try {
+      AppLogger.info('Attempting to change cover image for card $cardId to: "$coverImage"');
+      final success = await _repository.changeCoverImage(cardId, coverImage);
+      AppLogger.info('Repository changeCoverImage returned: $success');
+      
+      if (success) {
+        final index = _cards.indexWhere((card) => card.id == cardId);
+        AppLogger.info('Found card at index: $index');
+        
+        if (index != -1) {
+          // Create a new card instance with updated cover image
+          final updatedCard = coverImage.isEmpty 
+            ? _cards[index].copyWith(
+                clearCoverImage: true, // Only clear flag when removing
+                updatedAt: DateTime.now(),
+              )
+            : _cards[index].copyWith(
+                coverImage: coverImage, // Only set image when adding/changing
+                updatedAt: DateTime.now(),
+              );
+          AppLogger.info('Updated card cover image: ${updatedCard.coverImage}');
+          
+          // Replace the card in the list to trigger reactivity
+          _cards[index] = updatedCard;
+          // Force refresh of the observable list
+          _cards.refresh();
+        }
+
+        _dialogService.showSuccessSnackbar(
+          title: LocalKeys.success.tr,
+          message: coverImage.isEmpty 
+              ? 'Cover image removed successfully'
+              : 'Cover image changed successfully',
+        );
+      } else {
+        AppLogger.warning('Repository changeCoverImage returned false');
+        _dialogService.showErrorSnackbar(
+          title: LocalKeys.error.tr,
+          message: 'Failed to update cover image in database',
+        );
+      }
+    } catch (e) {
+      _dialogService.showErrorSnackbar(
+        title: LocalKeys.error.tr,
+        message: 'Failed to change cover image: ${e.toString()}',
+      );
+      AppLogger.error('Failed to change cover image: ${e.toString()}');
+    }
+  }
+  Future<void> setDueDate(int cardId, DateTime? dueDate) async {
+    try {
+      _isUpdating.value = true;
+      AppLogger.info('Attempting to set due date for card $cardId to: $dueDate');
+
+      final success = await _repository.setDueDate(cardId, dueDate);
+      AppLogger.info('Repository setDueDate returned: $success');
+      
+      if (success > 0) {
+        final index = _cards.indexWhere((card) => card.id == cardId);
+        AppLogger.info('Found card at index: $index');
+        
+        if (index != -1) {
+          // Create a new card instance with updated due date
+          final updatedCard = _cards[index].copyWith(
+            dueDate: dueDate,
+            clearDueDate: dueDate == null, // Clear due date if null
+            updatedAt: DateTime.now(),
+          );
+          AppLogger.info('Updated card due date: ${updatedCard.dueDate}');
+          
+          // Replace the card in the list to trigger reactivity
+          _cards[index] = updatedCard;
+          // Force refresh of the observable list
+          _cards.refresh();
+        }
+
+        _dialogService.showSuccessSnackbar(
+          title: LocalKeys.success.tr,
+          message: dueDate != null
+              ? 'Due date set successfully'
+              : 'Due date cleared',
+        );
+      } else {
+        AppLogger.warning('Repository setDueDate returned 0 or negative value');
+        _dialogService.showErrorSnackbar(
+          title: LocalKeys.error.tr,
+          message: 'Failed to update due date in database',
+        );
+      }
+    } catch (e) {
+      _dialogService.showErrorSnackbar(
+        title: LocalKeys.error.tr,
+        message: 'Failed to update due date: ${e.toString()}',
+      );
+      AppLogger.error('Failed to update due date: ${e.toString()}');
+    } finally {
+      _isUpdating.value = false;
+    }
+  }
+Future<void> loadCardsByDueDate({bool showLoading = true}) async {
+  try {
+    if (showLoading) _isLoading.value = true;
+
+    final cardsWithDueDate = await _repository.fetchCardsWithDueDates();
+    _cards.assignAll(cardsWithDueDate);
+    _cards.sort((a, b) => a.dueDate?.compareTo(b.dueDate ?? DateTime.now()) ?? (b.dueDate != null ? 1 : 0));
+  } catch (e) {
+    _dialogService.showErrorSnackbar(
+      title: LocalKeys.error.tr,
+      message: 'Failed to load cards by due date: ${e.toString()}',
+    );
+  } finally {
+    if (showLoading) _isLoading.value = false;
+  }
+}
+Future<void> loadOverdueCards({bool showLoading = true}) async {
+  try {
+    if (showLoading) _isLoading.value = true;
+
+    final overdueCards = await _repository.fetchOverdueCards();
+    _cards.assignAll(overdueCards);
+  } catch (e) {
+    _dialogService.showErrorSnackbar(
+      title: LocalKeys.error.tr,
+      message: 'Failed to load overdue cards: ${e.toString()}',
+    );
+  } finally {
+    if (showLoading) _isLoading.value = false;
+  }
+}
+
 }

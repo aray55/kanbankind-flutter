@@ -118,7 +118,10 @@ CREATE TABLE IF NOT EXISTS ${DatabaseConstants.cardsTable} (
   description TEXT,
   position REAL NOT NULL DEFAULT 1024,
   status TEXT NOT NULL DEFAULT 'todo',
+  cover_color TEXT CHECK(length(cover_color) BETWEEN 4 AND 9),
+  cover_image TEXT,
   completed_at INTEGER,
+  due_date INTEGER,
   archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0,1)),
   deleted_at INTEGER,
   created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
@@ -128,6 +131,7 @@ CREATE TABLE IF NOT EXISTS ${DatabaseConstants.cardsTable} (
 ''');
 
     await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_cards_due_date ON ${DatabaseConstants.cardsTable}(due_date);
 CREATE INDEX IF NOT EXISTS idx_cards_list_id ON ${DatabaseConstants.cardsTable}(list_id);
 CREATE INDEX IF NOT EXISTS idx_cards_archived ON ${DatabaseConstants.cardsTable}(archived);
 CREATE INDEX IF NOT EXISTS idx_cards_position ON ${DatabaseConstants.cardsTable}(position);

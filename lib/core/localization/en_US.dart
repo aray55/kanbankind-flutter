@@ -18,6 +18,7 @@ const Map<String, String> enUS = {
   'priority': 'Priority',
   'due_date': 'Due Date',
   'select_due_date': 'Select Due Date',
+  'remove_due_date': 'Remove Due Date',
   'high': 'High',
   'medium': 'Medium',
   'low': 'Low',
@@ -296,7 +297,7 @@ const Map<String, String> enUS = {
   "list_name": "List Name",
   'update_list_settings': 'Update List Settings',
   'setup_new_list': 'Set up a new list for your board',
- 'add_checklist': 'Add Checklist',
+  'add_checklist': 'Add Checklist',
   'edit_checklist': 'Edit Checklist',
   'checklist_name': 'Checklist Name',
   'checklist_title': 'Checklist Title',
@@ -323,15 +324,16 @@ const Map<String, String> enUS = {
   'move_checklist_to_another_card': 'Move checklist to another card',
   'delete_checklist_permanently': 'Delete checklist permanently',
   'delete_checklist': 'Delete Checklist',
-  'delete_checklist_confirmation': 'Are you sure you want to delete this checklist? This action cannot be undone.',
+  'delete_checklist_confirmation':
+      'Are you sure you want to delete this checklist? This action cannot be undone.',
   'duplicate_checklist': 'Duplicate Checklist',
   'copy': 'Copy',
   'unarchive': 'Unarchive',
   'options': 'Options',
-  'update_list':'Update List',
-  'no_cards':'No Cards',
-  'no_cards_found':'No Cards Found',
-  
+  'update_list': 'Update List',
+  'no_cards': 'No Cards',
+  'no_cards_found': 'No Cards Found',
+
   // Checklist Item Translations
   'checklist_item_created': 'Checklist item created successfully',
   'checklist_items_created': 'checklist items created successfully',
@@ -347,10 +349,53 @@ const Map<String, String> enUS = {
   'add_first_checklist_item': 'Add your first checklist item to get started',
   'rename_checklist_description': 'Change the name of this checklist',
   'archive_checklist_description': 'Hide this checklist from the active view',
-  'unarchive_checklist_description': 'Restore this checklist to the active view',
-  'duplicate_checklist_description': 'Create a copy of this checklist with all items',
-  'delete_checklist_description': 'Permanently remove this checklist and all items',
-  'no_checklists_description': 'Create checklists to organize your tasks with checkable items',
+  'unarchive_checklist_description':
+      'Restore this checklist to the active view',
+  'duplicate_checklist_description':
+      'Create a copy of this checklist with all items',
+  'delete_checklist_description':
+      'Permanently remove this checklist and all items',
+  'no_checklists_description':
+      'Create checklists to organize your tasks with checkable items',
   'create_first_checklist': 'Create First Checklist',
   'rename_checklist': 'Rename Checklist',
+
+  // Image Picker Translations
+  'select_image_source': 'Select Image Source',
+  'select_from_gallery': 'Select from Gallery',
+  'take_photo': 'Take Photo',
+  'remove_image': 'Remove Image',
+  'current_image': 'Current Image',
+  'choose_from_existing_photos': 'Choose from your existing photos',
+  'capture_new_photo': 'Capture a new photo with camera',
+  'remove_current_image': 'Remove the current image',
+  'close_without_changes': 'Close without making changes',
+  'confirm_remove_image': 'Are you sure you want to remove this image?',
+  'image_selected_successfully': 'Image selected successfully',
+  'image_removed_successfully': 'Image removed successfully',
+  'no_image_selected': 'No image was selected',
+  'error_picking_image': 'Error occurred while picking image',
+  'error_removing_image': 'Error occurred while removing image',
+  'remove': 'Remove',
+  
+  // Card Cover Translations
+  'card_cover': 'Card Cover',
+  'add_cover': 'Add Cover',
+  'change_cover': 'Change Cover',
+  'remove_cover': 'Remove Cover',
+  'cover_color': 'Cover Color',
+  'cover_image': 'Cover Image',
+  'select_cover_type': 'Select Cover Type',
+  'choose_cover_color': 'Choose a color for the card cover',
+  'choose_cover_image': 'Choose an image for the card cover',
+  'no_cover': 'No Cover',
+  'cover_updated_successfully': 'Cover updated successfully',
+  'cover_removed_successfully': 'Cover removed successfully',
+  'set_due_date': 'Set Due Date',
+  
+  // Due Date Status Translations
+  'due_date_complete': 'COMPLETE',
+  'due_date_overdue': 'OVERDUE',
+  'due_date_due_today': 'DUE TODAY',
+  'due_date_due_soon': 'DUE SOON',
 };

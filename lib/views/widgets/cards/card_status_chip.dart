@@ -25,6 +25,8 @@ class CardStatusChip extends StatelessWidget {
           color: _getTextColor(color ?? _getStatusColor(status)),
           fontWeight: FontWeight.w500,
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

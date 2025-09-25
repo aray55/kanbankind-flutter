@@ -61,13 +61,12 @@ class DateTimePicker extends StatelessWidget {
           if (label != null) ...[
             Row(
               children: [
-                Text(label!, style: Get.theme.textTheme.titleMedium),
+                AppText(label!, variant: AppTextVariant.h2),
                 if (required)
-                  Text(
+                  AppText(
                     ' *',
-                    style: Get.theme.textTheme.titleMedium?.copyWith(
-                      color: AppColors.error,
-                    ),
+                    variant: AppTextVariant.h2,
+                    color: AppColors.error,
                   ),
               ],
             ),
@@ -353,7 +352,7 @@ class CompactDateTimePicker extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
             color: enabled
                 ? Get.theme.colorScheme.surface
-                : Get.theme.colorScheme.surface.withOpacity(0.5),
+                : Get.theme.colorScheme.surface.withValues(alpha: 0.5),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -362,8 +361,8 @@ class CompactDateTimePicker extends StatelessWidget {
                 _getIcon(),
                 size: 16,
                 color: enabled
-                    ? Get.theme.colorScheme.onSurface.withOpacity(0.7)
-                    : Get.theme.colorScheme.onSurface.withOpacity(0.4),
+                    ? Get.theme.colorScheme.onSurface.withValues(alpha: 0.7)
+                    : Get.theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
               const SizedBox(width: 8),
               Text(
@@ -372,8 +371,8 @@ class CompactDateTimePicker extends StatelessWidget {
                   color: controller.selectedDateTime != null
                       ? (enabled
                             ? Get.theme.colorScheme.onSurface
-                            : Get.theme.colorScheme.onSurface.withOpacity(0.5))
-                      : Get.theme.colorScheme.onSurface.withOpacity(0.6),
+                            : Get.theme.colorScheme.onSurface.withValues(alpha: 0.5))
+                      : Get.theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
               if (controller.selectedDateTime != null && enabled) ...[
@@ -384,7 +383,7 @@ class CompactDateTimePicker extends StatelessWidget {
                   child: Icon(
                     Icons.close,
                     size: 14,
-                    color: Get.theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: Get.theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],

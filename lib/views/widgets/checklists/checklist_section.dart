@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kanbankit/views/components/empty_state.dart';
 import '../../../controllers/checklists_controller.dart';
 import '../../../core/localization/local_keys.dart';
 import '../../components/text_buttons/app_text_button.dart';
@@ -131,41 +132,10 @@ class ChecklistSection extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.checklist_outlined,
-            size: 48,
-            color: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
-          const SizedBox(height: 16),
-          AppText(
-            LocalKeys.noChecklistFound.tr,
-            variant: AppTextVariant.body,
-            textAlign: TextAlign.center,
-          ),
-          if (isEditable) ...[
-            const SizedBox(height: 8),
-            AppText(
-              LocalKeys.addChecklist.tr,
-              variant: AppTextVariant.body2,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ],
-      ),
+    return EmptyState(
+      title: LocalKeys.noChecklistFound.tr,
+      subtitle: LocalKeys.addChecklist.tr,
+      icon: Icons.checklist_outlined,
     );
   }
 

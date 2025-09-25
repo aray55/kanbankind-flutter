@@ -18,6 +18,7 @@ const Map<String, String> arYE = {
   'priority': 'الأولوية',
   'due_date': 'تاريخ الانتهاء',
   'select_due_date': 'حدد تاريخ الانتهاء',
+  'remove_due_date': 'إزالة تاريخ الانتهاء',
   'high': 'عالية',
   'medium': 'متوسطة',
   'low': 'منخفضة',
@@ -314,15 +315,16 @@ const Map<String, String> arYE = {
   'move_checklist_to_another_card': 'نقل قائمة التحقق إلى بطاقة أخرى',
   'delete_checklist_permanently': 'حذف قائمة التحقق نهائيًا',
   'delete_checklist': 'حذف قائمة التحقق',
-  'delete_checklist_confirmation': 'هل أنت متأكد من حذف قائمة التحقق هذه؟ لا يمكن التراجع عن هذا الإجراء.',
+  'delete_checklist_confirmation':
+      'هل أنت متأكد من حذف قائمة التحقق هذه؟ لا يمكن التراجع عن هذا الإجراء.',
   'duplicate_checklist': 'تكرار قائمة التحقق',
   'copy': 'نسخ',
   'unarchive': 'إلغاء الأرشفة',
   'options': 'خيارات',
-  'update_list':'تحديث القائمة',
-  'no_cards':'لا توجد بطاقات',
-  'no_cards_found':'لم يتم العثور على أي بطاقات',
-  
+  'update_list': 'تحديث القائمة',
+  'no_cards': 'لا توجد بطاقات',
+  'no_cards_found': 'لم يتم العثور على أي بطاقات',
+
   // Checklist Item Translations
   'checklist_item_created': 'تم إنشاء عنصر القائمة المرجعية بنجاح',
   'checklist_items_created': 'عنصر من عناصر القائمة المرجعية تم إنشاؤها بنجاح',
@@ -338,10 +340,55 @@ const Map<String, String> arYE = {
   'add_first_checklist_item': 'أضف عنصر القائمة المرجعية الأول للبدء',
   'rename_checklist_description': 'تغيير اسم هذه القائمة المرجعية',
   'archive_checklist_description': 'إخفاء هذه القائمة المرجعية من العرض النشط',
-  'unarchive_checklist_description': 'استعادة هذه القائمة المرجعية إلى العرض النشط',
-  'duplicate_checklist_description': 'إنشاء نسخة من هذه القائمة المرجعية مع جميع العناصر',
-  'delete_checklist_description': 'حذف هذه القائمة المرجعية وجميع العناصر نهائياً',
-  'no_checklists_description': 'إنشاء قوائم مرجعية لتنظيم مهامك مع عناصر قابلة للتحديد',
+  'unarchive_checklist_description':
+      'استعادة هذه القائمة المرجعية إلى العرض النشط',
+  'duplicate_checklist_description':
+      'إنشاء نسخة من هذه القائمة المرجعية مع جميع العناصر',
+  'delete_checklist_description':
+      'حذف هذه القائمة المرجعية وجميع العناصر نهائياً',
+  'no_checklists_description':
+      'إنشاء قوائم مرجعية لتنظيم مهامك مع عناصر قابلة للتحديد',
   'create_first_checklist': 'إنشاء قائمة تحقق',
   'rename_checklist': 'تغيير اسم القائمة',
+
+  // Image Picker Translations
+  'select_image_source': 'اختر مصدر الصورة',
+  'select_from_gallery': 'اختر من المعرض',
+  'take_photo': 'التقط صورة',
+  'remove_image': 'إزالة الصورة',
+  'current_image': 'الصورة الحالية',
+  'choose_from_existing_photos': 'اختر من صورك الموجودة',
+  'capture_new_photo': 'التقط صورة جديدة بالكاميرا',
+  'remove_current_image': 'إزالة الصورة الحالية',
+  'close_without_changes': 'إغلاق بدون تغييرات',
+  'confirm_remove_image': 'هل أنت متأكد من إزالة هذه الصورة؟',
+  'image_selected_successfully': 'تم اختيار الصورة بنجاح',
+  'image_removed_successfully': 'تم حذف الصورة بنجاح',
+  'no_image_selected': 'لم يتم اختيار أي صورة',
+  'error_picking_image': 'حدث خطأ أثناء اختيار الصورة',
+  'error_removing_image': 'حدث خطأ أثناء إزالة الصورة',
+  'remove': 'إزالة',
+
+  // Card Cover Translations
+  'card_cover': 'غلاف البطاقة',
+  'add_cover': 'إضافة غلاف',
+  'change_cover': 'تغيير الغلاف',
+  'remove_cover': 'إزالة الغلاف',
+  'cover_color': 'لون الغلاف',
+  'cover_image': 'صورة الغلاف',
+  'select_cover_type': 'اختر نوع الغلاف',
+  'choose_cover_color': 'اختر لوناً لغلاف البطاقة',
+  'choose_cover_image': 'اختر صورة لغلاف البطاقة',
+  'no_cover': 'بدون غلاف',
+  'cover_updated_successfully': 'تم تحديث الغلاف بنجاح',
+  'cover_removed_successfully': 'تم حذف الغلاف بنجاح',
+  'set_due_date': 'تعيين تاريخ الانتهاء',
+  
+  // Due Date Status Translations
+  'due_date_complete': 'مكتمل',
+  'due_date_overdue': 'متأخر',
+  'due_date_due_today': 'مطلوب اليوم',
+  'due_date_due_soon': 'مطلوب قريباً',
+  
+  
 };

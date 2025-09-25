@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kanbankit/models/card_model.dart';
 import 'package:kanbankit/views/widgets/cards/card_tile_widget.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
 
 class CardDraggableWidget extends StatelessWidget {
   final CardModel card;
@@ -28,7 +29,7 @@ class CardDraggableWidget extends StatelessWidget {
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Text(
+          child: AppText(
             card.title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

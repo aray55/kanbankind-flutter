@@ -322,4 +322,58 @@ class CardDao {
 
     return result.isNotEmpty;
   }
+  //Add cover color
+  Future<int> changeCoverColor(int cardId, String coverColor) async {
+    final db = await _database;
+    return await db.update(
+      _tableName,
+      {'cover_color': coverColor.isEmpty ? null : coverColor},
+      where: 'id = ?',
+      whereArgs: [cardId],
+    );
+  }
+  //Add cover image
+  Future<int> changeCoverImage(int cardId, String coverImage) async {
+    final db = await _database;
+    return await db.update(
+      _tableName,
+      {'cover_image': coverImage.isEmpty ? null : coverImage},
+      where: 'id = ?',
+      whereArgs: [cardId],
+    );
+  }
+  //Add due date
+  Future<int> updateDueDate(int cardId, int? dueDate) async {
+    final db = await _database;
+    return await db.update(
+      _tableName,
+      {
+        'due_date': dueDate,
+        'updated_at': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      },
+      where: 'id = ?',
+      whereArgs: [cardId],
+    );
+  }
+  //Get Cards with the Due Date
+  Future<List<CardModel>> getCardsWithDueDate() async {
+    final db = await _database;
+    final maps = await db.query(
+      _tableName,
+      where: 'due_date IS NOT NULL',
+      orderBy: 'due_date ASC',
+    );
+    return maps.map((map) => CardModel.fromMap(map)).toList();
+  }
+  //Get Overdue Cards
+  Future<List<CardModel>> getOverdueCards() async {
+    final db = await _database;
+    final maps = await db.query(
+      _tableName,
+      where: 'due_date IS NOT NULL AND due_date < ?',
+      whereArgs: [DateTime.now().millisecondsSinceEpoch ~/ 1000],
+      orderBy: 'due_date ASC',
+    );
+    return maps.map((map) => CardModel.fromMap(map)).toList();
+  }
 }

@@ -12,6 +12,7 @@ class CardRepository {
     String? description,
     double? position,
     String? status,
+    DateTime? dueDate,
   }) async {
     // Validate title length
     if (title.isEmpty || title.length > 255) {
@@ -33,6 +34,7 @@ class CardRepository {
       description: description,
       position: cardPosition,
       status: status != null ? CardStatus.fromString(status) : CardStatus.todo,
+      dueDate: dueDate  ,
     );
 
     final id = await _cardDao.insert(card);
@@ -278,5 +280,29 @@ class CardRepository {
     }
 
     return true;
+  }
+  //Change cover color
+  Future<bool> changeCoverColor(int cardId, String coverColor) async {
+    final result = await _cardDao.changeCoverColor(cardId, coverColor);
+    return result > 0;
+  }
+  //Change cover image
+  Future<bool> changeCoverImage(int cardId, String coverImage) async {
+    final result = await _cardDao.changeCoverImage(cardId, coverImage);
+    return result > 0;
+  }
+    Future<int> setDueDate(int cardId, DateTime? dueDate) async {
+    return _cardDao.updateDueDate(
+      cardId,
+      dueDate != null ? dueDate.millisecondsSinceEpoch ~/ 1000 : null,
+    );
+  }
+
+  Future<List<CardModel>> fetchCardsWithDueDates() async {
+    return _cardDao.getCardsWithDueDate();
+  }
+
+  Future<List<CardModel>> fetchOverdueCards() async {
+    return _cardDao.getOverdueCards();
   }
 }

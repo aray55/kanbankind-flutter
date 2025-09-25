@@ -27,15 +27,14 @@ class AddEditChecklistItemModal extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => AddEditChecklistItemModal(
-        checklistId: checklistId,
-        item: item,
-      ),
+      builder: (context) =>
+          AddEditChecklistItemModal(checklistId: checklistId, item: item),
     );
   }
 
   @override
-  State<AddEditChecklistItemModal> createState() => _AddEditChecklistItemModalState();
+  State<AddEditChecklistItemModal> createState() =>
+      _AddEditChecklistItemModalState();
 }
 
 class _AddEditChecklistItemModalState extends State<AddEditChecklistItemModal> {
@@ -104,46 +103,44 @@ class _AddEditChecklistItemModalState extends State<AddEditChecklistItemModal> {
     final mediaQuery = MediaQuery.of(context);
 
     return Container(
-      padding: EdgeInsets.only(
-        bottom: mediaQuery.viewInsets.bottom,
-      ),
+      padding: EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
       child: Container(
         decoration: BoxDecoration(
           color: colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(20),
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Handle bar
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: colorScheme.onSurface.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(2),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Handle bar
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: colorScheme.onSurface.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // Header
-              _buildHeader(),
-              const SizedBox(height: 24),
+                // Header
+                _buildHeader(),
+                const SizedBox(height: 24),
 
-              // Form
-              _buildForm(),
-              const SizedBox(height: 24),
+                // Form
+                _buildForm(),
+                const SizedBox(height: 24),
 
-              // Action buttons
-              _buildActionButtons(),
-            ],
+                // Action buttons
+                _buildActionButtons(),
+              ],
+            ),
           ),
         ),
       ),
@@ -280,10 +277,7 @@ class _AddEditChecklistItemModalState extends State<AddEditChecklistItemModal> {
               foregroundColor: Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-            child: AppText(
-              LocalKeys.cancel.tr,
-              variant: AppTextVariant.button,
-            ),
+            child: AppText(LocalKeys.cancel.tr, variant: AppTextVariant.button),
           ),
         ),
         const SizedBox(width: 12),

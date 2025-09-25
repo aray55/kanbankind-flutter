@@ -92,18 +92,24 @@ class ChecklistItemController extends GetxController {
         includeDeleted: includeDeleted,
       );
 
-      _checklistItems.assignAll(items.where((item) => item.isActive).toList());
-      _completedItems.assignAll(items.where((item) => item.isCompleted).toList());
-      _pendingItems.assignAll(items.where((item) => item.isPending).toList());
+      // Instead of replacing all items, update items for this specific checklist
+      final activeItems = items.where((item) => item.isActive).toList();
+      _updateItemsForChecklist(checklistId, activeItems);
       
       if (includeArchived) {
-        _archivedItems.assignAll(
+        // Remove existing archived items for this checklist
+        _archivedItems.removeWhere((item) => item.checklistId == checklistId);
+        // Add new archived items for this checklist
+        _archivedItems.addAll(
           items.where((item) => item.archived && !item.isDeleted).toList(),
         );
       }
       
       if (includeDeleted) {
-        _deletedItems.assignAll(
+        // Remove existing deleted items for this checklist
+        _deletedItems.removeWhere((item) => item.checklistId == checklistId);
+        // Add new deleted items for this checklist
+        _deletedItems.addAll(
           items.where((item) => item.isDeleted).toList(),
         );
       }
@@ -126,9 +132,9 @@ class ChecklistItemController extends GetxController {
       _currentChecklistId.value = checklistId;
 
       final items = await _repository.getActiveChecklistItems(checklistId);
-      _checklistItems.assignAll(items);
-      _completedItems.assignAll(items.where((item) => item.isDone).toList());
-      _pendingItems.assignAll(items.where((item) => !item.isDone).toList());
+      
+      // Instead of replacing all items, add/update items for this checklist
+      _updateItemsForChecklist(checklistId, items);
 
       await _loadStatistics();
     } catch (e) {
@@ -138,6 +144,24 @@ class ChecklistItemController extends GetxController {
       );
     } finally {
       _isLoading.value = false;
+    }
+  }
+
+  // Helper method to update items for a specific checklist without affecting others
+  void _updateItemsForChecklist(int checklistId, List<ChecklistItemModel> newItems) {
+    // Remove existing items for this checklist
+    _checklistItems.removeWhere((item) => item.checklistId == checklistId);
+    _completedItems.removeWhere((item) => item.checklistId == checklistId);
+    _pendingItems.removeWhere((item) => item.checklistId == checklistId);
+    
+    // Add new items for this checklist
+    _checklistItems.addAll(newItems);
+    _completedItems.addAll(newItems.where((item) => item.isDone).toList());
+    _pendingItems.addAll(newItems.where((item) => !item.isDone).toList());
+    
+    // Update the current checklist ID to the last loaded one
+    if (newItems.isNotEmpty) {
+      _currentChecklistId.value = checklistId;
     }
   }
 

@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:kanbankit/models/card_model.dart';
 import 'package:kanbankit/controllers/card_controller.dart';
 import 'package:kanbankit/core/localization/local_keys.dart';
+import 'package:kanbankit/views/widgets/responsive_text.dart';
+import 'card_cover_selector.dart';
 
 class CardActions extends StatelessWidget {
   final CardModel card;
@@ -37,7 +39,7 @@ class CardActions extends StatelessWidget {
                   ? Icons.radio_button_unchecked
                   : Icons.check_circle,
             ),
-            label: Text(
+            label: AppText(
               card.isCompleted
                   ? LocalKeys.markAsIncomplete.tr
                   : LocalKeys.markAsComplete.tr,
@@ -45,6 +47,24 @@ class CardActions extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16.0),
+
+        // Cover action (only for existing cards)
+        if (card.id != null) ...[
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => _showCoverSelector(context),
+              icon: Icon(
+                card.hasCover ? Icons.image : Icons.add_photo_alternate,
+                size: 18.0,
+              ),
+              label: AppText(
+                card.hasCover ? LocalKeys.changeCover.tr : LocalKeys.addCover.tr,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16.0),
+        ],
 
         // Other actions
         Row(
@@ -54,14 +74,14 @@ class CardActions extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onEdit,
               icon: const Icon(Icons.edit, size: 18.0),
-              label: Text(LocalKeys.edit.tr),
+              label: AppText(LocalKeys.edit.tr),
             ),
 
             // Archive button
             ElevatedButton.icon(
               onPressed: () => _confirmArchive(context, cardController),
               icon: const Icon(Icons.archive, size: 18.0),
-              label: Text(LocalKeys.archive.tr),
+              label: AppText(LocalKeys.archive.tr),
             ),
 
             // Delete button
@@ -71,7 +91,7 @@ class CardActions extends StatelessWidget {
                 backgroundColor: Theme.of(context).colorScheme.error,
               ),
               icon: const Icon(Icons.delete, size: 18.0),
-              label: Text(LocalKeys.delete.tr),
+              label: AppText(LocalKeys.delete.tr),
             ),
           ],
         ),
@@ -84,12 +104,12 @@ class CardActions extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(LocalKeys.archive.tr),
-          content: Text('${LocalKeys.areYouSureArchive.tr} "${card.title}"?'),
+          title: AppText(LocalKeys.archive.tr),
+          content: AppText('${LocalKeys.areYouSureArchive.tr} "${card.title}"?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(LocalKeys.cancel.tr),
+              child: AppText(LocalKeys.cancel.tr),
             ),
             TextButton(
               onPressed: () {
@@ -97,7 +117,7 @@ class CardActions extends StatelessWidget {
                 Navigator.of(context).pop(); // Close detail modal
                 controller.archiveCard(card.id!);
               },
-              child: Text(LocalKeys.archive.tr),
+              child: AppText(LocalKeys.archive.tr),
             ),
           ],
         );
@@ -110,14 +130,14 @@ class CardActions extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(LocalKeys.delete.tr),
-          content: Text(
+          title: AppText(LocalKeys.delete.tr),
+          content: AppText(
             '${LocalKeys.areYouSureDelete.tr} "${card.title}"? ${LocalKeys.cannotBeUndone.tr}',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(LocalKeys.cancel.tr),
+              child: AppText(LocalKeys.cancel.tr),
             ),
             TextButton(
               onPressed: () {
@@ -125,10 +145,21 @@ class CardActions extends StatelessWidget {
                 Navigator.of(context).pop(); // Close detail modal
                 controller.softDeleteCard(card.id!);
               },
-              child: Text(LocalKeys.delete.tr),
+              child: AppText(LocalKeys.delete.tr),
             ),
           ],
         );
+      },
+    );
+  }
+
+  void _showCoverSelector(BuildContext context) {
+    CardCoverSelector.show(
+      context: context,
+      card: card,
+      onCoverChanged: (updatedCard) {
+        // The card will be updated through the controller
+        // and the UI will refresh automatically
       },
     );
   }
