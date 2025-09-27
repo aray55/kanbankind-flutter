@@ -13,6 +13,7 @@ import 'card_due_date.dart';
 import 'card_form.dart';
 import 'card_actions.dart';
 import 'card_cover_widget.dart';
+import '../labels/labels_index.dart';
 
 class CardDetailModal extends StatelessWidget {
   final CardModel card;
@@ -109,6 +110,7 @@ class CardDetailModal extends StatelessWidget {
                   const SizedBox(height: 8.0),
                 ],
                 _buildDueDateSection(context, cardController, card),
+                _buildLabelsSection(context, card),
                 if (card.description != null &&
                     card.description!.isNotEmpty) ...[
                   AppText(LocalKeys.description.tr, variant: AppTextVariant.h2),
@@ -136,6 +138,41 @@ class CardDetailModal extends StatelessWidget {
         ),
       );
     }
+  }
+
+  Widget _buildLabelsSection(BuildContext context, CardModel card) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            AppText(
+              LocalKeys.labels.tr,
+              variant: AppTextVariant.h2,
+              fontWeight: FontWeight.w600,
+            ),
+            IconButton(
+              onPressed: () => _showLabelSelector(context, card),
+              icon: const Icon(Icons.add),
+              iconSize: 20,
+              tooltip: LocalKeys.addLabel.tr,
+            ),
+          ],
+        ),
+        const SizedBox(height: 8.0),
+        CardLabelsDisplay(
+          cardId: card.id!,
+          boardId: _getBoardIdFromCard(card),
+          mode: CardLabelsDisplayMode.chips,
+          showAddButton: true,
+          onLabelsChanged: (labels) {
+            // Refresh card data if needed
+          },
+        ),
+        const SizedBox(height: 16.0),
+      ],
+    );
   }
 
   Widget _buildDueDateSection(
@@ -233,5 +270,33 @@ class CardDetailModal extends StatelessWidget {
         return CardForm(card: card, listId: card.listId);
       },
     );
+  }
+
+  void _showLabelSelector(BuildContext context, CardModel card) {
+    Get.bottomSheet(
+      LabelSelectorModal(
+        cardId: card.id!,
+        boardId: _getBoardIdFromCard(card),
+        onSelectionChanged: (labels) {
+          // Optionally refresh card data or show success message
+        },
+      ),
+      isScrollControlled: true,
+      enableDrag: true,
+      isDismissible: true,
+      ignoreSafeArea: false,
+      useRootNavigator: true,
+    );
+  }
+
+  int _getBoardIdFromCard(CardModel card) {
+    // For now, we'll use a placeholder. In a real app, you would:
+    // 1. Get the list from ListController using card.listId
+    // 2. Get the boardId from that list
+    // 3. Or add boardId to CardModel directly
+    
+    // Temporary solution: get from current board context
+    // You might need to pass boardId as a parameter to CardDetailModal
+    return 1; // Replace with actual boardId logic
   }
 

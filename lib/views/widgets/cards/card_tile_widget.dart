@@ -10,6 +10,7 @@ import 'card_description_preview.dart';
 import 'card_status_chip.dart';
 import 'card_checklist_indicator.dart';
 import 'card_cover_widget.dart';
+import '../labels/card_labels_display.dart';
 
 class CardTile extends StatelessWidget {
   final CardModel card;
@@ -80,6 +81,17 @@ class CardTile extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6.0),
+
+            // Labels (if card has any)
+            if (card.id != null) ...[
+              CardLabelsDots(
+                cardId: card.id!,
+                boardId: 1, // TODO: Get actual boardId
+                maxLabels: 5,
+                onTap: () => _openCardDetail(context),
+              ),
+              const SizedBox(height: 6.0),
+            ],
 
             // Status indicator and description preview
             LayoutBuilder(

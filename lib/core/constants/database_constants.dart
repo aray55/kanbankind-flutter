@@ -8,4 +8,6 @@ class DatabaseConstants {
   static const String listTable = 'lists';
   static const String cardsTable = 'cards';
   static const String checklistsTable = 'checklists';
+  static const String labelsTable = 'labels';
+  static const String cardLabelsTable = 'card_labels';
 }

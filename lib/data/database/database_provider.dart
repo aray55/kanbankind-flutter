@@ -229,6 +229,57 @@ BEGIN
   WHERE id = OLD.id;
 END;
 ''');
+
+    // Create labels table
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS ${DatabaseConstants.labelsTable} (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  board_id INTEGER NOT NULL,
+  name TEXT NOT NULL,
+  color TEXT NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  deleted_at INTEGER,
+  FOREIGN KEY(board_id) REFERENCES ${DatabaseConstants.boardsTable}(id) ON DELETE CASCADE
+);
+''');
+
+    // Create indexes for labels table
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_labels_board_id ON ${DatabaseConstants.labelsTable}(board_id);
+''');
+
+    // Create trigger for labels table
+    await db.execute('''
+CREATE TRIGGER IF NOT EXISTS set_labels_updated_at
+AFTER UPDATE ON ${DatabaseConstants.labelsTable}
+FOR EACH ROW
+WHEN NEW.name IS NOT OLD.name
+   OR NEW.color IS NOT OLD.color
+BEGIN
+  UPDATE ${DatabaseConstants.labelsTable}
+  SET updated_at = strftime('%s','now')
+  WHERE id = OLD.id;
+END;
+''');
+
+    // Create card_labels table
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS ${DatabaseConstants.cardLabelsTable} (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  card_id INTEGER NOT NULL,
+  label_id INTEGER NOT NULL,
+  deleted_at INTEGER,
+  FOREIGN KEY(card_id) REFERENCES ${DatabaseConstants.cardsTable}(id) ON DELETE CASCADE,
+  FOREIGN KEY(label_id) REFERENCES ${DatabaseConstants.labelsTable}(id) ON DELETE CASCADE
+);
+''');
+
+    // Create indexes for card_labels table
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_card_labels_card_id ON ${DatabaseConstants.cardLabelsTable}(card_id);
+CREATE INDEX IF NOT EXISTS idx_card_labels_label_id ON ${DatabaseConstants.cardLabelsTable}(label_id);
+''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {

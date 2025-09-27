@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:kanbankit/core/utils/logger/app_logger.dart';
 import '../core/services/database_seeder_service.dart';
 import '../core/services/storage_service.dart';
 
@@ -16,23 +17,23 @@ class SeedingUtils {
 
       // Check if we need to seed
       if (!seeder.isSeeded) {
-        print('🌱 First time setup - seeding database...');
+        AppLogger.info('🌱 First time setup - seeding database...');
         await seeder.seedQuickStart();
 
         // Verify seeding worked
         final stats = await seeder.getSeedingStats();
         final boardsCount = stats['boardsCount']?['active'] ?? 0;
-        print('📋 Seeding completed. Active boards: $boardsCount');
+        AppLogger.info('📋 Seeding completed. Active boards: $boardsCount');
       } else {
-        print('✅ Database already seeded');
+        AppLogger.info('✅ Database already seeded');
 
         // Show current stats
         final stats = await seeder.getSeedingStats();
         final boardsCount = stats['boardsCount']?['active'] ?? 0;
-        print('📋 Current active boards: $boardsCount');
+        AppLogger.info('📋 Current active boards: $boardsCount');
       }
     } catch (e) {
-      print('❌ Seeding initialization failed: $e');
+      AppLogger.error('❌ Seeding initialization failed: $e');
       // Don't throw - app should still work without seeding
     }
   }
@@ -44,7 +45,7 @@ class SeedingUtils {
       final seeder = DatabaseSeederService();
       await seeder.resetAndSeed(seedType: 'sample');
     } catch (e) {
-      print('❌ Development reseed failed: $e');
+      AppLogger.error('❌ Development reseed failed: $e');
     }
   }
 
@@ -55,7 +56,7 @@ class SeedingUtils {
       final seeder = DatabaseSeederService();
       await seeder.seedQuickStart();
     } catch (e) {
-      print('❌ Quick seed failed: $e');
+      AppLogger.error('❌ Quick seed failed: $e');
     }
   }
 }
