@@ -220,4 +220,40 @@ class DialogService {
   void hideLoading() {
     if (Get.isDialogOpen == true) Get.back();
   }
+
+  // Shorthand methods for success and error messages
+  void showSuccess(String message, {String title = 'Success'}) {
+    showSuccessSnackbar(
+      title: title,
+      message: message,
+      backgroundColor: Colors.green,
+      icon: Icons.check_circle_outline,
+    );
+  }
+
+  void showError(String message, {String title = 'Error'}) {
+    showErrorSnackbar(
+      title: title,
+      message: message,
+      backgroundColor: Colors.red,
+      icon: Icons.error_outline,
+    );
+  }
+
+  void showInfo(String message, {String title = 'Info'}) {
+    showSnack(
+      title: title,
+      message: message,
+      icon: Icons.info_outline,
+    );
+  }
+
+  void showWarning(String message, {String title = 'Warning'}) {
+    showSnack(
+      title: title,
+      message: message,
+      backgroundColor: Colors.orange,
+      icon: Icons.warning_amber,
+    );
+  }
 }

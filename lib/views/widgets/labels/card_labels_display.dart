@@ -37,18 +37,24 @@ class CardLabelsDisplay extends StatelessWidget {
     final cardLabelController = Get.find<CardLabelController>();
     final labelController = Get.find<LabelController>();
 
-    // Load data if needed
+    // Always load data for this specific card
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (cardLabelController.cardLabels.isEmpty) {
-        cardLabelController.loadCardLabels(cardId);
-      }
+      // Force reload for this specific card to prevent data sharing
+      cardLabelController.loadCardLabels(cardId);
       if (labelController.boardLabels.isEmpty) {
         labelController.loadLabelsForBoard(boardId);
       }
     });
 
     return Obx(() {
-      final assignedLabelIds = cardLabelController.cardLabels
+      // Use cardLabelsMap instead of cardLabels to get card-specific labels
+      // This prevents data sharing between different cards
+      final cardSpecificLabels = cardLabelController.cardLabelsMap[cardId] ?? [];
+      
+      // Debug print to check data isolation
+      // print('CardLabelsDisplay for card $cardId: Found ${cardSpecificLabels.length} labels');
+      
+      final assignedLabelIds = cardSpecificLabels
           .map((cl) => cl.labelId)
           .toSet();
 
@@ -243,7 +249,7 @@ class CardLabelsDisplay extends StatelessWidget {
         style: Get.textTheme.bodySmall?.copyWith(
           fontSize: 10,
           fontWeight: FontWeight.w500,
-          color: Get.theme.colorScheme.onSurface.withOpacity(0.7),
+          color: Get.theme.colorScheme.onSurface.withValues(alpha: 0.7),
         ),
       ),
     );
@@ -254,7 +260,7 @@ class CardLabelsDisplay extends StatelessWidget {
       width: 8,
       height: 8,
       decoration: BoxDecoration(
-        color: Get.theme.colorScheme.outline.withOpacity(0.5),
+        color: Get.theme.colorScheme.outline.withValues(alpha: 0.5),
         shape: BoxShape.circle,
       ),
     );
@@ -265,7 +271,7 @@ class CardLabelsDisplay extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         border: Border.all(
-          color: Get.theme.colorScheme.primary.withOpacity(0.5),
+          color: Get.theme.colorScheme.primary.withValues(alpha: 0.5),
         ),
         borderRadius: BorderRadius.circular(8),
       ),
@@ -284,7 +290,7 @@ class CardLabelsDisplay extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           border: Border.all(
-            color: Get.theme.colorScheme.primary.withOpacity(0.5),
+            color: Get.theme.colorScheme.primary.withValues(alpha: 0.5),
           ),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -316,7 +322,7 @@ class CardLabelsDisplay extends StatelessWidget {
       height: 8,
       decoration: BoxDecoration(
         border: Border.all(
-          color: Get.theme.colorScheme.primary.withOpacity(0.5),
+          color: Get.theme.colorScheme.primary.withValues(alpha: 0.5),
         ),
         shape: BoxShape.circle,
       ),
@@ -339,7 +345,7 @@ class CardLabelsDisplay extends StatelessWidget {
             height: 12,
             decoration: BoxDecoration(
               border: Border.all(
-                color: Get.theme.colorScheme.primary.withOpacity(0.5),
+                color: Get.theme.colorScheme.primary.withValues(alpha: 0.5),
               ),
               borderRadius: BorderRadius.circular(6),
             ),

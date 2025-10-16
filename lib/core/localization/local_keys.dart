@@ -485,4 +485,157 @@ class LocalKeys {
   static const String errorCopyingLabelsToCard = 'error_copying_labels_to_card';
   static const String errorMovingLabelsToCard = 'error_moving_labels_to_card';
   static const String labelAssignmentsRemoved = 'label_assignments_removed';
+
+  // Trash Keys
+  static const String trash = 'trash';
+  static const String trashBin = 'trash_bin';
+  static const String restoreItem = 'restore_item';
+  static const String permanentDelete = 'permanent_delete';
+  static const String emptyTrash = 'empty_trash';
+  static const String cleanOldItems = 'clean_old_items';
+  static const String trashIsEmpty = 'trash_is_empty';
+  static const String noDeletedItems = 'no_deleted_items';
+  static const String searchInTrash = 'search_in_trash';
+  static const String noSearchResults = 'no_search_results';
+  static const String clearTrashSearch = 'clear_trash_search';
+  static const String showAll = 'show_all';
+  static const String totalDeletedItems = 'total_deleted_items';
+  static const String itemRestored = 'item_restored';
+  static const String itemPermanentlyDeleted = 'item_permanently_deleted';
+  static const String confirmPermanentDelete = 'confirm_permanent_delete';
+  static const String confirmEmptyTrash = 'confirm_empty_trash';
+  static const String confirmCleanOldItems = 'confirm_clean_old_items';
+  static const String itemsEmptiedFromTrash = 'items_emptied_from_trash';
+  static const String oldItemsCleaned = 'old_items_cleaned';
+  static const String noOldItemsToClean = 'no_old_items_to_clean';
+  static const String deletedAgo = 'deleted_ago';
+  static const String belongsTo = 'belongs_to';
+  static const String itemType = 'item_type';
+  static const String createdAt = 'created_at';
+  static const String updatedAt = 'updated_at';
+  static const String deletedAt = 'deleted_at';
+  static const String itemDetails = 'item_details';
+  static const String trashBoard = 'trash_board';
+  static const String trashList = 'trash_list';
+  static const String trashCard = 'trash_card';
+  static const String trashChecklist = 'trash_checklist';
+  static const String trashChecklistItem = 'trash_checklist_item';
+  static const String trashLabel = 'trash_label';
+  static const String trashBoards = 'trash_boards';
+  static const String trashLists = 'trash_lists';
+  static const String trashCards = 'trash_cards';
+  static const String trashChecklists = 'trash_checklists';
+  static const String trashChecklistItems = 'trash_checklist_items';
+  static const String trashLabels = 'trash_labels';
+  static const String trashAll = 'trash_all';
+  static const String trashDays = 'trash_days';
+  static const String trashHours = 'trash_hours';
+  static const String trashMinutes = 'trash_minutes';
+  static const String trashNow = 'trash_now';
+  static const String trashAgo = 'trash_ago';
+  static const String trashSince = 'trash_since';
+  
+  // Comments
+  static const String comments = 'comments';
+  static const String comment = 'comment';
+  static const String addComment = 'add_comment';
+  static const String editComment = 'edit_comment';
+  static const String deleteComment = 'delete_comment';
+  static const String commentAdded = 'comment_added';
+  static const String commentUpdated = 'comment_updated';
+  static const String commentDeleted = 'comment_deleted';
+  static const String commentRestored = 'comment_restored';
+  static const String noComments = 'no_comments';
+  static const String writeComment = 'write_comment';
+  static const String commentPlaceholder = 'comment_placeholder';
+  static const String editedComment = 'edited_comment';
+  static const String deletedComment = 'deleted_comment';
+  static const String commentCount = 'comment_count';
+  
+  // Attachments
+  static const String attachments = 'attachments';
+  static const String attachment = 'attachment';
+  static const String addAttachment = 'add_attachment';
+  static const String deleteAttachment = 'delete_attachment';
+  static const String attachmentAdded = 'attachment_added';
+  static const String attachmentDeleted = 'attachment_deleted';
+  static const String attachmentRestored = 'attachment_restored';
+  static const String noAttachments = 'no_attachments';
+  static const String selectFile = 'select_file';
+  static const String selectImage = 'select_image';
+  static const String selectDocument = 'select_document';
+  static const String attachmentCount = 'attachment_count';
+  static const String totalSize = 'total_size';
+  static const String fileSize = 'file_size';
+  static const String fileName = 'file_name';
+  static const String fileType = 'file_type';
+  static const String uploadFile = 'upload_file';
+  static const String downloadFile = 'download_file';
+  static const String viewFile = 'view_file';
+  static const String images = 'images';
+  static const String documents = 'documents';
+  static const String videos = 'videos';
+  static const String audio = 'audio';
+  static const String other = 'other';
+  
+  // Activity Log
+  static const String activityLog = 'activity_log';
+  static const String activity = 'activity';
+  static const String recentActivity = 'recent_activity';
+  static const String todayActivity = 'today_activity';
+  static const String noActivity = 'no_activity';
+  static const String activityTimeline = 'activity_timeline';
+  static const String viewActivity = 'view_activity';
+  static const String clearActivity = 'clear_activity';
+  static const String deleteOldActivity = 'delete_old_activity';
+  static const String activityCleared = 'activity_cleared';
+  static const String oldActivityDeleted = 'old_activity_deleted';
+  
+  // Activity Actions
+  static const String actionCreated = 'action_created';
+  static const String actionUpdated = 'action_updated';
+  static const String actionDeleted = 'action_deleted';
+  static const String actionMoved = 'action_moved';
+  static const String actionArchived = 'action_archived';
+  static const String actionRestored = 'action_restored';
+  static const String actionCompleted = 'action_completed';
+  static const String actionUncompleted = 'action_uncompleted';
+  
+  // Entity Types
+  static const String entityBoard = 'entity_board';
+  static const String entityList = 'entity_list';
+  static const String entityCard = 'entity_card';
+  static const String entityChecklist = 'entity_checklist';
+  static const String entityComment = 'entity_comment';
+  static const String entityAttachment = 'entity_attachment';
+  static const String entityLabel = 'entity_label';
+  
+  // Common Actions
+  static const String post = 'post';
+  static const String send = 'send';
+  static const String reply = 'reply';
+  static const String edited = 'edited';
+  static const String today = 'today';
+  static const String yesterday = 'yesterday';
+  static const String thisWeek = 'this_week';
+  static const String thisMonth = 'this_month';
+  static const String older = 'older';
+  
+  // Confirmation Messages
+  static const String confirmDeleteComment = 'confirm_delete_comment';
+  static const String confirmDeleteAttachment = 'confirm_delete_attachment';
+  static const String confirmClearActivity = 'confirm_clear_activity';
+  static const String confirmDeleteOldActivity = 'confirm_delete_old_activity';
+  
+  // Error Messages
+  static const String errorLoadingComments = 'error_loading_comments';
+  static const String errorAddingComment = 'error_adding_comment';
+  static const String errorUpdatingComment = 'error_updating_comment';
+  static const String errorDeletingComment = 'error_deleting_comment';
+  static const String errorLoadingAttachments = 'error_loading_attachments';
+  static const String errorAddingAttachment = 'error_adding_attachment';
+  static const String errorDeletingAttachment = 'error_deleting_attachment';
+  static const String errorLoadingActivity = 'error_loading_activity';
+  static const String commentCannotBeEmpty = 'comment_cannot_be_empty';
+  static const String fileNotSelected = 'file_not_selected';
 }

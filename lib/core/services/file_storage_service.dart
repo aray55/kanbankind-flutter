@@ -5,7 +5,7 @@ import 'package:path/path.dart' as path;
 
 /// Service for handling file storage operations
 class FileStorageService {
-  static const String _cardCoversDir = 'card_covers';
+  static const String _cardCoversDir = 'exam_logo';
   static const String _attachmentsDir = 'attachments';
   static const String _tempDir = 'temp';
   

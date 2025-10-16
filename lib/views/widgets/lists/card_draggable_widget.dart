@@ -38,7 +38,10 @@ class CardDraggableWidget extends StatelessWidget {
       ),
       childWhenDragging: Opacity(
         opacity: 0.5,
-        child: CardTile(card: card),
+        child: CardTile(
+          key: ValueKey('dragging_card_${card.id}'),
+          card: card
+        ),
       ),
       dragAnchorStrategy: pointerDragAnchorStrategy,
       onDragStarted: () {
@@ -50,7 +53,10 @@ class CardDraggableWidget extends StatelessWidget {
       onDraggableCanceled: (velocity, offset) {
         onDragEnd?.call();
       },
-      child: CardTile(card: card),
+      child: CardTile(
+        key: ValueKey('card_tile_${card.id}'),
+        card: card
+      ),
     );
   }
 }

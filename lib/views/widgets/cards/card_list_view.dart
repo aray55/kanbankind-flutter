@@ -22,6 +22,7 @@ class CardListView extends StatelessWidget {
       itemBuilder: (context, index) {
         final card = cards[index];
         return CardTile(
+          key: ValueKey('card_list_tile_${card.id}_${card.title}_${card.updatedAt.millisecondsSinceEpoch}'),
           card: card,
           onTap: onCardTap != null ? () => onCardTap!(card) : null,
         );

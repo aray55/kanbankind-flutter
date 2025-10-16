@@ -7,10 +7,23 @@ import 'package:kanbankit/data/repository/card_repository.dart';
 import 'package:kanbankit/core/enums/card_status.dart';
 
 import '../core/utils/logger/app_logger.dart';
+import '../controllers/activity_log_controller.dart';
+import '../models/activity_log_model.dart';
 
 class CardController extends GetxController {
   final CardRepository _repository = CardRepository();
   final DialogService _dialogService = Get.find<DialogService>();
+  
+  // Activity log controller (lazy loaded)
+  ActivityLogController? get _activityLogController {
+    try {
+      return Get.isRegistered<ActivityLogController>() 
+          ? Get.find<ActivityLogController>() 
+          : null;
+    } catch (e) {
+      return null;
+    }
+  }
 
   // Observable lists and states
   final RxList<CardModel> _cards = <CardModel>[].obs;
@@ -132,6 +145,13 @@ class CardController extends GetxController {
       _cards.add(card);
       _sortCardsByPosition();
 
+      // Log activity
+      _activityLogController?.logCardActivity(
+        cardId: card.id!,
+        actionType: ActionType.created,
+        description: 'Created card: ${card.title}',
+      );
+
       _dialogService.showSuccessSnackbar(
         title: LocalKeys.success.tr,
         message: LocalKeys.cardAddedSuccessfully.tr,
@@ -185,10 +205,21 @@ class CardController extends GetxController {
       );
       if (updatedCard != null) {
         final index = _cards.indexWhere((c) => c.id == id);
+        String? oldTitle;
         if (index != -1) {
+          oldTitle = _cards[index].title;
           _cards[index] = updatedCard;
           _cards.refresh();
         }
+
+        // Log activity
+        _activityLogController?.logCardActivity(
+          cardId: id,
+          actionType: ActionType.updated,
+          oldValue: oldTitle,
+          newValue: newTitle.trim(),
+          description: 'Updated card title',
+        );
 
         _dialogService.showSuccessSnackbar(
           title: LocalKeys.success.tr,
@@ -212,10 +243,21 @@ class CardController extends GetxController {
       );
       if (updatedCard != null) {
         final index = _cards.indexWhere((c) => c.id == id);
+        String? oldDescription;
         if (index != -1) {
+          oldDescription = _cards[index].description;
           _cards[index] = updatedCard;
           _cards.refresh();
         }
+
+        // Log activity
+        _activityLogController?.logCardActivity(
+          cardId: id,
+          actionType: ActionType.updated,
+          oldValue: oldDescription,
+          newValue: newDescription?.trim(),
+          description: 'Updated card description',
+        );
 
         _dialogService.showSuccessSnackbar(
           title: LocalKeys.success.tr,
@@ -383,7 +425,16 @@ class CardController extends GetxController {
       _isDeleting.value = true;
       final success = await _repository.softDeleteCard(id);
       if (success) {
+        final deletedCard = _cards.firstWhere((card) => card.id == id);
         _cards.removeWhere((card) => card.id == id);
+        
+        // Log activity
+        _activityLogController?.logCardActivity(
+          cardId: id,
+          actionType: ActionType.deleted,
+          description: 'Deleted card: ${deletedCard.title}',
+        );
+        
         _dialogService.showSuccessSnackbar(
           title: LocalKeys.success.tr,
           message: LocalKeys.cardDeletedSuccessfully.tr,

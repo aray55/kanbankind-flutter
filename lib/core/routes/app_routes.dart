@@ -6,4 +6,5 @@ class AppRoutes {
   static const String listScreen = '/list_screen/:boardId';
   static const String boardScreen = '/board_screen/:boardId';
   static const String cardDemo = '/card_demo'; // Add this line
+  static const String trash = '/trash';
 }

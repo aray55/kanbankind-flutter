@@ -7,6 +7,7 @@ import 'package:kanbankit/views/widgets/boards/boards_header.dart';
 import 'package:kanbankit/views/widgets/boards/view_mode_toggle.dart';
 import '../../controllers/board_controller.dart';
 import '../../core/enums/board_view_mode.dart';
+import '../../core/routes/app_routes.dart';
 import '../widgets/responsive_text.dart';
 import '../widgets/language_switcher.dart';
 import '../components/theme_switcher.dart';
@@ -68,6 +69,15 @@ class _BoardsScreenState extends State<BoardsScreen> {
               ),
               tooltip: LocalKeys.searchBoards.tr,
             ),
+          // Trash button
+          IconButton(
+            onPressed: () => Get.toNamed(AppRoutes.trash),
+            icon: Icon(
+              Icons.delete_outline,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            tooltip: LocalKeys.trashBin.tr,
+          ),
           // Refresh button
           IconButton(
             onPressed: () => _refreshCurrentView(boardController),

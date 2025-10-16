@@ -1,10 +1,12 @@
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:kanbankit/views/boards/boards_screen.dart';
 import 'package:kanbankit/views/lists/board_lists_route_screen.dart';
+import 'package:kanbankit/views/trash/trash_screen.dart';
 
 import '../../bindings/board_binding.dart';
 import '../../bindings/list_binding.dart';
 import '../../bindings/card_binding.dart'; // Add this import
+import '../../bindings/trash_binding.dart';
 // import '../../views/task_details/task_details_page.dart' show TaskDetailsPage;
 import '../../views/onboarding/onboarding_screen.dart' show OnboardingScreen;
 import '../../views/widgets/cards/card_list_view.dart';
@@ -33,6 +35,11 @@ class AppPages {
       name: AppRoutes.cardDemo, // Add this page
       page: () => const CardListView(cards: []),
       binding: CardBinding(), // Use CardBinding instead of ListBinding
+    ),
+    GetPage(
+      name: AppRoutes.trash,
+      page: () => TrashScreen(),
+      binding: TrashBinding(),
     ),
   ];
 }

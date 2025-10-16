@@ -55,6 +55,8 @@ dependencies:
   font_awesome_flutter: ^10.10.0
   image_picker: ^1.2.0
   path_provider: ^2.1.5
+  file_picker: ^10.3.3
+  timeago: ^3.7.1
 
 dev_dependencies:
   flutter_test:

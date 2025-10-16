@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:kanbankit/models/card_model.dart';
 import 'package:kanbankit/core/enums/card_status.dart';
 import 'package:kanbankit/controllers/card_controller.dart';
-import 'card_detail_modal.dart';
+import 'card_detail_modal_tabbed.dart';
 import 'card_due_date.dart';
 import 'card_title_text.dart';
 import 'card_description_preview.dart';
@@ -24,8 +24,10 @@ class CardTile extends StatelessWidget {
 
 
       return GestureDetector(
+      key: ValueKey('card_tile_gesture_${card.id}_${card.title}_${card.updatedAt}'),
       onTap: onTap ?? () => _openCardDetail(context),
       child: Container(
+        key: ValueKey('card_tile_container_${card.id}'),
         margin: const EdgeInsets.only(bottom: 8.0),
         padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
@@ -34,11 +36,13 @@ class CardTile extends StatelessWidget {
           boxShadow: [BoxShadow(blurRadius: 4.0, offset: const Offset(0, 2))],
         ),
         child: Column(
+          key: ValueKey('card_column_${card.id}_${card.title}'),
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Card cover (if exists) - show at the top
             if (card.hasCover)
               CardCoverWidget(
+                key: ValueKey('card_cover_${card.id}_${card.coverColor}_${card.coverImage}_${card.updatedAt.millisecondsSinceEpoch}'),
                 card: card,
                 height: 80,
                 borderRadius: const BorderRadius.vertical(
@@ -85,6 +89,7 @@ class CardTile extends StatelessWidget {
             // Labels (if card has any)
             if (card.id != null) ...[
               CardLabelsDots(
+                key: ValueKey('card_labels_${card.id}_${card.title}_${card.updatedAt.millisecondsSinceEpoch}'),
                 cardId: card.id!,
                 boardId: 1, // TODO: Get actual boardId
                 maxLabels: 5,
@@ -169,7 +174,11 @@ class CardTile extends StatelessWidget {
               const SizedBox(height: 6.0),
               Align(
                 alignment: Alignment.centerLeft,
-                child: CardChecklistIndicator(cardId: card.id!, compact: true),
+                child: CardChecklistIndicator(
+                  key: ValueKey('card_checklist_${card.id}_${card.title}_${card.updatedAt.millisecondsSinceEpoch}'),
+                  cardId: card.id!, 
+                  compact: true
+                ),
               ),
             ],
           ],
@@ -186,7 +195,7 @@ class CardTile extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
       ),
       builder: (BuildContext context) {
-        return CardDetailModal(card: card);
+        return CardDetailModalTabbed(card: card);
       },
     );
   }

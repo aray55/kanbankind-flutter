@@ -15,16 +15,20 @@ class CardChecklistIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ChecklistsController());
+    final controller = Get.find<ChecklistsController>();
 
-    // Load checklists for this card
+    // Always load checklists for this specific card to prevent data sharing
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (controller.currentCardId != cardId) {
-        controller.loadChecklistsByCardId(cardId);
-      }
+      // Force reload for this specific card
+      controller.loadChecklistsByCardId(cardId);
     });
 
     return Obx(() {
+      // Only show data if we're looking at the correct card
+      if (controller.currentCardId != cardId) {
+        return const SizedBox.shrink();
+      }
+      
       final totalChecklists = controller.totalChecklists;
       final statistics = controller.statistics;
       

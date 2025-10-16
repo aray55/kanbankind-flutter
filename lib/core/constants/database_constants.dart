@@ -10,4 +10,9 @@ class DatabaseConstants {
   static const String checklistsTable = 'checklists';
   static const String labelsTable = 'labels';
   static const String cardLabelsTable = 'card_labels';
+  
+  // New tables for enhanced functionality
+  static const String commentsTable = 'comments';
+  static const String attachmentsTable = 'attachments';
+  static const String activityLogTable = 'activity_log';
 }

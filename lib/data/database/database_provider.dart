@@ -280,6 +280,86 @@ CREATE TABLE IF NOT EXISTS ${DatabaseConstants.cardLabelsTable} (
 CREATE INDEX IF NOT EXISTS idx_card_labels_card_id ON ${DatabaseConstants.cardLabelsTable}(card_id);
 CREATE INDEX IF NOT EXISTS idx_card_labels_label_id ON ${DatabaseConstants.cardLabelsTable}(label_id);
 ''');
+
+    // Create comments table
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS ${DatabaseConstants.commentsTable} (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  card_id INTEGER NOT NULL,
+  content TEXT NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  deleted_at INTEGER,
+  FOREIGN KEY(card_id) REFERENCES ${DatabaseConstants.cardsTable}(id) ON DELETE CASCADE
+);
+''');
+
+    // Create indexes for comments table
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_comments_card_id ON ${DatabaseConstants.commentsTable}(card_id);
+CREATE INDEX IF NOT EXISTS idx_comments_created_at ON ${DatabaseConstants.commentsTable}(created_at);
+CREATE INDEX IF NOT EXISTS idx_comments_deleted_at ON ${DatabaseConstants.commentsTable}(deleted_at);
+''');
+
+    // Create trigger for comments table
+    await db.execute('''
+CREATE TRIGGER IF NOT EXISTS set_comments_updated_at
+AFTER UPDATE ON ${DatabaseConstants.commentsTable}
+FOR EACH ROW
+WHEN NEW.content IS NOT OLD.content
+   OR NEW.deleted_at IS NOT OLD.deleted_at
+BEGIN
+  UPDATE ${DatabaseConstants.commentsTable}
+  SET updated_at = strftime('%s','now')
+  WHERE id = OLD.id;
+END;
+''');
+
+    // Create attachments table
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS ${DatabaseConstants.attachmentsTable} (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  card_id INTEGER NOT NULL,
+  file_name TEXT NOT NULL,
+  file_path TEXT NOT NULL,
+  file_size INTEGER,
+  file_type TEXT,
+  mime_type TEXT,
+  thumbnail_path TEXT,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  deleted_at INTEGER,
+  FOREIGN KEY(card_id) REFERENCES ${DatabaseConstants.cardsTable}(id) ON DELETE CASCADE
+);
+''');
+
+    // Create indexes for attachments table
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_attachments_card_id ON ${DatabaseConstants.attachmentsTable}(card_id);
+CREATE INDEX IF NOT EXISTS idx_attachments_file_type ON ${DatabaseConstants.attachmentsTable}(file_type);
+CREATE INDEX IF NOT EXISTS idx_attachments_created_at ON ${DatabaseConstants.attachmentsTable}(created_at);
+CREATE INDEX IF NOT EXISTS idx_attachments_deleted_at ON ${DatabaseConstants.attachmentsTable}(deleted_at);
+''');
+
+    // Create activity_log table
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS ${DatabaseConstants.activityLogTable} (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  entity_type TEXT NOT NULL CHECK(entity_type IN ('board', 'list', 'card', 'checklist', 'comment', 'attachment', 'label')),
+  entity_id INTEGER NOT NULL,
+  action_type TEXT NOT NULL CHECK(action_type IN ('created', 'updated', 'deleted', 'moved', 'archived', 'restored', 'completed', 'uncompleted')),
+  old_value TEXT,
+  new_value TEXT,
+  description TEXT,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+''');
+
+    // Create indexes for activity_log table
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_activity_log_entity ON ${DatabaseConstants.activityLogTable}(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_activity_log_action_type ON ${DatabaseConstants.activityLogTable}(action_type);
+CREATE INDEX IF NOT EXISTS idx_activity_log_created_at ON ${DatabaseConstants.activityLogTable}(created_at);
+''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
